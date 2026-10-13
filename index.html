@@ -22,7 +22,7 @@ nav{display:flex;background:var(--cd);border-top:1px solid var(--bd)}nav button{
 #msgs{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:6px}
 .m{max-width:84%;padding:7px 11px;border-radius:14px;background:var(--cd);border:1px solid var(--bd);align-self:flex-start;white-space:pre-wrap;word-break:break-word}
 .m.me{align-self:flex-end;background:var(--me)}.m.gm{background:var(--gm);border:2px solid #f5b400;align-self:stretch;max-width:100%}
-.m.dado{align-self:center;background:var(--cd);border:1px dashed var(--pk);font-family:ui-monospace,monospace;font-size:14px}
+.m.dado{background:var(--cd);border:1px dashed var(--pk);font-family:ui-monospace,monospace;font-size:14px}
 .n{font-size:12px;font-weight:700;color:var(--pr)}.tg{font-size:10px;background:var(--pk);color:#fff;border-radius:6px;padding:1px 5px;margin-left:5px}.tg.g{background:#f5b400;color:#222}
 .pin{background:var(--gm);border-bottom:1px solid #f5b400;padding:7px 12px;font-size:13px;display:flex;gap:8px}.pin span{flex:1;white-space:pre-wrap}
 .cmp{padding:8px;border-top:1px solid var(--bd);background:var(--cd);display:flex;flex-direction:column;gap:6px}
@@ -39,6 +39,8 @@ button.on{background:var(--pk);color:#fff}
 .sp{background:var(--tx);color:transparent;border-radius:4px;cursor:pointer}.sp.on{color:inherit;background:var(--bd)}
 code{background:var(--bd);padding:1px 4px;border-radius:4px}
 .pa{padding:0;width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--bd);font-size:20px;line-height:44px;text-align:center}.pa img{width:100%;height:100%;object-fit:cover;display:block}.row>#cab{flex:none}
+.m{position:relative}.m.ha{margin-top:14px}.m.ha .n{padding-right:36px}
+.m .mav{position:absolute;top:-14px;right:-10px;width:46px;height:46px;max-width:none;max-height:none;margin:0;border-radius:50%;object-fit:cover;border:2px solid var(--bg);background:var(--bd);cursor:zoom-in}
 </style></head><body><div id="app"><div class="c"><h2>mRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
@@ -54,7 +56,7 @@ zero:{secoes:[S('Nova seção',[F('Nome','txt')])]}};
 const tela=h=>$('#app').innerHTML=h;
 const md=v=>{const m=Math.floor(((+v||0)-10)/2);return(m>=0?'+':'')+m};
 const fmt=t=>esc(t).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\|\|([^|\n]+)\|\|/g,'<span class=sp onclick="this.classList.toggle(\'on\')">$1</span>').replace(/\*([^*\n]+)\*/g,'<b>$1</b>').replace(/~([^~\n]+)~/g,'<s>$1</s>').replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g,'$1<i>$2</i>');
-const mid=x=>x?x.t==='v'?`<video controls preload=metadata src="${esc(x.u)}"></video>`:`<img src="${esc(x.u)}">`:'';
+const mid=x=>x?x.t==='v'?`<video controls preload=metadata src="${esc(x.u)}"></video>`:`<img src="${esc(x.u)}" onclick="ampliar(this.src)">`:'';
 const hpTxt=p=>p&&p.pvmax!=null&&p.pv!=null?'PV:'+(p.pv===p.pvmax?p.pv:p.pv+'/'+p.pvmax):'';
 const hpm=m=>{const t=m.pid?hpTxt(pers.find(x=>x.id===m.pid)):'';return t?` <b>${t}</b>`:''};
 const az=(a,b)=>a.nome.localeCompare(b.nome,'pt-BR',{sensitivity:'base'});
@@ -115,7 +117,7 @@ async function init(){if(!window.supabase||SUPA_URL.includes('COLE_AQUI'))return
 if(id){try{const p=await db.doc('usuarios/'+id).get();if(p.exists){uid=id;eu=p.data();return inicio()}}catch(e){}}login()}
 function sair(){try{localStorage.removeItem('mrpg_u')}catch(e){}desinscrever();login()}
 /* ---------- campanhas ---------- */
-async function inicio(){desinscrever();let l=[];try{l=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.cid)}catch(e){}
+async function inicio(){desinscrever();let l=[];try{l=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.cid)}catch(e){}await Promise.all(l.map(async x=>{try{const c=await db.doc('campanhas/'+x.cid).get();if(c.exists)x.nome=c.data().nome;else x.gone=1}catch(e){}}));l=l.filter(x=>!x.gone);
 tela(`<header><span>mRPG · ${esc(eu.nome)}</span><button class=h onclick="sair()">Sair</button></header><div class=c><div class=row style="margin-bottom:12px"><button onclick="novaCamp()">+ Nova campanha</button><button class=s onclick="entrarCod()">Entrar com código</button></div><h3>Minhas campanhas</h3>${l.length?l.map(x=>`<div class="card it" onclick="abrir('${esc(x.cid)}')"><b>${esc(x.nome)}</b><span class=mu>Abrir ›</span></div>`).join(''):'<p class=mu>Você ainda não participa de nenhuma campanha. Crie uma ou entre com um código de convite.</p>'}</div>`);
 const m=(location.hash.match(/convite=([\w]+)/)||[])[1];if(m){location.hash='';entrar(m)}}
 function novaCamp(){tela(`<header><button class=h onclick="inicio()">‹</button><span>Nova campanha</span></header><div class=c><label>Nome da campanha</label><input id=cn maxlength=60><label>Descrição</label><textarea id=cd></textarea><p class=err id=er></p><button onclick="criarCamp()" style="width:100%">Criar campanha</button></div>`)}
@@ -126,20 +128,25 @@ function entrarCod(){modal('Entrar em uma campanha',[{l:'Código de convite'}],(
 async function entrar(id){try{const s=await db.doc('campanhas/'+id).get();if(!s.exists)return alert('Campanha não encontrada. Confira o código de convite.');await vincular(id,s.data().nome);abrir(id)}catch(e){alert('Não foi possível entrar na campanha.')}}
 function desinscrever(){subs.forEach(f=>f());subs=[];camp=null;ativo=null}
 function abrir(id){desinscrever();cid=id;aba='chat';msgs=[];macros=[];pers=[];membros=[];let ini=false;const b='campanhas/'+id;
-subs.push(db.doc(b).onSnapshot(s=>{if(!s.exists){alert('Campanha não encontrada.');return inicio()}camp=s.data();if(!ini){ini=true;casca()}else{pin();if(aba==='chat'){cab();lista()}else if(aba==='pers'&&!document.activeElement.closest('#ab'))tab()}},()=>{}));
+subs.push(db.doc(b).onSnapshot(s=>{if(!s.exists){alert('Campanha não encontrada.');return inicio()}camp=s.data();if(!ini){ini=true;casca()}else{pin();tit();if(aba==='cfg'&&!document.activeElement.closest('#ab'))tab();else if(aba==='chat'){cab();lista()}else if(aba==='pers'&&!document.activeElement.closest('#ab'))tab()}},()=>{}));
 subs.push(db.collection(b+'/msgs').orderBy('t').limit(300).onSnapshot(s=>{msgs=s.docs.map(d=>d.data());if(aba==='chat')lista()},()=>{}));
 subs.push(db.collection(b+'/macros').onSnapshot(s=>{macros=s.docs.map(d=>({id:d.id,...d.data()}));if(aba==='macros')tab()},()=>{}));
 subs.push(db.collection(b+'/personagens').onSnapshot(s=>{pers=s.docs.map(d=>({id:d.id,...d.data()}));if(aba==='chat'){cab();lista()}else if(aba==='pers'&&!document.activeElement.closest('#ab'))tab()},()=>{}));
 subs.push(db.collection(b+'/membros').onSnapshot(s=>{membros=s.docs.map(d=>({id:d.id,...d.data()}));if(camp&&$('#pin')){pin();if(aba==='cfg'&&!document.activeElement.closest('#ab'))tab();else if(aba==='chat')cab()}},()=>{}))}
 const ehM=()=>!!camp&&(camp.mestre===uid||membros.some(m=>m.id===uid&&m.papel==='cogm'));
-function casca(){tela(`<header><button class=h onclick="voltar()">‹</button><span>${esc(camp.nome)}</span><button class=h onclick="aba='cfg';ativo=null;tab()">⚙️ Configurações</button></header><div id=pin></div><div id=ab style="flex:1;display:flex;flex-direction:column;min-height:0"></div>`);pin();tab()}
+function casca(){tela(`<header><button class=h onclick="voltar()">‹</button><img id=ti class=av style="display:none;width:30px;height:30px;margin:0"><span id=tt>${esc(camp.nome)}</span><button class=h onclick="aba='cfg';ativo=null;tab()" title="Configurações">⚙️</button></header><div id=pin></div><div id=ab style="flex:1;display:flex;flex-direction:column;min-height:0"></div>`);tit();pin();tab()}
 function voltar(){if(ativo)ativo=null;else if(aba==='macros'||aba==='modelo')aba='cfg';else if(aba!=='chat')aba='chat';else return inicio();tab()}
-function pin(){$('#pin').innerHTML=camp.fixa||ehM()?`<div class=pin><span>📌 ${camp.fixa?fmt(camp.fixa):'<i>Nenhuma mensagem fixa.</i>'}</span>${ehM()?'<button class=s style="padding:3px 9px" onclick="editarPin()">Editar</button>':''}</div>`:''}
+function pin(){const g=ehM();$('#pin').innerHTML=camp.fixa||g?`<div class=pin ${g?'onclick="editarPin()" style="cursor:pointer"':''}><span>📌 ${camp.fixa?fmt(camp.fixa):'<i>Toque para definir a mensagem fixa.</i>'}</span>${g?'<span class=mu style="flex:none">✎</span>':''}</div>`:''}
 const editarPin=()=>modal('Mensagem fixa',[{l:'Texto fixo no topo do chat',v:camp.fixa,ml:1}],([t])=>db.doc('campanhas/'+cid).update({fixa:t}));
 function info(){const base=location.href.split('#')[0];modal('Convidar amigos',[{l:'Código de convite',v:cid},{l:'Link de convite',v:base+'#convite='+cid}],()=>{});const o=document.querySelector('.ov');o.querySelectorAll('input').forEach(i=>i.readOnly=1);o.querySelector('#moc').textContent='Fechar';o.querySelector('#mok').remove();const p=document.createElement('p');p.className='mu';p.textContent='Envie o código ou o link. Quem recebe usa "Entrar com código" na tela inicial. Membros: '+membros.map(m=>m.nome).join(', ');o.querySelector('.card').insertBefore(p,o.querySelector('.row'))}
 function tab(){({chat:vChat,pers:vPers,cfg:vCfg,macros:vMacros,modelo:vModelo})[aba]()}
+const tit=()=>{const t=$('#tt');if(t)t.textContent=camp.nome;const i=$('#ti');if(i){i.src=camp.img||'';i.style.display=camp.img?'':'none'}};
+function ampliar(u){const o=document.createElement('div');o.className='ov';o.onclick=()=>o.remove();o.innerHTML=`<button class=s style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;padding:6px 14px">✕</button><img src="${esc(u)}" style="max-width:100%;max-height:85vh;border-radius:14px" onclick="event.stopPropagation()">`;document.body.appendChild(o)}
+const capa=g=>`<div class=card><div class=row><div class=big style="width:64px;height:64px;overflow:hidden;${g?'cursor:pointer':''}" ${g?`onclick="$('#ci').click()"`:''}>${camp.img?`<img src="${esc(camp.img)}" style="width:100%;height:100%;object-fit:cover">`:'<span style="font-size:28px;line-height:64px;display:block;text-align:center">🎲</span>'}</div><div ${g?`onclick="editarCamp('nome')" style="cursor:pointer"`:''}><b style="font-size:17px">${esc(camp.nome)}</b>${g?' <span class=mu>✎</span>':''}</div></div>${g?'<input id=ci type=file accept="image/*" style="display:none" onchange="imgCamp(this)">':''}<div class=mu style="margin-top:10px;white-space:pre-wrap;${g?'cursor:pointer':''}" ${g?`onclick="editarCamp('descricao')"`:''}>${camp.descricao?fmt(camp.descricao):g?'Configurar descrição da campanha…':'Sem descrição.'}</div></div>`;
+const editarCamp=c=>modal(c==='nome'?'Nome da campanha':'Descrição da campanha',[{l:c==='nome'?'Nome':'Descrição / história da campanha',v:camp[c],ml:c!=='nome'}],([t])=>{if(c==='nome'&&!t)return alert('O nome não pode ficar vazio.');db.doc('campanhas/'+cid).update({[c]:t})});
+async function imgCamp(el){const f=el.files[0];el.value='';if(!f)return;if(!f.type.startsWith('image/'))return alert('Envie uma imagem.');if(f.size>8*1048576)return alert('Imagem muito grande. O limite é 8 MB.');try{const u=await db.upload(f,cid+'/capa');await db.doc('campanhas/'+cid).update({img:u})}catch(e){alert('Não foi possível enviar a imagem. Confira se o arquivo atualizar.sql foi executado no Supabase.')}}
 function vCfg(){const gm=ehM(),dono=camp.mestre===uid,base=location.href.split('#')[0];const papel=m=>m.id===camp.mestre?'Mestre (GM)':m.papel==='cogm'?'Co-GM':'Jogador';
-$('#ab').innerHTML=`<div class=c><h3>Configurações</h3><div class=card><div class=it onclick="aba='macros';tab()"><b>⚡ Macros</b><span class=mu>›</span></div>${gm?`<hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='modelo';tab()"><b>🛠 Modelo de ficha</b><span class=mu>›</span></div>`:''}</div>
+$('#ab').innerHTML=`<div class=c>${capa(gm)}<h3>Configurações</h3><div class=card><div class=it onclick="aba='macros';tab()"><b>⚡ Macros</b><span class=mu>›</span></div>${gm?`<hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='modelo';tab()"><b>🛠 Modelo de ficha</b><span class=mu>›</span></div>`:''}</div>
 <h3>Convidar amigos</h3><div class=card><label>Código de convite</label><input readonly value="${esc(cid)}"><label>Link de convite</label><input readonly value="${esc(base+'#convite='+cid)}"></div>
 <h3>Participantes (${membros.length})</h3>${membros.slice().sort((a,b)=>(b.id===camp.mestre)-(a.id===camp.mestre)||az(a,b)).map(m=>`<div class="card it" style="cursor:default"><b>${esc(m.nome)}</b><span class="tg ${m.id===camp.mestre?'g':''}">${papel(m)}</span>${dono&&m.id!==camp.mestre?`<button class=s onclick="cogm('${m.id}',${m.papel!=='cogm'})">${m.papel==='cogm'?'Remover co-GM':'Tornar co-GM'}</button>`:''}</div>`).join('')}
 ${dono?'<p class=mu>O co-GM faz quase tudo que o Mestre faz, exceto excluir a campanha.</p><button class=x style="width:100%" onclick="excluirCamp()">Excluir campanha</button>':''}</div>`}
@@ -157,11 +164,11 @@ const it=(v,img,ic,t,sub)=>`<div class="card it" onclick="falar='${v}';this.clos
 const o=document.createElement('div');o.className='ov';o.onclick=e=>{if(e.target===o)o.remove()};
 o.innerHTML=`<div class=card style="max-height:80vh;overflow:auto"><h3>Falar como…</h3>${it('eu','','👤',eu.nome,'Você')}${ehM()?it('gm','','👑','Mestre','GM'):''}${meus.filter(p=>!p.npc).map(p=>it('p:'+p.id,p.img,'🧙',p.nome,hpTxt(p))).join('')}${meus.filter(p=>p.npc).map(p=>it('n:'+p.id,p.img,'🎭',p.nome,('NPC '+hpTxt(p)).trim())).join('')}${it('npc','','🎭','NPC avulso…','nome livre')}<button class=s style="width:100%;margin-top:8px" onclick="this.closest('.ov').remove()">Fechar</button></div>`;document.body.appendChild(o)}
 const avulso=()=>modal('NPC avulso',[{l:'Nome do NPC',v:npcN}],([n])=>{npcN=n||npcN||'NPC';cab()});
+const cor=u=>{let h=0;for(const c of String(u))h=(h*31+c.charCodeAt(0))%360;return`hsl(${h} 70% 62%)`};
 function lista(){const e=$('#msgs');if(!e)return;const b=e.scrollHeight-e.scrollTop-e.clientHeight<80||!e.children.length;
-e.innerHTML=msgs.length?msgs.map(m=>{const h=new Date(m.t).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-if(m.tipo==='dado')return`<div class="m dado"><span class=n>${esc(m.nome)}</span> <span class=mu>${h}</span><br>🎲 ${esc(m.texto)}</div>`;
+e.innerHTML=msgs.length?msgs.map(m=>{const h=new Date(m.t).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),d=m.tipo==='dado';
 const tg=m.tipo==='npc'?'<span class=tg>NPC</span>':m.tipo==='gm'?'<span class="tg g">MESTRE</span>':'';
-return`<div class="m ${m.tipo} ${m.uid===uid&&m.tipo!=='gm'?'me':''}"><div class=n>${m.av?`<img class=av src="${esc(m.av)}">`:''}${esc(m.nome)}${tg}${hpm(m)} <span class=mu>${h}</span></div>${fmt(m.texto)}${mid(m.midia)}</div>`}).join(''):'<p class=mu style="text-align:center">Nenhuma mensagem ainda. Comece a aventura!</p>';
+return`<div class="m ${m.tipo} ${m.av?'ha':''} ${m.uid===uid&&m.tipo!=='gm'?'me':''}">${m.av?`<img class=mav src="${esc(m.av)}" onclick="ampliar(this.src)" title="Ampliar">`:''}<div class=n style="color:${cor(m.uid)}">${esc(m.nome)}${tg}${hpm(m)} <span class=mu>${h}</span></div>${d?'🎲 '+esc(m.texto):fmt(m.texto)+mid(m.midia)}</div>`}).join(''):'<p class=mu style="text-align:center">Nenhuma mensagem ainda. Comece a aventura!</p>';
 if(b)e.scrollTop=e.scrollHeight}
 /* ---------- macros ---------- */
 function vMacros(){const v=macros.filter(m=>m.publica||m.dono===uid);$('#ab').innerHTML=`<div class=c><button onclick="novaMacro()" style="width:100%">+ Nova macro</button><p class=mu>Use no chat digitando #nome. Dados dentro de //…// são rolados. Ex.: Josias atacou ferozmente! //2d20+5//</p>${v.map(m=>`<div class=card><b>#${esc(m.nome)}</b> <span class=tg>${m.publica?'Pública':'Particular'}</span><div class=mu>${esc(m.texto)}</div>${m.dono===uid||ehM()?`<button class="s" style="margin-top:8px" onclick="delMacro('${m.id}')">Excluir</button>`:''}</div>`).join('')||'<p class=mu>Nenhuma macro criada.</p>'}</div>`}
