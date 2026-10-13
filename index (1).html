@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>mRPG</title>
+<style>
+:root{--bg:#f5f3ff;--cd:#fff;--tx:#1f1b2e;--mu:#7a7390;--pr:#7c3aed;--pk:#ec4899;--bd:#e4defa;--gm:#fff4d6;--me:#ede4ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15111f;--cd:#221b33;--tx:#f1ecff;--mu:#a69cc4;--bd:#38305a;--gm:#3a3015;--me:#3b2a66}}
+:root[data-theme="dark"]{--bg:#15111f;--cd:#221b33;--tx:#f1ecff;--mu:#a69cc4;--bd:#38305a;--gm:#3a3015;--me:#3b2a66}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+#app{height:100%;display:flex;flex-direction:column;max-width:640px;margin:0 auto}
+header{background:linear-gradient(90deg,var(--pr),var(--pk));color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px;font-weight:700}
+header span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:9px 14px;background:var(--pr);color:#fff}
+button.s{background:var(--bd);color:var(--tx)}button.h{background:rgba(255,255,255,.2);padding:6px 10px}button.x{background:#e11d48}
+input,select,textarea{font:inherit;width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:10px;background:var(--cd);color:var(--tx)}
+textarea{min-height:70px;resize:vertical}label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+.c{padding:16px;overflow:auto;flex:1}.card{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:0 0 10px}
+.it{display:flex;align-items:center;gap:10px;cursor:pointer}.it b{flex:1}.mu{color:var(--mu);font-size:13px}
+.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.row>button{flex:none}
+nav{display:flex;background:var(--cd);border-top:1px solid var(--bd)}nav button{flex:1;background:none;color:var(--mu);border-radius:0;padding:11px 2px;font-size:13px}nav button.on{color:var(--pr);font-weight:700;box-shadow:inset 0 -3px var(--pk)}
+#msgs{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:6px}
+.m{max-width:84%;padding:7px 11px;border-radius:14px;background:var(--cd);border:1px solid var(--bd);align-self:flex-start;white-space:pre-wrap;word-break:break-word}
+.m.me{align-self:flex-end;background:var(--me)}.m.gm{background:var(--gm);border:2px solid #f5b400;align-self:stretch;max-width:100%}
+.m.dado{align-self:center;background:var(--cd);border:1px dashed var(--pk);font-family:ui-monospace,monospace;font-size:14px}
+.n{font-size:12px;font-weight:700;color:var(--pr)}.tg{font-size:10px;background:var(--pk);color:#fff;border-radius:6px;padding:1px 5px;margin-left:5px}.tg.g{background:#f5b400;color:#222}
+.pin{background:var(--gm);border-bottom:1px solid #f5b400;padding:7px 12px;font-size:13px;display:flex;gap:8px}.pin span{flex:1;white-space:pre-wrap}
+.cmp{padding:8px;border-top:1px solid var(--bd);background:var(--cd);display:flex;flex-direction:column;gap:6px}
+.q{display:flex;flex-wrap:wrap;gap:6px}.q button{padding:6px 10px;background:var(--bd);color:var(--tx)}
+.mod{min-width:44px;text-align:center;font-weight:700;color:var(--pk)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}.ov .card{width:100%;max-width:420px;margin:0}
+h2,h3{margin:6px 0}.err{color:#e11d48;font-size:13px;min-height:18px}
+.m img,.m video{max-width:100%;max-height:300px;border-radius:10px;display:block;margin-top:4px}
+.av{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:5px;background:var(--bd)}
+.big{width:96px;height:96px;border-radius:14px;object-fit:cover;background:var(--bd);display:block}.row>.big,.row>img{flex:none}
+.pv{display:flex;flex-direction:column;gap:4px;font-size:13px}.pv:empty{display:none}
+.ch{border-radius:10px;padding:5px 9px;background:var(--bd)}.ch.ok{background:rgba(34,197,94,.2)}.ch.er{background:rgba(225,29,72,.2)}
+button.on{background:var(--pk);color:#fff}
+.sp{background:var(--tx);color:transparent;border-radius:4px;cursor:pointer}.sp.on{color:inherit;background:var(--bd)}
+code{background:var(--bd);padding:1px 4px;border-radius:4px}
+</style></head><body><div id="app"><div class="c"><h2>mRPG</h2><p class="mu">Carregando…</p></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const gid=()=>Math.random().toString(36).slice(2,10);
+let db,uid,eu,camp,cid,subs=[],msgs=[],macros=[],pers=[],membros=[],aba='chat',ativo=null,falar='eu',npcN='',mod=null;
+const F=(n,k)=>({n,k}),S=(t,c)=>({t,campos:c});
+const MODELOS={
+dnd:{secoes:[S('Informações',[F('Classe','txt'),F('Raça','txt'),F('Nível','num'),F('Antecedente','txt')]),S('Atributos',['Força','Destreza','Constituição','Inteligência','Sabedoria','Carisma'].map(n=>F(n,'attr'))),S('Combate',[F('Classe de Armadura','num'),F('Iniciativa','num'),F('Deslocamento','num'),F('Pontos de Vida (máx.)','num'),F('Pontos de Vida (atuais)','num')]),S('Anotações',[F('Equipamento','long'),F('Habilidades e magias','long')])]},
+tdt:{secoes:[S('Atributos',['Força','Habilidade','Resistência','Armadura','Poder de Fogo'].map(n=>F(n,'num'))),S('Status',[F('Pontos de Vida','num'),F('Pontos de Magia','num'),F('Pontos de Experiência','num')]),S('Características',[F('Vantagens','long'),F('Desvantagens','long'),F('Perícias','long'),F('Anotações','long')])]},
+zero:{secoes:[S('Nova seção',[F('Nome','txt')])]}};
+const tela=h=>$('#app').innerHTML=h;
+const md=v=>{const m=Math.floor(((+v||0)-10)/2);return(m>=0?'+':'')+m};
+const fmt=t=>esc(t).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\|\|([^|\n]+)\|\|/g,'<span class=sp onclick="this.classList.toggle(\'on\')">$1</span>').replace(/\*([^*\n]+)\*/g,'<b>$1</b>').replace(/~([^~\n]+)~/g,'<s>$1</s>').replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g,'$1<i>$2</i>');
+const mid=x=>x?x.t==='v'?`<video controls preload=metadata src="${esc(x.u)}"></video>`:`<img src="${esc(x.u)}">`:'';
+const az=(a,b)=>a.nome.localeCompare(b.nome,'pt-BR',{sensitivity:'base'});
+function modal(t,cs,cb){const o=document.createElement('div');o.className='ov';o.innerHTML=`<div class=card><h3>${esc(t)}</h3>${cs.map((c,i)=>`<label>${esc(c.l)}</label>${c.ml?`<textarea id=mo${i}>${esc(c.v||'')}</textarea>`:`<input id=mo${i} value="${esc(c.v||'')}">`}`).join('')}<div class=row style="margin-top:12px"><button class=s id=moc>Cancelar</button><button id=mok>Salvar</button></div></div>`;document.body.appendChild(o);o.querySelector('#moc').onclick=()=>o.remove();o.querySelector('#mok').onclick=()=>{cb(cs.map((c,i)=>o.querySelector('#mo'+i).value.trim()));o.remove()}}
+/* ---------- dados ---------- */
+function rolar(e){e=String(e).replace(/\s+/g,'').toLowerCase();if(!/^[+-]?(\d*d(\d+|f|%)|\d+)([+-](\d*d(\d+|f|%)|\d+))*$/.test(e))return null;let tot=0,out=[];
+for(const m of e.matchAll(/([+-]?)(\d*)d(\d+|f|%)|([+-]?)(\d+)/g)){
+if(m[3]){const sg=m[1]==='-'?-1:1,n=Math.min(m[2]?+m[2]:1,100),f=m[3]==='%'?100:m[3]==='f'?0:Math.min(+m[3],1000);if(f<0||(m[3]!=='f'&&!f))return null;let r=[];for(let i=0;i<n;i++)r.push(m[3]==='f'?Math.floor(Math.random()*3)-1:1+Math.floor(Math.random()*f));tot+=sg*r.reduce((a,b)=>a+b,0);out.push((sg<0?'−':'')+'['+r.join(', ')+']')}
+else{const v=(m[4]==='-'?-1:1)*+m[5];tot+=v;out.push((v<0?'−':'+')+Math.abs(v))}}
+return{e,t:tot,txt:e+': '+out.join(' ').replace(/ ([+−])/g,' $1')+' = '+tot}}
+function processa(tx){tx=tx.replace(/#([\wÀ-ÿ-]+)/g,(a,n)=>{const m=macros.find(x=>x.nome.toLowerCase()===n.toLowerCase()&&(x.publica||x.dono===uid));return m?m.texto:a});
+return tx.replace(/\/\/([^/]+)\/\//g,(a,x)=>{const r=rolar(x);return r?'🎲 '+r.txt:a})}
+function quem(){if(falar==='gm')return{tipo:'gm',nome:'Mestre'};if(falar==='npc')return{tipo:'npc',nome:npcN||'NPC'};if(falar[1]===':'){const p=pers.find(x=>x.id===falar.slice(2));if(p)return{tipo:falar[0]==='n'?'npc':'pers',nome:p.nome,av:p.img||''}}return{tipo:'eu',nome:eu.nome}}
+const enviarMsg=(q,texto,dado,midia)=>{const m={t:Date.now(),uid,tipo:dado?'dado':q.tipo,nome:q.nome,texto};if(q.av)m.av=q.av;if(midia)m.midia=midia;return db.collection('campanhas/'+cid+'/msgs').add(m)};
+async function enviar(){const i=$('#ent');const tx=i.value.trim();if(!tx)return;const q=quem();
+const r=/^\/r(\s|$)/.test(tx)?rolar(tx.slice(2)):/d/i.test(tx)?rolar(tx):null;
+if(/^\/r(\s|$)/.test(tx)&&!r)return alert('Expressão de dados inválida. Exemplos: /r 2d6+3, /r d20, /r 4dF');
+i.value='';previa();
+try{if(r)await enviarMsg(q,r.txt,1);else await enviarMsg(q,processa(tx))}catch(e){alert('Não foi possível enviar a mensagem.')}}
+function previa(){const i=$('#ent'),e=$('#pv');if(!i||!e)return;const t=i.value;let h='',d=0;const ok=x=>`<div class="ch ok">${x}</div>`,er=x=>`<div class="ch er">${x}</div>`;
+const rr=t.match(/^\/r(?:\s+(.*))?$/);
+if(rr){d=1;const x=(rr[1]||'').trim();h=!x?er('🎲 Dados: digite a rolagem, ex.: 2d6+3, d20, 4dF'):rolar(x)?ok('🎲 Rolagem de dados: <b>'+esc(x)+'</b> ✓ será rolada ao enviar'):er('🎲 Expressão de dados inválida: '+esc(x))}
+else if(/d/i.test(t)&&rolar(t)){d=1;h=ok('🎲 Rolagem de dados: <b>'+esc(t.trim())+'</b> ✓ será rolada ao enviar')}
+else{for(const m of t.matchAll(/#([\wÀ-ÿ-]+)/g)){const k=macros.find(x=>x.nome.toLowerCase()===m[1].toLowerCase()&&(x.publica||x.dono===uid));h+=k?ok('⚡ Macro <b>#'+esc(k.nome)+'</b> ✓ '+fmt(k.texto)):er('⚡ #'+esc(m[1])+': macro não encontrada')}
+if([...t.matchAll(/\/\/([^/]+)\/\//g)].some(m=>rolar(m[1]))){d=1;h+=ok('🎲 Rolagem dentro da mensagem ✓')}
+if(/\*[^*\n]+\*|~[^~\n]+~|_[^_\n]+_|`[^`\n]+`|\|\|[^|\n]+\|\|/.test(t))h+=ok('✨ Prévia: '+fmt(t))}
+e.innerHTML=h;const b=$('#bd');if(b)b.classList.toggle('on',!!d)}
+async function enviarMidia(el){const f=el.files[0];el.value='';if(!f)return;if(!/^(image|video)\//.test(f.type))return alert('Envie apenas imagens, GIFs ou vídeos.');
+if(f.size>25*1048576)return alert('Arquivo muito grande. O limite é 25 MB.');
+const i=$('#ent'),ph=i.placeholder,leg=i.value.trim();i.placeholder='Enviando arquivo…';
+try{const u=await db.upload(f,cid);i.value='';previa();await enviarMsg(quem(),leg?processa(leg):'',0,{t:f.type.startsWith('video')?'v':'i',u})}catch(e){alert('Não foi possível enviar o arquivo. Confira se o arquivo atualizar.sql foi executado no Supabase.')}
+i.placeholder=ph}
+function rolarPainel(){const r=rolar($('#ex').value);if(!r){alert('Expressão de dados inválida. Exemplos: 1d20, 2d6, d20+5, 4dF, d%');return}enviarMsg(quem(),r.txt,1)}
+/* ---------- banco (Supabase) ---------- */
+function criaDb(){
+const cl=supabase.createClient(SUPA_URL,SUPA_KEY);
+const par=p=>p.slice(0,p.lastIndexOf('/')),fim=p=>p.split('/').pop();
+const snap=r=>({id:fim(r.path),exists:true,data:()=>r.data});
+async function ler(p){const{data,error}=await cl.from('docs').select('*').eq('path',p).maybeSingle();if(error)throw error;return data?snap(data):{id:fim(p),exists:false,data:()=>undefined}}
+async function gravar(p,d){const{error}=await cl.from('docs').upsert({path:p,parent:par(p),data:d});if(error)throw error}
+function ouvir(campo,val,f,er){let vivo=true;const run=()=>{if(vivo)f().catch(e=>er&&er(e))};run();const ch=cl.channel('c'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'docs',filter:campo+'=eq.'+val},run).subscribe();return()=>{vivo=false;cl.removeChannel(ch)}}
+function doc(p){return{id:fim(p),get:()=>ler(p),set:d=>gravar(p,d),
+async update(d){const s=await ler(p);await gravar(p,{...(s.data()||{}),...d})},
+async delete(){const{error}=await cl.from('docs').delete().eq('path',p);if(error)throw error},
+onSnapshot(cb,er){return ouvir('path',p,async()=>cb(await ler(p)),er)}}}
+function col(p,o={}){const q={
+async get(){const{data,error}=await cl.from('docs').select('*').eq('parent',p);if(error)throw error;let r=data.map(snap);if(o.f)r.sort((a,b)=>(a.data()[o.f]>b.data()[o.f]?1:-1)*(o.d==='desc'?-1:1));if(o.n)r=r.slice(0,o.n);return{docs:r,size:r.length,empty:!r.length}},
+doc:id=>doc(p+'/'+(id||Math.random().toString(36).slice(2,10))),
+async add(d){const r=q.doc();await r.set(d);return r},
+orderBy:(f,d)=>col(p,{...o,f,d}),limit:n=>col(p,{...o,n}),
+onSnapshot(cb,er){return ouvir('parent',p,async()=>cb(await q.get()),er)}};return q}
+return{doc,collection:col,async upload(f,pasta){const n=pasta+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,6)+'-'+f.name.normalize('NFD').replace(/[^\w.-]/g,'_');const{error}=await cl.storage.from('midia').upload(n,f,{contentType:f.type});if(error)throw error;return cl.storage.from('midia').getPublicUrl(n).data.publicUrl}}}
+/* ---------- login ---------- */
+function login(){tela(`<header><span>mRPG</span></header><div class=c><h2>Bem-vindo ao mRPG!</h2><p class=mu>Digite seu nome de usuário para entrar. Se for novo, o perfil é criado na hora.</p><label>Nome de usuário</label><input id=nu maxlength=24 placeholder="Ex.: Josias" onkeydown="if(event.key==='Enter')entrarUsuario()"><p class=err id=er></p><button onclick="entrarUsuario()" style="width:100%">Entrar</button></div>`)}
+async function entrarUsuario(){const n=$('#nu').value.trim(),id=n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');if(id.length<2)return $('#er').textContent='Digite um nome de usuário com pelo menos 2 letras ou números.';
+try{const p=await db.doc('usuarios/'+id).get();if(p.exists)eu=p.data();else{eu={nome:n};await db.doc('usuarios/'+id).set(eu)}uid=id;try{localStorage.setItem('mrpg_u',id)}catch(e){}inicio()}catch(e){$('#er').textContent='Erro ao conectar ao banco de dados. Confira a configuração do Supabase.'}}
+async function init(){if(!window.supabase||SUPA_URL.includes('COLE_AQUI'))return tela('<div class=c><h2>mRPG</h2><p>Falta configurar o Supabase. Abra o arquivo index.html e preencha SUPA_URL e SUPA_KEY no começo do script.</p></div>');db=criaDb();let id=null;try{id=localStorage.getItem('mrpg_u')}catch(e){}
+if(id){try{const p=await db.doc('usuarios/'+id).get();if(p.exists){uid=id;eu=p.data();return inicio()}}catch(e){}}login()}
+function sair(){try{localStorage.removeItem('mrpg_u')}catch(e){}desinscrever();login()}
+/* ---------- campanhas ---------- */
+async function inicio(){desinscrever();let l=[];try{l=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.cid)}catch(e){}
+tela(`<header><span>mRPG · ${esc(eu.nome)}</span><button class=h onclick="sair()">Sair</button></header><div class=c><div class=row style="margin-bottom:12px"><button onclick="novaCamp()">+ Nova campanha</button><button class=s onclick="entrarCod()">Entrar com código</button></div><h3>Minhas campanhas</h3>${l.length?l.map(x=>`<div class="card it" onclick="abrir('${esc(x.cid)}')"><b>${esc(x.nome)}</b><span class=mu>Abrir ›</span></div>`).join(''):'<p class=mu>Você ainda não participa de nenhuma campanha. Crie uma ou entre com um código de convite.</p>'}</div>`);
+const m=(location.hash.match(/convite=([\w]+)/)||[])[1];if(m){location.hash='';entrar(m)}}
+function novaCamp(){tela(`<header><button class=h onclick="inicio()">‹</button><span>Nova campanha</span></header><div class=c><label>Nome da campanha</label><input id=cn maxlength=60><label>Descrição</label><textarea id=cd></textarea><p class=err id=er></p><button onclick="criarCamp()" style="width:100%">Criar campanha</button></div>`)}
+async function criarCamp(){const n=$('#cn').value.trim();if(!n)return $('#er').textContent='Dê um nome à campanha.';const id=gid();
+try{await db.doc('campanhas/'+id).set({nome:n,descricao:$('#cd').value.trim(),mestre:uid,mestreNome:eu.nome,fixa:'',modelo:MODELOS.dnd});await vincular(id,n);abrir(id)}catch(e){$('#er').textContent='Erro ao criar a campanha.'}}
+const vincular=(id,n)=>Promise.all([db.doc('campanhas/'+id+'/membros/'+uid).set({nome:eu.nome}),db.collection('data/users/'+uid).doc('c-'+id).set({cid:id,nome:n})]);
+function entrarCod(){modal('Entrar em uma campanha',[{l:'Código de convite'}],([c])=>c&&entrar(c.replace(/.*convite=/,'').trim()))}
+async function entrar(id){try{const s=await db.doc('campanhas/'+id).get();if(!s.exists)return alert('Campanha não encontrada. Confira o código de convite.');await vincular(id,s.data().nome);abrir(id)}catch(e){alert('Não foi possível entrar na campanha.')}}
+function desinscrever(){subs.forEach(f=>f());subs=[];camp=null;ativo=null}
+function abrir(id){desinscrever();cid=id;aba='chat';msgs=[];macros=[];pers=[];membros=[];let ini=false;const b='campanhas/'+id;
+subs.push(db.doc(b).onSnapshot(s=>{if(!s.exists){alert('Campanha não encontrada.');return inicio()}camp=s.data();if(!ini){ini=true;casca()}else{pin();if(aba==='chat')cab();else if((aba==='ficha'||aba==='npc')&&!document.activeElement.closest('#ab'))tab()}},()=>{}));
+subs.push(db.collection(b+'/msgs').orderBy('t').limit(300).onSnapshot(s=>{msgs=s.docs.map(d=>d.data());if(aba==='chat')lista()},()=>{}));
+subs.push(db.collection(b+'/macros').onSnapshot(s=>{macros=s.docs.map(d=>({id:d.id,...d.data()}));if(aba==='macros')tab()},()=>{}));
+subs.push(db.collection(b+'/personagens').onSnapshot(s=>{pers=s.docs.map(d=>({id:d.id,...d.data()}));if(aba==='chat')cab();else if((aba==='ficha'||aba==='npc')&&!document.activeElement.closest('#ab'))tab()},()=>{}));
+subs.push(db.collection(b+'/membros').onSnapshot(s=>{membros=s.docs.map(d=>({id:d.id,...d.data()}))},()=>{}))}
+const ehM=()=>camp&&camp.mestre===uid;
+function casca(){tela(`<header><button class=h onclick="inicio()">‹</button><span>${esc(camp.nome)}</span><button class=h onclick="info()">Convite</button></header><div id=pin></div><div id=ab style="flex:1;display:flex;flex-direction:column;min-height:0"></div><nav>${[['chat','💬 Chat'],['ficha','📜 Fichas'],['npc','🎭 NPCs'],['macros','⚡ Macros'],['modelo','🛠 Modelo']].map(([k,t])=>`<button data-k=${k} onclick="aba='${k}';ativo=null;tab()">${t}</button>`).join('')}</nav>`);pin();tab()}
+function pin(){$('#pin').innerHTML=camp.fixa||ehM()?`<div class=pin><span>📌 ${camp.fixa?fmt(camp.fixa):'<i>Nenhuma mensagem fixa.</i>'}</span>${ehM()?'<button class=s style="padding:3px 9px" onclick="editarPin()">Editar</button>':''}</div>`:''}
+const editarPin=()=>modal('Mensagem fixa',[{l:'Texto fixo no topo do chat',v:camp.fixa,ml:1}],([t])=>db.doc('campanhas/'+cid).update({fixa:t}));
+function info(){const base=location.href.split('#')[0];modal('Convidar amigos',[{l:'Código de convite',v:cid},{l:'Link de convite',v:base+'#convite='+cid}],()=>{});const o=document.querySelector('.ov');o.querySelectorAll('input').forEach(i=>i.readOnly=1);o.querySelector('#moc').textContent='Fechar';o.querySelector('#mok').remove();const p=document.createElement('p');p.className='mu';p.textContent='Envie o código ou o link. Quem recebe usa "Entrar com código" na tela inicial. Membros: '+membros.map(m=>m.nome).join(', ');o.querySelector('.card').insertBefore(p,o.querySelector('.row'))}
+function tab(){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.k===aba));({chat:vChat,ficha:()=>vLista(0),npc:()=>vLista(1),macros:vMacros,modelo:vModelo})[aba]()}
+/* ---------- chat ---------- */
+function vChat(){$('#ab').innerHTML=`<div id=msgs></div><div class=cmp><div id=cab class=row></div><div id=pd style="display:none"><div class=row><input id=ex value="d20" placeholder="Ex.: 2d6+3"><button onclick="rolarPainel()">Rolar</button></div><div class=q style="margin-top:6px">${['d4','d6','d8','d10','d12','d20','d%','4dF','2d6','d20+5'].map(d=>`<button onclick="$('#ex').value='${d}'">${d}</button>`).join('')}</div></div><div id=pv class=pv></div><div class=row><button id=bd class=s onclick="$('#pd').style.display=$('#pd').style.display?'':'none'" title="Calculadora de dados">🎲</button><button class=s onclick="$('#arq').click()" title="Enviar imagem, GIF ou vídeo">📎</button><input id=ent placeholder="Mensagem, /r 2d6, *negrito*, #macro" oninput="previa()" onkeydown="if(event.key==='Enter')enviar()"><input id=arq type=file accept="image/*,video/*" style="display:none" onchange="enviarMidia(this)"><button onclick="enviar()">Enviar</button></div></div>`;cab();lista()}
+function cab(){const e=$('#cab');if(!e)return;const meus=pers.filter(p=>p.dono===uid).sort(az);if(falar[1]===':'&&!meus.find(p=>p.id===falar.slice(2)))falar='eu';if(falar==='gm'&&!ehM())falar='eu';
+const op=(v,t)=>`<option value="${v}" ${falar===v?'selected':''}>${t}</option>`;
+e.innerHTML=`<select onchange="falar=this.value;cab()">${op('eu','Falar como: Você ('+esc(eu.nome)+')')}${meus.filter(p=>!p.npc).map(p=>op('p:'+p.id,'Personagem: '+esc(p.nome))).join('')}${ehM()?op('gm','Mestre'):''}${meus.filter(p=>p.npc).map(p=>op('n:'+p.id,'NPC: '+esc(p.nome))).join('')}${op('npc','NPC avulso…')}</select>${falar==='npc'?`<input value="${esc(npcN)}" placeholder="Nome do NPC" oninput="npcN=this.value">`:''}`}
+function lista(){const e=$('#msgs');if(!e)return;const b=e.scrollHeight-e.scrollTop-e.clientHeight<80||!e.children.length;
+e.innerHTML=msgs.length?msgs.map(m=>{const h=new Date(m.t).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+if(m.tipo==='dado')return`<div class="m dado"><span class=n>${esc(m.nome)}</span> <span class=mu>${h}</span><br>🎲 ${esc(m.texto)}</div>`;
+const tg=m.tipo==='npc'?'<span class=tg>NPC</span>':m.tipo==='gm'?'<span class="tg g">MESTRE</span>':'';
+return`<div class="m ${m.tipo} ${m.uid===uid&&m.tipo!=='gm'?'me':''}"><div class=n>${m.av?`<img class=av src="${esc(m.av)}">`:''}${esc(m.nome)}${tg} <span class=mu>${h}</span></div>${fmt(m.texto)}${mid(m.midia)}</div>`}).join(''):'<p class=mu style="text-align:center">Nenhuma mensagem ainda. Comece a aventura!</p>';
+if(b)e.scrollTop=e.scrollHeight}
+/* ---------- macros ---------- */
+function vMacros(){const v=macros.filter(m=>m.publica||m.dono===uid);$('#ab').innerHTML=`<div class=c><button onclick="novaMacro()" style="width:100%">+ Nova macro</button><p class=mu>Use no chat digitando #nome. Dados dentro de //…// são rolados. Ex.: Josias atacou ferozmente! //2d20+5//</p>${v.map(m=>`<div class=card><b>#${esc(m.nome)}</b> <span class=tg>${m.publica?'Pública':'Particular'}</span><div class=mu>${esc(m.texto)}</div>${m.dono===uid||ehM()?`<button class="s" style="margin-top:8px" onclick="delMacro('${m.id}')">Excluir</button>`:''}</div>`).join('')||'<p class=mu>Nenhuma macro criada.</p>'}</div>`}
+function novaMacro(){modal('Nova macro',[{l:'Nome (sem espaços)'},{l:'Texto da macro',ml:1},{l:'Pública? Digite "sim" para todos usarem'}],([n,t,p])=>{n=n.replace(/\s+/g,'');if(!n||!t)return alert('Preencha o nome e o texto da macro.');db.collection('campanhas/'+cid+'/macros').add({nome:n,texto:t,dono:uid,publica:/^s/i.test(p)})})}
+const delMacro=id=>db.doc('campanhas/'+cid+'/macros/'+id).delete();
+/* ---------- fichas ---------- */
+function vLista(npc){const p=pers.find(x=>x.id===ativo);if(p)return fichaDe(p);
+const v=pers.filter(x=>!!x.npc===!!npc&&(x.dono===uid||(!npc&&ehM()))).sort(az);
+$('#ab').innerHTML=`<div class=c><button onclick="novoPers(${npc})" style="width:100%">+ ${npc?'Novo NPC':'Novo personagem'}</button><div style="height:10px"></div>${v.map(x=>`<div class="card it" onclick="ativo='${x.id}';tab()">${x.img?`<img class=av style="width:40px;height:40px" src="${esc(x.img)}">`:''}<b>${esc(x.nome)}</b><span class=mu>${npc?'':esc(x.donoNome||'')}</span></div>`).join('')||`<p class=mu>${npc?'Você ainda não criou NPCs.':'Você ainda não tem personagens.'}</p>`}</div>`}
+const novoPers=npc=>modal(npc?'Novo NPC':'Novo personagem',[{l:npc?'Nome do NPC':'Nome do personagem'}],([n])=>{if(!n)return;const id=gid();db.doc('campanhas/'+cid+'/personagens/'+id).set({nome:n,dono:uid,donoNome:eu.nome,v:{},npc:!!npc}).then(()=>{ativo=id;tab()})});
+async function imgPers(el){const f=el.files[0];el.value='';if(!f)return;if(!f.type.startsWith('image/'))return alert('Envie uma imagem.');if(f.size>8*1048576)return alert('Imagem muito grande. O limite é 8 MB.');
+try{const u=await db.upload(f,cid+'/avatares');await db.doc('campanhas/'+cid+'/personagens/'+ativo).update({img:u});const p=pers.find(x=>x.id===ativo);if(p)p.img=u;tab()}catch(e){alert('Não foi possível enviar a imagem. Confira se o arquivo atualizar.sql foi executado no Supabase.')}}
+function fichaDe(p){const mo=camp.modelo.secoes,v=p.v||{};const dono=ehM()?`<label>Jogador responsável</label><select onchange="atribuir('${p.id}',this.value)">${membros.map(m=>`<option value="${m.id}" ${m.id===p.dono?'selected':''}>${esc(m.nome)}</option>`).join('')}</select>`:'';
+$('#ab').innerHTML=`<div class=c><div class=row><button class=s onclick="ativo=null;tab()">‹ Voltar</button><button class=x onclick="delPers('${p.id}')">Excluir</button></div><h2>${esc(p.nome)}</h2><div class=row style="margin-bottom:8px">${p.img?`<img class=big src="${esc(p.img)}">`:'<div class=big></div>'}<div><button class=s onclick="$('#ai').click()">📷 ${p.img?'Trocar':'Adicionar'} imagem</button><input id=ai type=file accept="image/*" style="display:none" onchange="imgPers(this)"></div></div>${dono}${mo.map((s,i)=>`<h3>${esc(s.t)}</h3><div class=card>${s.campos.map((c,j)=>{const x=v[c.n]??'';const L=`<label>${esc(c.n)}</label>`;
+if(c.k==='attr')return L+`<div class=row><input type=number value="${esc(x)}" oninput="this.nextElementSibling.textContent=md(this.value)" onchange="sv(${i},${j},this.value)"><b class=mod>${md(x)}</b><button class=s onclick="testar(${i},${j})">🎲</button></div>`;
+if(c.k==='long')return L+`<textarea onchange="sv(${i},${j},this.value)">${esc(x)}</textarea>`;return L+`<input type=${c.k==='num'?'number':'text'} value="${esc(x)}" onchange="sv(${i},${j},this.value)">`}).join('')}</div>`).join('')}</div>`}
+function sv(i,j,val){const c=camp.modelo.secoes[i].campos[j],p=pers.find(x=>x.id===ativo);p.v={...(p.v||{}),[c.n]:val};db.doc('campanhas/'+cid+'/personagens/'+ativo).update({v:p.v})}
+function testar(i,j){const c=camp.modelo.secoes[i].campos[j],p=pers.find(x=>x.id===ativo),m=Math.floor(((+(p.v||{})[c.n]||0)-10)/2),r=rolar('d20'+(m<0?m:'+'+m));enviarMsg({tipo:'pers',nome:p.nome},'Teste de '+c.n+' — '+r.txt,1);alert('Resultado enviado ao chat: '+r.txt)}
+const atribuir=(id,u)=>{const m=membros.find(x=>x.id===u);db.doc('campanhas/'+cid+'/personagens/'+id).update({dono:u,donoNome:m.nome})};
+const delPers=id=>{if(confirm('Excluir este personagem?')){db.doc('campanhas/'+cid+'/personagens/'+id).delete();ativo=null;tab()}};
+/* ---------- modelo de ficha ---------- */
+function vModelo(){if(!ehM()){$('#ab').innerHTML='<div class=c><p>Somente o mestre pode editar o modelo de ficha desta campanha.</p></div>';return}mod=mod||JSON.parse(JSON.stringify(camp.modelo));edM()}
+function edM(){const T={attr:'Atributo (com modificador)',num:'Número',txt:'Texto curto',long:'Texto longo'};
+$('#ab').innerHTML=`<div class=c><h3>Modelo de ficha</h3><div class=q><button class=s onclick="mod=JSON.parse(JSON.stringify(MODELOS.dnd));edM()">Modelo D&amp;D 5e</button><button class=s onclick="mod=JSON.parse(JSON.stringify(MODELOS.tdt));edM()">Modelo 3D&amp;T</button><button class=s onclick="mod=JSON.parse(JSON.stringify(MODELOS.zero));edM()">Do zero</button></div>${mod.secoes.map((s,i)=>`<div class=card><div class=row><input value="${esc(s.t)}" oninput="mod.secoes[${i}].t=this.value" placeholder="Título da seção"><button class=x onclick="mod.secoes.splice(${i},1);edM()">✕</button></div>${s.campos.map((c,j)=>`<div class=row style="margin-top:6px"><input value="${esc(c.n)}" oninput="mod.secoes[${i}].campos[${j}].n=this.value" placeholder="Nome do campo"><select onchange="mod.secoes[${i}].campos[${j}].k=this.value">${Object.entries(T).map(([k,t])=>`<option value=${k} ${c.k===k?'selected':''}>${t}</option>`).join('')}</select><button class=s onclick="mod.secoes[${i}].campos.splice(${j},1);edM()">✕</button></div>`).join('')}<button class=s style="margin-top:8px" onclick="mod.secoes[${i}].campos.push({n:'Novo campo',k:'txt'});edM()">+ Campo</button></div>`).join('')}<div class=row><button class=s onclick="mod.secoes.push({t:'Nova seção',campos:[]});edM()">+ Seção</button><button onclick="salvarModelo()">Salvar modelo</button></div><p class=mu>Em campos de atributo, o modificador (ex.: Força 16 → +3) é calculado sozinho.</p></div>`}
+async function salvarModelo(){try{await db.doc('campanhas/'+cid).update({modelo:mod});mod=null;alert('Modelo salvo! As fichas já usam o novo modelo.')}catch(e){alert('Erro ao salvar o modelo.')}}
+init();
+</script></body></html>
