@@ -68,23 +68,85 @@ code{background:var(--bd);padding:1px 4px;border-radius:4px}
 #ent::placeholder{color:#8a8a99;opacity:.9}
 .eb{text-shadow:.5px 0 currentColor,-.5px 0 currentColor}.es{text-decoration:line-through}.ei{color:#a78bfa;text-decoration:underline dotted}.ec{background:rgba(127,127,127,.28);border-radius:3px}.ep{background:rgba(127,127,127,.5)}
 .m.sus{border-style:dashed;border-color:#8b5cf6}.tk{margin-left:4px;vertical-align:middle;cursor:pointer}
-.pg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:50;background:var(--bg);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden;pointer-events:none;will-change:transform;box-shadow:0 0 22px rgba(0,0,0,.28)}
+.pg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:7;background:var(--bg);color:var(--tx);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden;pointer-events:none;will-change:transform;box-shadow:0 0 22px rgba(0,0,0,.28)}
 .pgi{height:100%;display:flex;flex-direction:column;max-width:640px;margin:0 auto}
 #app:has(.hm),#app:has(.sc){touch-action:pan-y}
 html,body{overscroll-behavior-x:none}
+/* ===== visual das telas Campanhas e Amigos (modo claro = mockup; modo escuro automático) ===== */
+:root{--bnh:64px}
+body.tabs,.pg.tt{--bg:#fefaee;--cd:#f3edf8;--tx:#2a1632;--mu:#8b7a8a;--bd:#e4d6ef;--pr:#4a2260;--ac:#4a2260;--ch:#e6d6f1;--bi:#f0eff4}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.tabs,:root:not([data-theme="light"]) .pg.tt{--bg:#15111d;--cd:#221a2f;--tx:#efe3fb;--mu:#a592bd;--bd:#392b50;--ac:#d4b5f6;--ch:#33264a;--bi:#241b32}}
+:root[data-theme="dark"] body.tabs,:root[data-theme="dark"] .pg.tt{--bg:#15111d;--cd:#221a2f;--tx:#efe3fb;--mu:#a592bd;--bd:#392b50;--ac:#d4b5f6;--ch:#33264a;--bi:#241b32}
+i.ic{font-style:normal;display:block}.ic svg,.ic img{width:100%;height:100%;display:block;object-fit:contain}.ol{fill:var(--bg)}
+header.th{background:none;color:var(--tx);position:relative;padding:14px 12px 8px 16px;font-size:21px}
+header.th>span:first-child{max-width:calc(50% - 40px);flex:none}header.th::after{content:"";flex:1}
+header.th .lg{position:absolute;left:50%;top:50%;transform:translate(-50%,-48%);width:36px;height:36px;color:var(--ac)}
+header.th{justify-content:space-between}header.th button.h{background:none;color:var(--tx);font-size:24px;line-height:1;padding:4px 10px}
+.bq{position:relative;margin:4px 0 12px}.bq>.ic{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--mu);pointer-events:none}
+.bq input{padding:13px 16px 13px 46px;border-radius:999px;background:var(--bi);border:0;font-size:16px}
+.chs{display:flex;gap:8px;margin:0 0 14px}
+.chip{background:var(--bi);color:var(--tx);border:1px solid var(--bd);border-radius:999px;padding:7px 16px;font-size:15px;display:inline-flex;align-items:center;gap:7px}.chip.on{background:var(--ch);font-weight:600}
+.chip .bdg{background:var(--pr);min-width:20px;height:20px;font-size:12px}
+.sh{color:var(--mu);font-weight:600;font-size:16px;margin:4px 0 6px}
+.cr{display:flex;align-items:center;gap:12px;padding:9px 2px;cursor:pointer}
+.av2{width:54px;height:54px;border-radius:50%;border:2px solid var(--bd);background:var(--ch);overflow:hidden;flex:none;color:var(--ac);display:flex;align-items:center;justify-content:center}
+.av2 img{width:100%;height:100%;object-fit:cover}.av2 .ic{width:68%;height:68%}
+.cr .mid{flex:1;min-width:0}.cr .nm{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:600}
+.cr .nm b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cr .bdg{background:var(--pr);flex:none}
+.pvw{color:var(--mu);font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pvw.nv{color:var(--tx);font-weight:600}
+.cr .rt{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}.rt .tm{font-size:13px;color:var(--mu)}
+.rt button{background:none;color:var(--mu);padding:3px 4px;width:34px;height:28px;border-radius:8px}.rt .ic{width:22px;height:22px;margin:0 auto}
+.pm{min-width:250px;padding:6px;margin:0}.pm>div{padding:12px 14px;cursor:pointer;border-radius:10px;display:flex;gap:12px;align-items:center;font-size:16px}.pm>div:active{background:var(--ch)}
+.bl{display:flex!important;gap:10px;align-items:center;justify-content:center}.bl .ic{width:20px;height:20px}
+#bn{position:fixed;left:0;right:0;bottom:0;z-index:8;display:none;justify-content:center;background:var(--bg);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+#bn .in{display:flex;width:100%;max-width:640px}
+#bn button{flex:1;background:none;border-radius:0;color:var(--mu);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:var(--bnh);font-size:14px}
+#bn button.on{color:var(--ac);font-weight:700}
+#bn .ic{position:relative;width:38px;height:30px;overflow:visible}#bn button:not(.on) .ic img{opacity:.55}
+#bn .bdg{position:absolute;top:-7px;right:-10px;height:18px;min-width:18px;font-size:11px;background:var(--pr);color:#fff;padding:0 5px}
+body.tabs #bn{display:flex}body.tabs #app{padding-bottom:var(--bnh)}
+body.tabs .pg{padding-bottom:calc(var(--bnh) + env(safe-area-inset-bottom,0px))}
+body.kb #bn{display:none}body.kb.tabs #app{padding-bottom:0}
 </style></head><body><div id="app"><div class="c"><h2>mRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const gid=()=>Math.random().toString(36).slice(2,10);
+/* =====================================================================
+   IMAGENS E ÍCONES DO APP  —  para trocar um, é só mudar a linha dele.
+   Cada valor pode ser:  (a) um desenho SVG (usa a cor do tema)  ou
+                         (b) um endereço de imagem / arquivo (png, jpg, webp, svg) ou data:...
+   Nomes:
+     logo            raposa no topo das telas Campanhas e Amigos
+     abaCampanhas    ícone da aba "Campanhas" (barra de baixo)
+     abaAmigos       ícone da aba "Amigos" (barra de baixo)
+     campanhaPadrao  foto das campanhas que não têm imagem (d20)
+     lupa            lupa da barra de pesquisa
+     info            botão ☰ de cada campanha (abre foto, descrição e sino)
+     sino / sinoMudo sino de notificações dentro da janela da campanha
+   ===================================================================== */
+const RAPC='<path d="M5 5l14 8h10l14-8-2 22c-1 8-9 16-17 17-8-1-16-9-17-17z"/>',RAPF='<path class="ol" d="M14 24l7 3-4 3zM34 24l-7 3 4 3zM21 36h6l-3 4z"/>',RAP=RAPC+RAPF;
+const SV='fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+const IMG={
+ logo:`<svg viewBox="0 0 48 48" fill="currentColor">${RAP}</svg>`,
+ abaCampanhas:`<svg viewBox="0 0 48 48" fill="currentColor"><path d="M24 4l17 9.5-17 9.5-17-9.5z"/><path d="M7 13.5L24 23v21L7 34.5z" opacity=".72"/><path d="M41 13.5L24 23v21l17-9.5z" opacity=".5"/><g class="ol"><circle cx="24" cy="13.5" r="2.3"/><circle cx="13" cy="24" r="2"/><circle cx="18" cy="33" r="2"/><circle cx="30" cy="29" r="2"/><circle cx="35" cy="22.5" r="2"/><circle cx="33" cy="35" r="2"/></g></svg>`,
+ abaAmigos:`<svg viewBox="0 0 76 48" fill="currentColor"><g transform="translate(0 2) scale(.9)">${RAP}</g><g transform="translate(30 2) scale(.9)"><g style="stroke:var(--bg);stroke-width:3;paint-order:stroke">${RAPC}</g>${RAPF}</g></svg>`,
+ campanhaPadrao:`<svg viewBox="0 0 48 48" ${SV}><path d="M24 4l17 10v20L24 44 7 34V14z"/><path d="M24 4L7 34h34zM7 14l17 10 17-10M24 24v20"/></svg>`,
+ lupa:`<svg viewBox="0 0 24 24" ${SV}><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>`,
+ info:`<svg viewBox="0 0 24 24" ${SV}><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke-width="3"/></svg>`,
+ sino:`<svg viewBox="0 0 24 24" ${SV}><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>`,
+ sinoMudo:`<svg viewBox="0 0 24 24" ${SV}><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/><path d="M3 3l18 18"/></svg>`
+};
+const ic=n=>{const v=IMG[n]||'';return'<i class="ic">'+(/^(https?:|data:|\/|\.\.?\/|[\w.-]+\.(png|jpe?g|webp|gif|svg)$)/i.test(v)?`<img src="${esc(v)}" alt="">`:v)+'</i>'};
+
 let db,uid,eu,camp,cid,subs=[],msgs=[],macros=[],pers=[],membros=[],aba='chat',ativo=null,falar='eu',npcN='',mod=null;
 const F=(n,k)=>({n,k}),S=(t,c)=>({t,campos:c});
 const MODELOS={
 dnd:{secoes:[S('Informações',[F('Classe','txt'),F('Raça','txt'),F('Nível','num'),F('Antecedente','txt')]),S('Atributos',['Força','Destreza','Constituição','Inteligência','Sabedoria','Carisma'].map(n=>F(n,'attr'))),S('Combate',[F('Classe de Armadura','num'),F('Iniciativa','num'),F('Deslocamento','num'),F('Pontos de Vida (máx.)','num'),F('Pontos de Vida (atuais)','num')]),S('Anotações',[F('Equipamento','long'),F('Habilidades e magias','long')])]},
 tdt:{secoes:[S('Atributos',['Força','Habilidade','Resistência','Armadura','Poder de Fogo'].map(n=>F(n,'num'))),S('Status',[F('Pontos de Vida','num'),F('Pontos de Magia','num'),F('Pontos de Experiência','num')]),S('Características',[F('Vantagens','long'),F('Desvantagens','long'),F('Perícias','long'),F('Anotações','long')])]},
 zero:{secoes:[S('Nova seção',[F('Nome','txt')])]}};
-let admin=false,monitor=false,tq=0,lido=null,entrou=false,carregou=false,semScroll=0,abrTk=0,naoLidas={},watch=[],watchK="",resp=null,ac,leit=[],digit={},canalDig=null,ultDig=0,pres=null,online=[],amigos=[],amigIds=null,dmMsgs=[],dmFr=null,dmLido=0,dmVisto=0,dmNl=0,watchD=[],watchKD="",dmCh=null,dmTm=0,dmPar="",dmNome="",perfis={},tl="auth",hd=0,sigM="";const REC=/type=recovery/.test(location.hash),MSGRO="Modo de monitoramento: somente leitura.";const tela=h=>$('#app').innerHTML=h;
+let admin=false,monitor=false,tq=0,lido=null,entrou=false,carregou=false,semScroll=0,abrTk=0,naoLidas={},watch=[],watchK="",resp=null,ac,leit=[],digit={},canalDig=null,ultDig=0,pres=null,online=[],amigos=[],amigIds=null,dmMsgs=[],dmFr=null,dmLido=0,dmVisto=0,dmNl=0,watchD=[],watchKD="",dmCh=null,dmTm=0,dmPar="",dmNome="",perfis={},tl="auth",hd=0,sigM="";const REC=/type=recovery/.test(location.hash),MSGRO="Modo de monitoramento: somente leitura.";const tela=h=>{$('#app').innerHTML=h;sincBn()};
 const md=v=>{const m=Math.floor(((+v||0)-10)/2);return(m>=0?'+':'')+m};
 const fmt=t=>esc(t).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\|\|([^|\n]+)\|\|/g,'<span class=sp onclick="this.classList.toggle(\'on\')">$1</span>').replace(/\*([^*\n]+)\*/g,'<b>$1</b>').replace(/~([^~\n]+)~/g,'<s>$1</s>').replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g,'$1<i>$2</i>');
 const mid=x=>x?x.t==='v'?`<video controls preload=metadata src="${esc(x.u)}"></video>`:`<img src="${esc(x.u)}" onclick="ampliar(this.src)">`:'';
@@ -142,7 +204,7 @@ orderBy:(f,d)=>col(p,{...o,f,d}),limit:n=>col(p,{...o,n}),
 onSnapshot(cb,er){return ouvir('parent',p,async()=>cb(await q.get()),er)}};return q}
 return{cl,canal(nome,onB,o){o=o||{};const ch=cl.channel(nome,{config:{broadcast:{self:false},presence:{key:o.key||'anon'}}});if(onB)ch.on('broadcast',{event:'dig'},x=>onB(x.payload));if(o.sync)ch.on('presence',{event:'sync'},()=>o.sync(Object.keys(ch.presenceState())));ch.subscribe(st=>{if(st==='SUBSCRIBED'&&o.key)ch.track({t:Date.now()})});return{env:p=>{try{ch.send({type:'broadcast',event:'dig',payload:p})}catch(e){}},fim:()=>cl.removeChannel(ch)}},doc,collection:col,async entrar(c){const{data,error}=await cl.rpc('entrar_campanha',{c});if(error)throw error;return data},async souAdmin(){const{data,error}=await cl.rpc('sou_admin');return error?false:!!data},observa(p,cb){const ch=cl.channel('o'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'INSERT',schema:'public',table:'docs',filter:'parent=eq.'+p},x=>{try{cb({id:fim(x.new.path),...x.new.data})}catch(e){}}).subscribe();return()=>cl.removeChannel(ch)},
 async naoLidas(p,t,u){const{count,error}=await cl.from('docs').select('path',{count:'exact',head:true}).eq('parent',p).filter('data->>t','gt',String(t)).neq('data->>uid',u);return error?0:(count||0)},
-async ultima(p){const{data,error}=await cl.from('docs').select('data').eq('parent',p).order('data->>t',{ascending:false}).limit(1);return error||!data||!data[0]?0:(Number(data[0].data&&data[0].data.t)||0)},
+async ultima(p){const{data,error}=await cl.from('docs').select('data').eq('parent',p).order('data->>t',{ascending:false}).limit(1);return error||!data||!data[0]?null:data[0].data},
 async upload(f,pasta){if(monitor)throw new Error("ro");const n=pasta+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,6)+'-'+f.name.normalize('NFD').replace(/[^\w.-]/g,'_');const{error}=await cl.storage.from('midia').upload(n,f,{contentType:f.type});if(error)throw error;return cl.storage.from('midia').getPublicUrl(n).data.publicUrl}}}
 /* ---------- conta ---------- */
 const erroAuth=x=>{const m=String(x&&x.message||'');return/Invalid login/i.test(m)?'E-mail ou senha incorretos.':/not confirmed/i.test(m)?'Confirme seu e-mail pelo link que enviamos antes de entrar.':/already registered/i.test(m)?'Já existe uma conta com esse e-mail.':/rate limit|too many/i.test(m)?'Muitas tentativas. Espere um pouco e tente de novo.':/not authorized/i.test(m)?'O envio de e-mail ainda não está configurado no Supabase.':/valid email|invalid.*email/i.test(m)?'Digite um e-mail válido.':/sending|send.*email/i.test(m)?'Não foi possível enviar o e-mail de confirmação. Confira as configurações de envio de e-mail (SMTP) no Supabase.':/signups? (not allowed|disabled)/i.test(m)?'O cadastro de novas contas está desligado no Supabase.':/fetch|network/i.test(m)?'Sem conexão com o servidor. Confira a URL e a chave do Supabase no index.html.':'Não foi possível concluir. Tente de novo. ('+m+')'};
@@ -165,10 +227,36 @@ if(REC)return login('nova','Digite a sua nova senha.');
 try{const{data}=await db.cl.auth.getSession();if(data.session)return carregaPerfil()}catch(e){}login()}
 async function sair(){try{await db.cl.auth.signOut()}catch(e){}desinscrever();if(pres){pres.fim();pres=null}watchD.forEach(f=>f());watchD=[];watchKD="";watch.forEach(f=>f());watch=[];watchK='';amigIds=null;uid=null;eu=null;admin=false;login()}
 /* ---------- campanhas ---------- */
-async function inicio(){tl='home';if(camp&&aba==='chat'&&!monitor&&msgs.length&&noFundo()){const u=msgs[msgs.length-1].t;if(u>lido){lido=u;try{await db.doc('data/users/'+uid+'/c-'+cid).update({lido});await db.doc('campanhas/'+cid+'/leituras/'+uid).set({nome:eu.nome,t:lido})}catch(e){}}}desinscrever();monitor=false;let l=[],ad=[];try{l=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.cid)}catch(e){}await Promise.all(l.map(async x=>{try{const c=await db.doc('campanhas/'+x.cid).get();if(c.exists){const d=c.data();x.nome=d.nome;x.img=d.img||'';x.desc=d.descricao||''}else x.gone=1}catch(e){}}));l=l.filter(x=>!x.gone);await Promise.all(l.map(async x=>{x.nl=x.lido!=null?await db.naoLidas('campanhas/'+x.cid+'/msgs',x.lido,uid):0;naoLidas[x.cid]=x.nl;try{const u=await db.ultima('campanhas/'+x.cid+'/msgs');if(u>(ativ[x.cid]||0))ativ[x.cid]=u}catch(e){}}));l.sort(ordC);iniciaWatch(l);listaC=l;iniciaWatchDM();if(admin){try{ad=(await db.collection('campanhas').get()).docs.map(d=>({id:d.id,...d.data()})).sort(az)}catch(e){}}
+async function inicio(){tl='home';if(camp&&aba==='chat'&&!monitor&&msgs.length&&noFundo()){const u=msgs[msgs.length-1].t;if(u>lido){lido=u;try{await db.doc('data/users/'+uid+'/c-'+cid).update({lido});await db.doc('campanhas/'+cid+'/leituras/'+uid).set({nome:eu.nome,t:lido})}catch(e){}}}desinscrever();monitor=false;let l=[],ad=[];try{l=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.cid)}catch(e){}await Promise.all(l.map(async x=>{try{const c=await db.doc('campanhas/'+x.cid).get();if(c.exists){const d=c.data();x.nome=d.nome;x.img=d.img||'';x.desc=d.descricao||'';x.mestre=d.mestreNome||''}else x.gone=1}catch(e){}}));l=l.filter(x=>!x.gone);await Promise.all(l.map(async x=>{x.nl=x.lido!=null?await db.naoLidas('campanhas/'+x.cid+'/msgs',x.lido,uid):0;naoLidas[x.cid]=x.nl;try{const u=await db.ultima('campanhas/'+x.cid+'/msgs');if(u){const t=Number(u.t)||0;if(t>=(ativ[x.cid]||0)){ativ[x.cid]=t;ultM[x.cid]=u}}}catch(e){}}));l.sort(ordC);iniciaWatch(l);listaC=l;iniciaWatchDM();if(admin){try{ad=(await db.collection('campanhas').get()).docs.map(d=>({id:d.id,...d.data()})).sort(az)}catch(e){}}
 if(tl==='home'){listaAd=ad;homeOk=true;tela(homeHtml(l,ad))};
 const m=(location.hash.match(/convite=([\w]+)/)||[])[1];if(m){history.replaceState({n:hd},'',location.pathname+location.search);entrar(m)}}
-function homeHtml(l,ad){l=l.map(x=>({...x,nl:naoLidas[x.cid]||0}));return `<header><span>mRPG · ${esc(eu.nome)}${admin?' 🛡️':''}</span><button class=h id=ps onclick="social()" title="Perfil e amigos">${pHtml()}</button><button class=h id=mt onclick="mudoT()" title="Silenciar todas as notificações">${mu().todos?'🔕':'🔔'}</button><button class=h onclick="sair()">Sair</button></header><div class="c hm"><div class=row style="margin-bottom:12px"><button onclick="novaCamp()">+ Nova campanha</button><button class=s onclick="entrarCod()">Entrar com código</button></div><h3>Minhas campanhas</h3><div id=lc>${l.length?l.map(x=>`<div class="card it" data-c="${esc(x.cid)}" onclick="abrir('${esc(x.cid)}')">${x.img?`<img class=av style="width:40px;height:40px;margin:0" src="${esc(x.img)}">`:'<span class=av style="width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;margin:0">🎲</span>'}<b>${esc(x.nome)}</b><button class=s style="padding:2px 11px;font-size:16px" onclick="event.stopPropagation();infoCamp('${esc(x.cid)}')" title="Sobre a campanha">?</button><span class=bdg id="nb-${esc(x.cid)}" style="display:${x.nl?'inline-flex':'none'}">${x.nl>99?'99+':x.nl}</span><span id="mu-${esc(x.cid)}" onclick="event.stopPropagation();mudoC('${esc(x.cid)}')" title="Silenciar ou ativar o som desta campanha" style="font-size:18px">${(mu().c||{})[x.cid]?'🔕':'🔔'}</span><span class=mu>›</span></div>`).join(''):'<p class=mu>Você ainda não participa de nenhuma campanha. Crie uma ou entre com um código de convite.</p>'}</div>${ad.length?`<h3>🛡️ Administração · todas as campanhas</h3><p class=mu>Entrada invisível e somente leitura.</p>${ad.map(x=>`<div class="card it" onclick="abrir('${esc(x.id)}',1)"><b>${esc(x.nome)}</b><span class=mu>GM: ${esc(x.mestreNome||'')} · 👁</span></div>`).join('')}`:''}</div>`}
+const sem=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function fmtT(t){if(!t)return'';const d=new Date(t),h=new Date(),z=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime(),dif=Math.round((z(h)-z(d))/864e5);if(dif<=0)return d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});if(dif===1)return'Ontem';if(dif<7)return d.toLocaleDateString('pt-BR',{weekday:'short'}).replace('.','');return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})}
+function prevTxt(m){if(!m)return'Sem mensagens ainda';if(m.apagada)return'🚫 Mensagem apagada';const tx=String(m.texto||'').replace(/\s+/g,' ').trim()||(m.midia?'📎 Mídia':'');if(m.tipo==='sys')return(m.nome?m.nome+' ':'')+tx;const q=m.uid===uid?'Você':m.tipo==='gm'?'Mestre':(m.nome||'');return q?q+': '+tx:tx}
+function linhaAt(c){const m=ultM[c],p=document.getElementById('pv-'+c),t=document.getElementById('tm-'+c);if(p)p.textContent=prevTxt(m);if(t)t.textContent=fmtT(m?m.t:0)}
+const linhaC=x=>{const m=ultM[x.cid],n=naoLidas[x.cid]||0,id=esc(x.cid);return`<div class="cr" data-c="${id}" onclick="abrir('${id}')"><div class="av2">${x.img?`<img src="${esc(x.img)}" alt="">`:ic('campanhaPadrao')}</div><div class="mid"><div class="nm"><b>${esc(x.nome)}</b><span class="bdg" id="nb-${id}" style="display:${n?'inline-flex':'none'}">${n>99?'99+':n}</span><span class="mu" id="mu-${id}">${(mu().c||{})[x.cid]?'🔕':''}</span></div><div class="pvw${n?' nv':''}" id="pv-${id}">${esc(prevTxt(m))}</div></div><div class="rt"><span class="tm" id="tm-${id}">${esc(fmtT(m?m.t:0))}</span><button onclick="event.stopPropagation();infoCamp('${id}')" title="Foto, descrição e notificações">${ic('info')}</button></div></div>`};
+function homeHtml(l,ad){const nl=l.filter(x=>(naoLidas[x.cid]||0)>0).length;
+return`<header class="th"><span>mRPG - ${esc(eu.nome)}${admin?' 🛡️':''}</span><div class="lg">${ic('logo')}</div><button class="h" onclick="menuTopo()" title="Menu">⋮</button></header><div class="c hm"><div class="bq">${ic('lupa')}<input id="bq" type="search" value="${esc(bAt)}" placeholder="Pesquisar campanhas ou mestres..." oninput="filtra()" autocomplete="off"></div><div class="chs"><button class="chip${fAt==='todos'?' on':''}" id="ft-todos" onclick="filtro('todos')">Todos</button><button class="chip${fAt==='nao'?' on':''}" id="ft-nao" onclick="filtro('nao')">Não lidas <span class="bdg" id="ftn" style="display:${nl?'inline-flex':'none'}">${nl}</span></button></div><div class="sh">Minhas campanhas</div><div id="lc">${l.length?l.map(linhaC).join(''):'<div class="card"><p class="mu" style="margin:0 0 10px">Você ainda não participa de nenhuma campanha.</p><div class="row"><button onclick="novaCamp()">+ Nova campanha</button><button class="s" onclick="entrarCod()">Entrar com código</button></div></div>'}</div><p class="mu" id="lv" style="display:none;text-align:center">Nenhuma campanha encontrada.</p>${ad.length?`<h3>🛡️ Administração · todas as campanhas</h3><p class="mu">Entrada invisível e somente leitura.</p>${ad.map(x=>`<div class="card it" onclick="abrir('${esc(x.id)}',1)"><b>${esc(x.nome)}</b><span class="mu">GM: ${esc(x.mestreNome||'')} · 👁</span></div>`).join('')}`:''}</div>`}
+/* busca + filtro "Não lidas" (só mostra/esconde linhas; não recarrega a lista) */
+function contaNl(){const n=listaC.reduce((a,x)=>a+(naoLidas[x.cid]||0),0),c=listaC.filter(x=>(naoLidas[x.cid]||0)>0).length,e=document.getElementById('bn-c'),f=document.getElementById('ftn');if(e){e.textContent=n>99?'99+':n;e.style.display=n?'inline-flex':'none'}if(f){f.textContent=c;f.style.display=c?'inline-flex':'none'}}
+function filtra(r){r=r||document;const q=r.querySelector('#bq'),c=r.querySelector('#lc');if(!c)return;if(q)bAt=q.value;const t=sem(bAt);let v=0;
+[...c.children].forEach(e=>{const cid=e.dataset&&e.dataset.c;if(!cid)return;const x=listaC.find(y=>y.cid===cid)||{};const ok=(!t||sem(x.nome).includes(t)||sem(x.mestre).includes(t))&&(fAt!=='nao'||(naoLidas[cid]||0)>0);e.style.display=ok?'':'none';if(ok)v++});
+const lv=r.querySelector('#lv');if(lv)lv.style.display=(!v&&listaC.length)?'block':'none'}
+function filtro(f){fAt=f;const a=$('#ft-todos'),b=$('#ft-nao');if(a)a.classList.toggle('on',f==='todos');if(b)b.classList.toggle('on',f==='nao');filtra()}
+/* menu ⋮ do topo */
+function menuTopo(){if($('.ov'))return;const o=document.createElement('div');o.className='ov';o.style.cssText='align-items:flex-start;justify-content:flex-end;padding:54px 12px 0;background:rgba(0,0,0,.25)';o.onclick=e=>{if(e.target===o)o.remove()};const t=mu().todos;
+const it=(i,x,f)=>`<div onclick="this.closest('.ov').remove();${f}"><span>${i}</span><span>${x}</span></div>`;
+o.innerHTML=`<div class="card pm">${it('➕','Nova campanha','novaCamp()')}${it('🔑','Entrar com código','entrarCod()')}${it(t?'🔔':'🔕',t?'Ativar todas as notificações':'Silenciar todas as notificações','mudoT()')}${it('🚪','Sair','sair()')}</div>`;document.body.appendChild(o)}
+/* barra de baixo: Campanhas | Amigos */
+function setAba(a){document.querySelectorAll('#bn button').forEach(b=>b.classList.toggle('on',b.dataset.a===a))}
+function sincBn(){let b=document.getElementById('bn');
+if(!b){b=document.createElement('div');b.id='bn';b.innerHTML=`<div class="in"><button data-a="campanhas" onclick="irAba('campanhas')">${ic('abaCampanhas')}<span>Campanhas</span></button><button data-a="amigos" onclick="irAba('amigos')">${ic('abaAmigos')}<span>Amigos</span></button></div>`;
+b.querySelectorAll('.ic').forEach((e,i)=>{const g=document.createElement('span');g.className='bdg';g.id=i?'bn-a':'bn-c';g.style.display='none';e.appendChild(g)});document.body.appendChild(b)}
+const on=tl==='home'||tl==='social';document.body.classList.toggle('tabs',on);
+if(on){setAba(tl==='social'?'amigos':'campanhas');contaNl();badgeP();if(tl==='home')filtra()}}
+function irAba(a){if(tl==='home'&&a==='amigos')return deslizar(1);if(tl==='social'&&a==='campanhas')return homeOk?deslizar(-1):inicio();const c=$('#app .c');if(c&&c.scrollTo)c.scrollTo({top:0,behavior:'smooth'})}
+document.addEventListener('focusin',e=>{if(e.target.matches&&e.target.matches('input,textarea'))document.body.classList.add('kb')});
+document.addEventListener('focusout',()=>document.body.classList.remove('kb'));
 /* sobe a campanha com mensagem nova (como no WhatsApp), animando a troca de lugar */
 function reordena(){const c=$('#lc');if(!c||tl!=='home')return;listaC.sort(ordC);const mp={};[...c.children].forEach(e=>{if(e.dataset&&e.dataset.c)mp[e.dataset.c]=e});
 const cs=listaC.map(x=>mp[x.cid]).filter(Boolean);if(cs.length<2||cs.every((e,i)=>c.children[i]===e))return;
@@ -238,10 +326,10 @@ const mu=()=>{try{return JSON.parse(localStorage.getItem('mrpg_mudo_'+uid)||'{}'
 const gmu=m=>{try{localStorage.setItem('mrpg_mudo_'+uid,JSON.stringify(m))}catch(e){}};
 const silencio=c=>{const m=mu();return!!m.todos||!!(m.c&&m.c[c])};
 function mudoT(){const m=mu();m.todos=!m.todos;gmu(m);const e=$('#mt');if(e)e.textContent=m.todos?'🔕':'🔔'}
-function mudoC(c){const m=mu();m.c=m.c||{};m.c[c]=!m.c[c];gmu(m);const e=document.getElementById('mu-'+c);if(e)e.textContent=m.c[c]?'🔕':'🔔'}
-function badge(c){const e=document.getElementById('nb-'+c);if(!e)return;const n=naoLidas[c]||0;e.textContent=n>99?'99+':n;e.style.display=n?'inline-flex':'none'}
+function mudoC(c){const m=mu();m.c=m.c||{};m.c[c]=!m.c[c];gmu(m);const e=document.getElementById('mu-'+c);if(e)e.textContent=m.c[c]?'🔕':''}
+function badge(c){const n=naoLidas[c]||0,e=document.getElementById('nb-'+c);if(e){e.textContent=n>99?'99+':n;e.style.display=n?'inline-flex':'none'}const p=document.getElementById('pv-'+c);if(p)p.classList.toggle('nv',!!n);contaNl();if(fAt==='nao')filtra()}
 function iniciaWatch(l){const k=l.map(x=>x.cid).join();if(k===watchK)return;watchK=k;watch.forEach(f=>f());
-watch=l.map(x=>db.observa('campanhas/'+x.cid+'/msgs',m=>{if(m.t&&m.t>(ativ[x.cid]||0)){ativ[x.cid]=m.t;reordena()}if(m.uid===uid||monitor)return;if(!(camp&&cid===x.cid&&!document.hidden)){naoLidas[x.cid]=(naoLidas[x.cid]||0)+1;badge(x.cid)}if(!silencio(x.cid))som()}))}
+watch=l.map(x=>db.observa('campanhas/'+x.cid+'/msgs',m=>{if(m.t&&m.t>(ativ[x.cid]||0)){ativ[x.cid]=m.t;ultM[x.cid]=m;linhaAt(x.cid);reordena()}if(m.uid===uid||monitor)return;if(!(camp&&cid===x.cid&&!document.hidden)){naoLidas[x.cid]=(naoLidas[x.cid]||0)+1;badge(x.cid)}if(!silencio(x.cid))som()}))}
 function responder(id){const m=msgs.find(x=>x.id===id);if(!m)return;resp={id:m.id,nome:m.nome,u:m.uid,t:(m.texto||(m.midia?'📎 Mídia':'')).replace(/\s+/g,' ').slice(0,90)};rb();const i=$('#ent');if(i)i.focus()}
 function rb(){const e=$('#rb');if(!e)return;e.innerHTML=resp?`<div class=ch style="display:flex;gap:8px;align-items:center"><span style="flex:1;border-left:3px solid ${cor(resp.u)};padding-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>↩ ${esc(resp.nome)}</b> ${esc(resp.t)}</span><button class=s style="padding:2px 10px" onclick="resp=null;rb()">✕</button></div>`:''}
 const auto=e=>{e.style.height='auto';e.style.height=Math.min(e.scrollHeight,120)+'px'};
@@ -262,7 +350,7 @@ function mostraDig(){const e=$('#dg');if(!e)return;const ag=Date.now(),n=Object.
 const par=(a,b)=>[a,b].sort().join('_');
 function marcaOnline(){document.querySelectorAll('[data-on]').forEach(e=>{e.style.background=online.includes(e.dataset.on)?'#22c55e':'#9ca3af'})}
 const pHtml=()=>'👤'+(dmNl?` <span class=bdg style="display:inline-flex;vertical-align:middle">${dmNl>99?'99+':dmNl}</span>`:'');
-const badgeP=()=>{const e=$('#ps');if(e)e.innerHTML=pHtml()};
+const badgeP=()=>{const e=document.getElementById('bn-a');if(e){e.textContent=dmNl>99?'99+':dmNl;e.style.display=dmNl?'inline-flex':'none'}};
 async function iniciaWatchDM(){let am=[];try{am=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.fr)}catch(e){}
 amigIds=new Set(am.map(x=>x.fr));const cs=await Promise.all(am.map(x=>db.naoLidas('dm/'+par(uid,x.fr)+'/msgs',x.lido||0,uid).catch(()=>0)));dmNl=cs.reduce((a,b)=>a+b,0);badgeP();
 const k=am.map(x=>x.fr).join();if(k===watchKD)return;watchKD=k;watchD.forEach(f=>f());
@@ -272,7 +360,7 @@ async function socialHtml(){let am=[];
 try{am=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.fr)}catch(e){}
 await Promise.all(am.map(async x=>{try{const p=await db.doc('usuarios/'+x.fr).get();if(p.exists){const d=p.data();x.nome=d.nome;x.foto=d.foto||'';x.fotoG=d.fotoG||'';x.frase=d.frase||''}x.nl=await db.naoLidas('dm/'+par(uid,x.fr)+'/msgs',x.lido||0,uid)}catch(e){x.nl=0}}));
 amigos=am.sort(az);amigIds=new Set(am.map(x=>x.fr));
-return `<header><button class=h onclick="inicio()">‹</button><span>Perfil e amigos</span></header><div class="c sc"><div class=card><div class=row><div class=big style="width:72px;height:72px;overflow:hidden;cursor:pointer" onclick="$('#fp').click()">${eu.foto?`<img src="${esc(eu.foto)}" style="width:100%;height:100%;object-fit:cover">`:'<span style="font-size:32px;line-height:72px;display:block;text-align:center">👤</span>'}</div><div style="cursor:pointer" onclick="editarFrase()"><b style="font-size:17px">${esc(eu.nome)}</b><div class=mu>${eu.frase?esc(eu.frase):'Toque para escrever uma frase'} ✎</div></div></div><input id=fp type=file accept="image/*" style="display:none" onchange="fotoPerfil(this)"></div><h3>Amigos</h3><button onclick="addAmigo()" style="width:100%;margin-bottom:8px">+ Adicionar amigo</button>${am.map(x=>`<div class="card it" onclick="abreDM('${x.fr}')">${x.foto?`<img class=av style="width:40px;height:40px;margin:0" src="${esc(x.foto)}" data-g="${esc(x.fotoG||'')}" onclick="event.stopPropagation();ampliar(this.dataset.g||this.src)">`:'<span class=av style="width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;margin:0">👤</span>'}<div style="flex:1;min-width:0"><b>${esc(x.nome||x.fr)}</b><span class=pd data-on="${x.fr}"></span><div class=mu style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.frase||'')}</div></div><span class=bdg style="display:${x.nl?'inline-flex':'none'}">${x.nl>99?'99+':x.nl}</span><button class=s style="padding:4px 9px" onclick="event.stopPropagation();delAmigo('${x.fr}')" title="Remover amigo">✕</button></div>`).join('')||'<p class=mu>Você ainda não adicionou amigos.</p>'}</div>`}
+return `<header class="th"><span>Amigos</span><div class="lg">${ic('logo')}</div></header><div class="c sc"><div class=card><div class=row><div class=big style="width:72px;height:72px;overflow:hidden;cursor:pointer" onclick="$('#fp').click()">${eu.foto?`<img src="${esc(eu.foto)}" style="width:100%;height:100%;object-fit:cover">`:'<span style="font-size:32px;line-height:72px;display:block;text-align:center">👤</span>'}</div><div style="cursor:pointer" onclick="editarFrase()"><b style="font-size:17px">${esc(eu.nome)}</b><div class=mu>${eu.frase?esc(eu.frase):'Toque para escrever uma frase'} ✎</div></div></div><input id=fp type=file accept="image/*" style="display:none" onchange="fotoPerfil(this)"></div><h3>Amigos</h3><button onclick="addAmigo()" style="width:100%;margin-bottom:8px">+ Adicionar amigo</button>${am.map(x=>`<div class="card it" onclick="abreDM('${x.fr}')">${x.foto?`<img class=av style="width:40px;height:40px;margin:0" src="${esc(x.foto)}" data-g="${esc(x.fotoG||'')}" onclick="event.stopPropagation();ampliar(this.dataset.g||this.src)">`:'<span class=av style="width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;margin:0">👤</span>'}<div style="flex:1;min-width:0"><b>${esc(x.nome||x.fr)}</b><span class=pd data-on="${x.fr}"></span><div class=mu style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.frase||'')}</div></div><span class=bdg style="display:${x.nl?'inline-flex':'none'}">${x.nl>99?'99+':x.nl}</span><button class=s style="padding:4px 9px" onclick="event.stopPropagation();delAmigo('${x.fr}')" title="Remover amigo">✕</button></div>`).join('')||'<p class=mu>Você ainda não adicionou amigos.</p>'}</div>`}
 const editarFrase=()=>modal('Sua frase',[{l:'Frase do seu perfil (opcional)',v:eu.frase||''}],([t])=>{eu.frase=t.slice(0,80);db.doc('usuarios/'+uid).update({frase:eu.frase}).then(social).catch(()=>alert('Não foi possível salvar a frase.'))});
 function fotoPerfil(el){escolheImg(el,'perfis/'+uid,async(m,g)=>{eu.foto=m;eu.fotoG=g;await db.doc('usuarios/'+uid).update({foto:m,fotoG:g});social()})}
 function addAmigo(s){const go=async v=>{const id=String(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');if(id===uid)return alert('Esse é o seu próprio perfil.');
@@ -318,10 +406,12 @@ recorta(f,async(t,g)=>{try{const mini=await db.upload(t,pasta+'/mini'),grande=aw
 const avg=m=>m.tipo==='gm'?(camp&&camp.imgGmG)||'':(m.avg||'');
 const avP=id=>{const p=perfis[id]||{};return p.foto?`<img class=av style="width:40px;height:40px;margin:0;cursor:zoom-in" src="${esc(p.foto)}" data-g="${esc(p.fotoG||'')}" onclick="ampliar(this.dataset.g||this.src)">`:'<span class=av style="width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;margin:0">👤</span>'};
 async function carregaPerfis(){const f=membros.filter(m=>!perfis[m.id]);if(!f.length)return;await Promise.all(f.map(async m=>{try{const p=await db.doc('usuarios/'+m.id).get();perfis[m.id]=p.exists?p.data():{}}catch(e){perfis[m.id]={}}}));if(aba==='cfg'&&camp&&!document.activeElement.closest('#ab'))vCfg()}
-let listaC=[],listaAd=[],ativ={},homeOk=false,socH='';
+let listaC=[],listaAd=[],ativ={},homeOk=false,socH='',ultM={},fAt='todos',bAt='';
 const atC=x=>ativ[x.cid]||x.lido||0,ordC=(a,b)=>atC(b)-atC(a)||az(a,b);
 function infoCamp(id){const x=listaC.find(c=>c.cid===id);if(!x)return;const o=document.createElement('div');o.className='ov';o.onclick=e=>{if(e.target===o)o.remove()};
-o.innerHTML=`<div class=card style="max-height:88vh;overflow:auto"><h3>${esc(x.nome)}</h3>${x.img?`<img src="${esc(x.img)}" style="max-width:100%;max-height:50vh;border-radius:12px;display:block;margin:0 auto 10px">`:''}<div style="white-space:pre-wrap">${x.desc?fmt(x.desc):'<span class=mu>Esta campanha ainda não tem descrição.</span>'}</div><button class=s style="width:100%;margin-top:12px" onclick="this.closest('.ov').remove()">Fechar</button></div>`;document.body.appendChild(o)}
+const sino=()=>{const m=(mu().c||{})[id];return ic(m?'sinoMudo':'sino')+'<span>'+(m?'Notificações silenciadas':'Notificações ativadas')+'</span>'};
+o.innerHTML=`<div class="card" style="max-height:88vh;overflow:auto"><h3>${esc(x.nome)}</h3>${x.img?`<img src="${esc(x.img)}" style="max-width:100%;max-height:50vh;border-radius:12px;display:block;margin:0 auto 10px">`:''}<div style="white-space:pre-wrap">${x.desc?fmt(x.desc):'<span class="mu">Esta campanha ainda não tem descrição.</span>'}</div><button class="s bl" id="snb" style="width:100%;margin-top:12px">${sino()}</button><button class="s" style="width:100%;margin-top:8px" onclick="this.closest('.ov').remove()">Fechar</button></div>`;
+o.querySelector('#snb').onclick=function(){mudoC(id);this.innerHTML=sino()};document.body.appendChild(o)}
 /* ---------- botão "Voltar" do celular ---------- */
 function nivel(){let n=document.querySelectorAll('.ov').length;
 if(tl==='social'||tl==='nova')n+=1;else if(tl==='dm')n+=2;
@@ -478,17 +568,17 @@ function dirDe(x,alvo,m){
   return(!m&&x>=innerWidth-28)?1:0;
 }
 function inicia(x,y,alvo,m){ini=null;const d=dirDe(x,alvo,m);if(d)ini={x,y,d}}
-function pos(p){const a=A();if(ini.d===1){a.style.transform='translateX('+(-p)+'px)';pn.style.transform='translateX('+(W-p)+'px)'}else{a.style.transform='translateX('+p+'px)';pn.style.transform='translateX('+(p-W)+'px)'}}
+function pos(p){const a=A();if(ini.d===1){a.style.transform='translateX('+(-p)+'px)';pn.style.transform='translateX('+(W-p)+'px)'}else{a.style.transform='translateX('+p+'px)';pn.style.transform='translateX('+(p-W)+'px)'}const q=p>W*.5;setAba(ini.d===1?(q?'amigos':'campanhas'):(q?'campanhas':'amigos'))}
 function comeca(){
   W=innerWidth;drag=true;ld=0;lt=Date.now();vel=0;
-  pn=document.createElement('div');pn.className='pg';pn.style.transition='none';pn.innerHTML='<div class=pgi></div>';
+  pn=document.createElement('div');pn.className='pg tt';pn.style.transition='none';pn.innerHTML='<div class=pgi></div>';
   pn.style.transform='translateX('+(ini.d===1?W:-W)+'px)';
   const i=pn.firstChild;
   if(ini.d===1){
-    i.innerHTML=socH||'<header><button class=h>‹</button><span>Perfil e amigos</span></header><div class=c><p class=mu>Carregando…</p></div>';
+    i.innerHTML=socH||'<header class=th><span>Amigos</span></header><div class="c sc"><p class=mu>Carregando…</p></div>';
     pr=socialHtml().then(h=>{socH=h;if(pn&&pn.isConnected){i.innerHTML=h;marcaOnline()}return h}).catch(()=>null);
   }else i.innerHTML=homeHtml(listaC,listaAd);
-  document.body.appendChild(pn);marcaOnline();
+  document.body.appendChild(pn);marcaOnline();if(ini.d===-1)filtra(pn);
   A().style.transition='none';document.body.style.overflow='hidden';document.body.style.userSelect='none';
 }
 function move(x,y,e){
@@ -505,12 +595,12 @@ function move(x,y,e){
   const n=Date.now();if(n>lt){vel=vel*.3+((p-ld)/(n-lt))*.7;lt=n}ld=p;
   pos(p);
 }
-function limpa(){const a=A();if(a){a.style.transition='';a.style.transform=''}if(pn){pn.remove();pn=null}pr=null;document.body.style.overflow='';document.body.style.userSelect='';anim=false}
+function limpa(){const a=A();if(a){a.style.transition='';a.style.transform=''}if(pn){pn.remove();pn=null}pr=null;document.body.style.overflow='';document.body.style.userSelect='';anim=false;sincBn()}
 function fim(cancel){
   if(!ini)return;const d=ini.d;ini=null;
   if(!drag)return;drag=false;
   const ok=!cancel&&(ld>W*.33||(vel>.45&&ld>30));
-  anim=true;const a=A(),p=pn;
+  anim=true;const a=A(),p=pn;setAba(ok?(d===1?'amigos':'campanhas'):(d===1?'campanhas':'amigos'));
   a.style.transition=T;p.style.transition=T;
   if(ok){a.style.transform='translateX('+(d===1?-W:W)+'px)';p.style.transform='translateX(0)'}
   else{a.style.transform='translateX(0)';p.style.transform='translateX('+(d===1?W:-W)+'px)'}
@@ -524,6 +614,7 @@ function fim(cancel){
     limpa();
   },230);
 }
+window.deslizar=d=>{if(anim||drag||$('.ov'))return;ini={x:0,y:0,d};comeca();pn.getBoundingClientRect();ld=innerWidth;vel=1;fim(false)};
 const cancela=()=>{if(drag)fim(true);else ini=null};
 document.addEventListener('touchstart',e=>{if(e.touches.length>1)return cancela();const t=e.touches[0];inicia(t.clientX,t.clientY,e.target,false)},{passive:true});
 document.addEventListener('touchmove',e=>{if(!ini)return;const t=e.touches[0];move(t.clientX,t.clientY,e)},{passive:false});
