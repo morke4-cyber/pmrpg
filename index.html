@@ -150,7 +150,7 @@ body.tabs,.pg.tt{background:var(--bgimg) center/cover no-repeat fixed,var(--bg)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) #msgs{background:var(--chatimg) center/cover no-repeat #15111f}}
 :root[data-theme="dark"] #msgs{background:var(--chatimg) center/cover no-repeat #15111f}
 /* ===== PC (tela larga + mouse): painel central escuro. Celular/tablet NÃO são afetados ===== */
-@media (min-width:900px) and (hover:hover) and (pointer:fine){
+@media (min-width:900px) and (any-pointer:fine){
 :root{--pw:780px}
 html,body,body.tabs{background:#0b0910}
 #app{background:var(--bg);box-shadow:0 0 0 1px rgba(255,255,255,.07),0 0 48px rgba(0,0,0,.65)}
