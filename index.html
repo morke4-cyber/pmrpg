@@ -127,6 +127,23 @@ header.th .hb{display:flex;margin-left:auto}header.th .hb button.h .ic{width:24p
 .av2 .ep{font-size:26px}
 .xr{background:var(--bi);color:var(--mu);border-radius:50%;width:32px;height:32px;padding:0;font-size:14px;flex:none}
 .rq{flex-wrap:wrap;cursor:default}.rqb{display:flex;gap:8px;width:100%;padding-left:66px}.rqb button{padding:8px 16px;font-size:15px;border-radius:12px}
+
+/* ===== brilhos e cores do mockup (modo escuro) ===== */
+body.tabs,.pg.tt{--glf:none;--glf2:none;--ring:var(--bd);--ringg:none;--hgr:none;--io:.55;--navb:var(--bd);--navg:none;--bdgb:var(--pr);--bdgt:#fff;--chb:var(--bd);--chbg:var(--bi);--navon:var(--ac);--navt:none}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.tabs,:root:not([data-theme="light"]) .pg.tt{--bg:#14121b;--bi:#27242f;--ch:#3a2c57;--bd:#4a3b6e;--tx:#f3ecfc;--mu:#c7b2e6;--ac:#d9b8fb;--glf:drop-shadow(0 0 5px rgba(192,132,252,.8)) drop-shadow(0 0 14px rgba(168,85,247,.5));--glf2:drop-shadow(0 0 7px rgba(216,180,254,.95)) drop-shadow(0 0 20px rgba(168,85,247,.75));--ring:#cdaef3;--ringg:0 0 0 1px rgba(205,174,243,.25),0 0 11px rgba(168,85,247,.5);--hgr:linear-gradient(180deg,rgba(139,92,246,.42),rgba(139,92,246,0));--io:.85;--navb:#6b4e9e;--navg:0 -8px 22px rgba(124,58,237,.2);--bdgb:#b79ee6;--bdgt:#1a1226;--chb:#5b4789;--chbg:#1d1829;--navon:#fff;--navt:0 0 10px rgba(192,132,252,.9)}}
+:root[data-theme="dark"] body.tabs,:root[data-theme="dark"] .pg.tt{--bg:#14121b;--bi:#27242f;--ch:#3a2c57;--bd:#4a3b6e;--tx:#f3ecfc;--mu:#c7b2e6;--ac:#d9b8fb;--glf:drop-shadow(0 0 5px rgba(192,132,252,.8)) drop-shadow(0 0 14px rgba(168,85,247,.5));--glf2:drop-shadow(0 0 7px rgba(216,180,254,.95)) drop-shadow(0 0 20px rgba(168,85,247,.75));--ring:#cdaef3;--ringg:0 0 0 1px rgba(205,174,243,.25),0 0 11px rgba(168,85,247,.5);--hgr:linear-gradient(180deg,rgba(139,92,246,.42),rgba(139,92,246,0));--io:.85;--navb:#6b4e9e;--navg:0 -8px 22px rgba(124,58,237,.2);--bdgb:#b79ee6;--bdgt:#1a1226;--chb:#5b4789;--chbg:#1d1829;--navon:#fff;--navt:0 0 10px rgba(192,132,252,.9)}
+header.th{background:var(--hgr)}
+header.th .lg{filter:var(--glf)}
+.av2,.tav{border-color:var(--ring);box-shadow:var(--ringg)}
+.chip{border-color:var(--chb);background:var(--chbg)}.chip.on{background:var(--ch);border-color:var(--ring)}
+.chip .bdg,.cr .bdg,#bn .bdg{background:var(--bdgb);color:var(--bdgt)}
+.rt button{color:var(--ac)}
+#bn{border-top-color:var(--navb);box-shadow:var(--navg)}
+#bn button{color:var(--ac)}
+#bn button.on{color:var(--navon);text-shadow:var(--navt)}
+#bn button .ic{filter:var(--glf)}
+#bn button.on .ic{filter:var(--glf2)}
+#bn button:not(.on) .ic img{opacity:var(--io)}
 </style></head><body><div id="app"><div class="c"><h2>mRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
