@@ -223,18 +223,21 @@ for(const m of e.matchAll(/([+-]?)(\d*)d(\d+|f|%)(?:k([hl])(\d*))?|([+-]?)(\d+)/
 if(m[3]){const sg=m[1]==='-'?-1:1,f=m[3]==='%'?100:m[3]==='f'?0:Math.min(+m[3],1000);let n=Math.min(m[2]?+m[2]:1,100),k=m[4];if(k&&n===0){n=2;k='l'}if(f<0||(m[3]!=='f'&&!f))return null;let r=[];for(let i=0;i<n;i++)r.push(m[3]==='f'?Math.floor(Math.random()*3)-1:1+Math.floor(Math.random()*f));let a=r,sh=r;if(k){const kn=Math.max(1,+m[5]||1),ix=r.map((v,i)=>i).sort((x,y)=>k==='h'?r[y]-r[x]:r[x]-r[y]),ok=new Set(ix.slice(0,kn));a=r.filter((v,i)=>ok.has(i));sh=r.map((v,i)=>ok.has(i)?v:'('+v+')')}tot+=sg*a.reduce((x,y)=>x+y,0);out.push((sg<0?'−':'')+'['+sh.join(', ')+']')}
 else{const v=(m[6]==='-'?-1:1)*+m[7];tot+=v;out.push((v<0?'−':'+')+Math.abs(v))}}
 return{e,t:tot,txt:e+': '+out.join(' ').replace(/ ([+−])/g,' $1')+' = '+tot}}
+function cmdF(tx){const m=String(tx).match(/^\/f\s+(.+?)\s*=\s*(-?\d+)\s*$/i);return m?{e:m[1],alvo:+m[2]}:null}
+function rolarForcado(e,alvo){for(let i=0;i<50000;i++){const r=rolar(e);if(!r)return null;if(r.t===alvo)return r}return null}
 function processa(tx){tx=tx.replace(/#([\wÀ-ÿ-]+)/g,(a,n)=>{const m=macros.find(x=>x.nome.toLowerCase()===n.toLowerCase()&&(x.publica||x.dono===uid));return m?m.texto:a});
 return tx.replace(/\/\/([^/]+)\/\//g,(a,x)=>{const r=rolar(x);return r?'🎲 '+r.txt:a})}
 function quem(){if(falar[0]==='a'&&falar[1]===':'){const x=avl.find(y=>y.id===falar.slice(2));return{tipo:'npc',nome:x?x.nome:'NPC'}}if(falar==='gm'&&isCo())return{tipo:'gm',co:1,nome:(narr&&narr.n)||'Co-narrador',av:(narr&&narr.av)||'',avg:(narr&&narr.avg)||''};if(falar==='gm')return{tipo:'gm',nome:'Mestre',av:(camp&&camp.imgGm)||''};if(falar==='npc')return{tipo:'npc',nome:npcN||'NPC'};if(falar[1]===':'){const p=pers.find(x=>x.id===falar.slice(2));if(p)return{tipo:falar[0]==='n'?'npc':'pers',nome:p.nome,av:p.img||'',avg:p.imgG||'',pid:p.id}}return{tipo:'eu',nome:eu.nome,av:eu.foto||'',avg:eu.fotoG||''}}
 const enviarMsg=(q,texto,dado,midia)=>{const m={t:agora(),uid,tipo:dado?'dado':q.tipo,nome:q.nome,texto};if(q.av)m.av=q.av;if(q.avg)m.avg=q.avg;if(q.pid)m.pid=q.pid;if(q.co)m.co=1;if(eu.cor)m.bc=eu.cor;if(susU)m.sus=susU;if(resp){m.re=resp;resp=null;rb()}if(midia)m.midia=midia;return db.collection('campanhas/'+cid+'/msgs').add(m)};
 async function enviar(){const i=$('#ent');const tx=i.value.trim();if(!tx)return;const q=quem();
+if(/^\/f(\s|$)/i.test(tx)){if(!admin){i.value='';i.style.height='44px';previa();return}const f=cmdF(tx);if(!f)return alert('Uso: /f d20+5 = 18');const rf=rolarForcado(f.e,f.alvo);if(!rf)return alert('Não dá para chegar a '+f.alvo+' com essa expressão (inválida ou impossível).');i.value='';i.style.height='44px';previa();try{await enviarMsg(q,rf.txt,1)}catch(e){alert('Não foi possível enviar a mensagem.')}return}
 const r=/^\/r(\s|$)/.test(tx)?rolar(tx.slice(2)):/d/i.test(tx)?rolar(tx):null;
 if(/^\/r(\s|$)/.test(tx)&&!r)return alert('Expressão de dados inválida. Exemplos: /r 2d6+3, /r d20, /r 4dF');
 i.value='';i.style.height='44px';previa();
 try{if(r)await enviarMsg(q,r.txt,1);else await enviarMsg(q,processa(tx))}catch(e){alert('Não foi possível enviar a mensagem.')}}
 function previa(){const i=$('#ent'),e=$('#pv');if(!i||!e)return;const t=i.value;let h='',d=0;const ok=x=>`<div class="ch ok">${x}</div>`,er=x=>`<div class="ch er">${x}</div>`;
-const rr=t.match(/^\/r(?:\s+(.*))?$/);
-if(rr){d=1;const x=(rr[1]||'').trim();h=!x?er('🎲 Dados: digite a rolagem, ex.: 2d6+3, d20, 4dF'):rolar(x)?ok('🎲 Rolagem de dados: <b>'+esc(x)+'</b> ✓ será rolada ao enviar'):er('🎲 Expressão de dados inválida: '+esc(x))}
+const rr=t.match(/^\/r(?:\s+(.*))?$/),ff=admin?cmdF(t):null;
+if(ff){d=1;h=rolar(ff.e)?ok('🎲 Total forçado: <b>'+esc(ff.e)+' = '+ff.alvo+'</b> ✓ (só você vê isto)'):er('🎲 Expressão inválida: '+esc(ff.e))}else if(rr){d=1;const x=(rr[1]||'').trim();h=!x?er('🎲 Dados: digite a rolagem, ex.: 2d6+3, d20, 4dF'):rolar(x)?ok('🎲 Rolagem de dados: <b>'+esc(x)+'</b> ✓ será rolada ao enviar'):er('🎲 Expressão de dados inválida: '+esc(x))}
 else if(/d/i.test(t)&&rolar(t)){d=1;h=ok('🎲 Rolagem de dados: <b>'+esc(t.trim())+'</b> ✓ será rolada ao enviar')}
 else{for(const m of t.matchAll(/#([\wÀ-ÿ-]+)/g)){const k=macros.find(x=>x.nome.toLowerCase()===m[1].toLowerCase()&&(x.publica||x.dono===uid));h+=k?ok('⚡ Macro <b>#'+esc(k.nome)+'</b> ✓ '+fmt(k.texto)):er('⚡ #'+esc(m[1])+': macro não encontrada')}
 if([...t.matchAll(/\/\/([^/]+)\/\//g)].some(m=>rolar(m[1]))){d=1;h+=ok('🎲 Rolagem dentro da mensagem ✓')}
@@ -536,7 +539,7 @@ const me=m.uid===uid,h=hora(m.t,m.id);return`<div class="m ${me?'me':''} ${m.dad
 if(b)e.scrollTop=e.scrollHeight;const u=dmMsgs.length?dmMsgs[dmMsgs.length-1]:null;
 if(u&&u.uid!==uid&&!document.hidden&&u.t>dmLido){dmLido=u.t;db.doc('dm/'+dmPar+'/leituras/'+uid).set({t:u.t}).catch(()=>{});db.doc('data/users/'+uid+'/f-'+dmFr).update({lido:u.t}).catch(()=>{})}}
 const dmSend=(texto,extra)=>db.collection('dm/'+dmPar+'/msgs').add({t:agora(),uid,texto,...extra,...dmRe()}).catch(()=>alert('Não foi possível enviar a mensagem.'));
-function dmEnviar(){const i=$('#dmt'),t=i.value.trim();if(!t)return;const rc=/^\/r(\s|$)/.test(t),r=rc?rolar(t.slice(2)):/d/i.test(t)?rolar(t):null;if(rc&&!r)return alert('Expressão de dados inválida. Exemplos: /r 2d6+3, /r d20, /r 4dF');
+function dmEnviar(){const i=$('#dmt'),t=i.value.trim();if(!t)return;if(/^\/f(\s|$)/i.test(t)){if(!admin){i.value='';i.style.height='44px';return}const f=cmdF(t);if(!f)return alert('Uso: /f d20+5 = 18');const rf=rolarForcado(f.e,f.alvo);if(!rf)return alert('Não dá para chegar a '+f.alvo+' com essa expressão (inválida ou impossível).');i.value='';i.style.height='44px';dmSend(rf.txt,{dado:1});return}const rc=/^\/r(\s|$)/.test(t),r=rc?rolar(t.slice(2)):/d/i.test(t)?rolar(t):null;if(rc&&!r)return alert('Expressão de dados inválida. Exemplos: /r 2d6+3, /r d20, /r 4dF');
 i.value='';i.style.height='44px';if(r)dmSend(r.txt,{dado:1});else dmSend(t.replace(/\/\/([^/]+)\/\//g,(a,x)=>{const q=rolar(x);return q?'🎲 '+q.txt:a}))}
 function dmRolar(){const r=rolar($('#ex').value);if(!r)return alert('Expressão de dados inválida. Exemplos: 1d20, 2d6, d20+5, 4dF, d%');dmSend(r.txt,{dado:1})}
 /* ---- chat privado: responder, editar e apagar ---- */
