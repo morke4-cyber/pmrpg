@@ -223,21 +223,44 @@ for(const m of e.matchAll(/([+-]?)(\d*)d(\d+|f|%)(?:k([hl])(\d*))?|([+-]?)(\d+)/
 if(m[3]){const sg=m[1]==='-'?-1:1,f=m[3]==='%'?100:m[3]==='f'?0:Math.min(+m[3],1000);let n=Math.min(m[2]?+m[2]:1,100),k=m[4];if(k&&n===0){n=2;k='l'}if(f<0||(m[3]!=='f'&&!f))return null;let r=[];for(let i=0;i<n;i++)r.push(m[3]==='f'?Math.floor(Math.random()*3)-1:1+Math.floor(Math.random()*f));let a=r,sh=r;if(k){const kn=Math.max(1,+m[5]||1),ix=r.map((v,i)=>i).sort((x,y)=>k==='h'?r[y]-r[x]:r[x]-r[y]),ok=new Set(ix.slice(0,kn));a=r.filter((v,i)=>ok.has(i));sh=r.map((v,i)=>ok.has(i)?v:'('+v+')')}tot+=sg*a.reduce((x,y)=>x+y,0);out.push((sg<0?'−':'')+'['+sh.join(', ')+']')}
 else{const v=(m[6]==='-'?-1:1)*+m[7];tot+=v;out.push((v<0?'−':'+')+Math.abs(v))}}
 return{e,t:tot,txt:e+': '+out.join(' ').replace(/ ([+−])/g,' $1')+' = '+tot}}
+/* rolagem forçada (só admin): expr=total, ex.: d20=18, 2d6+3=11, 4d6kh3=15. Sai idêntica a uma rolagem normal. */
+function rolarF(e,alvo){e=String(e).replace(/\s+/g,'').toLowerCase();if(!/^[+-]?(\d*d(\d+|f|%)(k[hl]\d*)?|\d+)([+-](\d*d(\d+|f|%)(k[hl]\d*)?|\d+))*$/.test(e))return null;
+const T=[];let cs=0;
+for(const m of e.matchAll(/([+-]?)(\d*)d(\d+|f|%)(?:k([hl])(\d*))?|([+-]?)(\d+)/g)){
+if(m[3]){const fu=m[3]==='f',f=m[3]==='%'?100:fu?0:Math.min(+m[3],1000);let n=Math.min(m[2]?+m[2]:1,100),k=m[4];if(k&&n===0){n=2;k='l'}if(!fu&&!f)return null;
+T.push({d:1,sg:m[1]==='-'?-1:1,lo:fu?-1:1,hi:fu?1:f,n,k,kn:k?Math.min(Math.max(1,+m[5]||1),n):n,r:[]})}
+else{const v=(m[6]==='-'?-1:1)*+m[7];cs+=v;T.push({d:0,v})}}
+const D=T.filter(t=>t.d);let mn=cs,mx=cs;
+for(const t of D){const a=t.kn*t.lo,b=t.kn*t.hi;if(t.sg>0){mn+=a;mx+=b}else{mn-=b;mx-=a}}
+if(alvo<mn||alvo>mx)return{err:'Total impossível para '+e+': só dá entre '+mn+' e '+mx+'.'};
+for(const t of D)for(let i=0;i<t.n;i++)t.r.push(t.lo+Math.floor(Math.random()*(t.hi-t.lo+1)));
+const ki=t=>{const ix=t.r.map((v,i)=>i);if(!t.k)return ix;ix.sort((x,y)=>t.k==='h'?t.r[y]-t.r[x]:t.r[x]-t.r[y]);return ix.slice(0,t.kn)};
+const tot=()=>cs+D.reduce((s,t)=>s+t.sg*ki(t).reduce((a,i)=>a+t.r[i],0),0);
+for(let g=0;g<5000;g++){const dl=alvo-tot();if(!dl)break;const dir=dl>0?1:-1,c=[];
+for(const t of D){const dv=dir*t.sg;for(const i of ki(t)){const room=dv>0?t.hi-t.r[i]:t.r[i]-t.lo;if(room>0)c.push([t,i,dv,room])}}
+if(!c.length)break;const[t,i,dv,room]=c[Math.floor(Math.random()*c.length)];t.r[i]+=dv*(1+Math.floor(Math.random()*Math.min(Math.abs(dl),room)))}
+if(tot()!==alvo)return{err:'Não consegui montar esse total. Tente de novo.'};
+const out=[];for(const t of T){if(t.d){const ks=new Set(ki(t)),sh=t.k?t.r.map((v,i)=>ks.has(i)?v:'('+v+')'):t.r;out.push((t.sg<0?'−':'')+'['+sh.join(', ')+']')}else out.push((t.v<0?'−':'+')+Math.abs(t.v))}
+return{e,t:alvo,txt:e+': '+out.join(' ').replace(/ ([+−])/g,' $1')+' = '+alvo}}
+function rolarX(s){const m=admin&&!monitor?String(s).match(/^(.+?)\s*=\s*(-?\d+)\s*$/):null;return m?rolarF(m[1],+m[2]):rolar(s)}
 function processa(tx){tx=tx.replace(/#([\wÀ-ÿ-]+)/g,(a,n)=>{const m=macros.find(x=>x.nome.toLowerCase()===n.toLowerCase()&&(x.publica||x.dono===uid));return m?m.texto:a});
-return tx.replace(/\/\/([^/]+)\/\//g,(a,x)=>{const r=rolar(x);return r?'🎲 '+r.txt:a})}
+return tx.replace(/\/\/([^/]+)\/\//g,(a,x)=>{const r=rolarX(x);return r&&!r.err?'🎲 '+r.txt:a})}
 function quem(){if(falar[0]==='a'&&falar[1]===':'){const x=avl.find(y=>y.id===falar.slice(2));return{tipo:'npc',nome:x?x.nome:'NPC'}}if(falar==='gm'&&isCo())return{tipo:'gm',co:1,nome:(narr&&narr.n)||'Co-narrador',av:(narr&&narr.av)||'',avg:(narr&&narr.avg)||''};if(falar==='gm')return{tipo:'gm',nome:'Mestre',av:(camp&&camp.imgGm)||''};if(falar==='npc')return{tipo:'npc',nome:npcN||'NPC'};if(falar[1]===':'){const p=pers.find(x=>x.id===falar.slice(2));if(p)return{tipo:falar[0]==='n'?'npc':'pers',nome:p.nome,av:p.img||'',avg:p.imgG||'',pid:p.id}}return{tipo:'eu',nome:eu.nome,av:eu.foto||'',avg:eu.fotoG||''}}
 const enviarMsg=(q,texto,dado,midia)=>{const m={t:agora(),uid,tipo:dado?'dado':q.tipo,nome:q.nome,texto};if(q.av)m.av=q.av;if(q.avg)m.avg=q.avg;if(q.pid)m.pid=q.pid;if(q.co)m.co=1;if(eu.cor)m.bc=eu.cor;if(susU)m.sus=susU;if(resp){m.re=resp;resp=null;rb()}if(midia)m.midia=midia;return db.collection('campanhas/'+cid+'/msgs').add(m)};
 async function enviar(){const i=$('#ent');const tx=i.value.trim();if(!tx)return;const q=quem();
+const rf=admin&&!monitor?tx.match(/^\/rf\s+(.+)$/i):null;
+if(rf){const x=rf[1].match(/^(.+?)\s*=\s*(-?\d+)$/),z=x?rolarF(x[1],+x[2]):null;if(!z||z.err)return alert(z&&z.err?z.err:'Use: /rf d20=18  (rolagem = total desejado)');i.value='';i.style.height='44px';previa();try{await enviarMsg(q,z.txt,1)}catch(e){alert('Não foi possível enviar a mensagem.')}return}
 const r=/^\/r(\s|$)/.test(tx)?rolar(tx.slice(2)):/d/i.test(tx)?rolar(tx):null;
 if(/^\/r(\s|$)/.test(tx)&&!r)return alert('Expressão de dados inválida. Exemplos: /r 2d6+3, /r d20, /r 4dF');
 i.value='';i.style.height='44px';previa();
 try{if(r)await enviarMsg(q,r.txt,1);else await enviarMsg(q,processa(tx))}catch(e){alert('Não foi possível enviar a mensagem.')}}
 function previa(){const i=$('#ent'),e=$('#pv');if(!i||!e)return;const t=i.value;let h='',d=0;const ok=x=>`<div class="ch ok">${x}</div>`,er=x=>`<div class="ch er">${x}</div>`;
-const rr=t.match(/^\/r(?:\s+(.*))?$/);
-if(rr){d=1;const x=(rr[1]||'').trim();h=!x?er('🎲 Dados: digite a rolagem, ex.: 2d6+3, d20, 4dF'):rolar(x)?ok('🎲 Rolagem de dados: <b>'+esc(x)+'</b> ✓ será rolada ao enviar'):er('🎲 Expressão de dados inválida: '+esc(x))}
+const rr=t.match(/^\/r(?:\s+(.*))?$/),rfm=admin&&!monitor?t.match(/^\/rf(?:\s+(.*))?$/i):null;
+if(rfm){d=1;const x=(rfm[1]||'').trim().match(/^(.+?)\s*=\s*(-?\d+)$/),z=x?rolarF(x[1],+x[2]):null;h=!z?er('🎲 Forçada: use /rf d20=18'):z.err?er('🎲 '+esc(z.err)):ok('🎲 Forçada: <b>'+esc(x[1])+' = '+esc(x[2])+'</b> ✓ sai como rolagem normal')}
+else if(rr){d=1;const x=(rr[1]||'').trim();h=!x?er('🎲 Dados: digite a rolagem, ex.: 2d6+3, d20, 4dF'):rolar(x)?ok('🎲 Rolagem de dados: <b>'+esc(x)+'</b> ✓ será rolada ao enviar'):er('🎲 Expressão de dados inválida: '+esc(x))}
 else if(/d/i.test(t)&&rolar(t)){d=1;h=ok('🎲 Rolagem de dados: <b>'+esc(t.trim())+'</b> ✓ será rolada ao enviar')}
 else{for(const m of t.matchAll(/#([\wÀ-ÿ-]+)/g)){const k=macros.find(x=>x.nome.toLowerCase()===m[1].toLowerCase()&&(x.publica||x.dono===uid));h+=k?ok('⚡ Macro <b>#'+esc(k.nome)+'</b> ✓ '+fmt(k.texto)):er('⚡ #'+esc(m[1])+': macro não encontrada')}
-if([...t.matchAll(/\/\/([^/]+)\/\//g)].some(m=>rolar(m[1]))){d=1;h+=ok('🎲 Rolagem dentro da mensagem ✓')}
+if([...t.matchAll(/\/\/([^/]+)\/\//g)].some(m=>{const r=rolarX(m[1]);return r&&!r.err})){d=1;h+=ok('🎲 Rolagem dentro da mensagem ✓')}
 }
 e.innerHTML=h;entM();const b=$('#bd');if(b)b.classList.toggle('on',!!d)}
 function prevMidia(f,leg0,pasta,send){const u=URL.createObjectURL(f),v=f.type.startsWith('video'),o=document.createElement('div');o.className='ov';
@@ -246,7 +269,7 @@ document.body.appendChild(o);const fim=()=>{URL.revokeObjectURL(u);o.remove()},s
 sim.onclick=async()=>{const leg=o.querySelector('#lg').value.trim();sim.disabled=true;sim.textContent='Enviando…';try{const url=await db.upload(f,pasta);await send(url,v,leg);fim()}catch(e){alert('Não foi possível enviar o arquivo. Confira se o arquivo atualizar.sql foi executado no Supabase.');sim.disabled=false;sim.textContent='Enviar'}}}
 function enviarMidia(el){const f=el.files[0];el.value='';if(!f)return;if(!/^(image|video)\//.test(f.type))return alert('Envie apenas imagens, GIFs ou vídeos.');if(f.size>25*1048576)return alert('Arquivo muito grande. O limite é 25 MB.');const i=$('#ent');
 prevMidia(f,i.value.trim(),cid,async(url,v,leg)=>{if(leg===i.value.trim()){i.value='';i.style.height='44px';previa()}await enviarMsg(quem(),leg?processa(leg):'',0,{t:v?'v':'i',u:url})})}
-function rolarPainel(){const r=rolar($('#ex').value);if(!r){alert('Expressão de dados inválida. Exemplos: 1d20, 2d6, d20+5, 4dF, d%');return}enviarMsg(quem(),r.txt,1)}
+function rolarPainel(){const r=rolarX($('#ex').value);if(!r||r.err){alert(r&&r.err?r.err:'Expressão de dados inválida. Exemplos: 1d20, 2d6, d20+5, 4dF, d%');return}enviarMsg(quem(),r.txt,1)}
 /* ---------- banco (Supabase) ---------- */
 function criaDb(){
 const cl=supabase.createClient(SUPA_URL,SUPA_KEY);
