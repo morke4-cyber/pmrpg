@@ -273,7 +273,7 @@ run();_ouv.add(run);
 /* recarrega sempre que o canal (re)conecta, inclusive na 1ª vez: o que chegar entre a busca inicial e a conexão não se perde */
 const ch=cl.channel('c'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'docs',filter:campo+'=eq.'+val},run).subscribe(st=>{if(st==='SUBSCRIBED'||st==='CHANNEL_ERROR'||st==='TIMED_OUT')run()});
 /* rede de segurança: chats conferem o servidor a cada 20 s caso o tempo real tenha caído sem aviso */
-const poll=/\/msgs$/.test(String(val))?setInterval(()=>{if(!document.hidden&&Date.now()-ult>15000)run()},20000):0;
+const poll=/\/(msgs|ooc)$/.test(String(val))?setInterval(()=>{if(!document.hidden&&Date.now()-ult>15000)run()},20000):0;
 return()=>{vivo=false;_ouv.delete(run);if(poll)clearInterval(poll);cl.removeChannel(ch)}}
 function doc(p){return{id:fim(p),get:()=>ler(p),set:d=>gravar(p,d),
 async update(d){const s=await ler(p);await gravar(p,{...(s.data()||{}),...d})},
@@ -374,7 +374,7 @@ function casca(){tela(`<header class="ch"><button class="h" onclick="voltar()" t
 function menuCamp(){if($('.ov'))return;const o=document.createElement('div');o.className='ov';o.style.cssText='align-items:flex-start;justify-content:flex-end;padding:54px 12px 0;background:rgba(0,0,0,.25)';o.onclick=e=>{if(e.target===o)o.remove()};
 const it=(ic,t,fn)=>{const d=document.createElement('div');d.innerHTML='<span>'+ic+'</span><span>'+t+'</span>';d.onclick=()=>{o.remove();fn()};return d};
 const c=document.createElement('div');c.className='card pm';
-c.appendChild(it('🗺','Mapas',()=>vMapas()));c.appendChild(it('🔍','Buscar no chat',()=>buscaChat()));c.appendChild(it('⚙️','Configurações',()=>{aba='cfg';ativo=null;tab()}));
+c.appendChild(it('🗺','Mapas',()=>vMapas()));c.appendChild(it('🔍','Buscar no chat',()=>buscaChat()));if(ehM()&&!monitor)c.appendChild(it('👥','Adicionar amigos',()=>addAmigosCamp()));c.appendChild(it('⚙️','Configurações',()=>{aba='cfg';ativo=null;tab()}));
 o.appendChild(c);document.body.appendChild(o)}
 function voltar(){if(ativo)ativo=null;else if(['macros','modelo','tema','diario','galeria'].includes(aba))aba='cfg';else if(aba!=='chat')aba='chat';else return inicio();tab()}
 /* ---------- mapas ---------- */
@@ -510,7 +510,7 @@ const badgeP=()=>{const e=document.getElementById('bn-a'),n=dmNl+pedN;if(e){e.te
 async function iniciaWatchDM(){let am=[];try{am=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.fr)}catch(e){}
 amigIds=new Set(am.map(x=>x.fr));const cs=await Promise.all(am.map(x=>db.naoLidas('dm/'+par(uid,x.fr)+'/msgs',x.lido||0,uid).catch(()=>0)));am.forEach((x,i)=>{nlF[x.fr]=cs[i]||0});dmNl=cs.reduce((a,b)=>a+b,0);badgeP();recarregaPedidos();
 const k=am.map(x=>x.fr).join();if(k===watchKD)return;watchKD=k;watchD.forEach(f=>f());
-watchD=am.map(x=>db.observa('dm/'+par(uid,x.fr)+'/msgs',m=>{if(m.t&&m.t>=(ativF[x.fr]||0)&&m.tipo!=='pedido'){ativF[x.fr]=m.t;ultD[x.fr]=m;linhaAmigAt(x.fr);reordenaAmig()}if(m.uid===uid)return;if(!(dmFr===x.fr&&!document.hidden)){dmNl++;nlF[x.fr]=(nlF[x.fr]||0)+1;badgeP();linhaAmigAt(x.fr)}if(!silencio('dm'))som()}))}
+watchD=am.map(x=>db.observa('dm/'+par(uid,x.fr)+'/msgs',m=>{if(m.tipo==='addcamp'&&m.uid!==uid&&tl==='home'){setTimeout(()=>{try{inicio()}catch(e){}},400)}if(m.t&&m.t>=(ativF[x.fr]||0)&&m.tipo!=='pedido'){ativF[x.fr]=m.t;ultD[x.fr]=m;linhaAmigAt(x.fr);reordenaAmig()}if(m.uid===uid)return;if(!(dmFr===x.fr&&!document.hidden)){dmNl++;nlF[x.fr]=(nlF[x.fr]||0)+1;badgeP();linhaAmigAt(x.fr)}if(!silencio('dm'))som()}))}
 async function social(h){tl='social';desinscrever();monitor=false;dmNl=0;if(typeof h!=='string')h=await socialHtml();socH=h;tela(h);marcaOnline()}
 function prevDM(m){if(!m)return'';if(m.tipo==='pedido')return m.uid===uid?'Pedido de amizade enviado':'Quer ser seu amigo';if(m.apagada)return'🚫 Mensagem apagada';const tx=String(m.texto||'').replace(/\s+/g,' ').trim()||(m.midia?'📎 Mídia':''),t=m.dado?'🎲 '+tx:tx;return m.uid===uid?'Você: '+t:t}
 const ordF=(a,b)=>(ativF[b.fr]||0)-(ativF[a.fr]||0)||az(a,b);
@@ -644,7 +644,7 @@ o.innerHTML=`<div class=card><h3>👑 ${esc(m.nome)}</h3><button class=s style="
 document.body.appendChild(o);o.onclick=e=>{if(e.target===o)o.remove()};o.querySelector('#cg0').onclick=()=>o.remove();o.querySelector('#cg1').onclick=()=>{o.remove();cogm(id,!co)};o.querySelector('#cg2').onclick=()=>{o.remove();passarMestre(id)}}
 const cogm=(id,on)=>db.doc('campanhas/'+cid+'/membros/'+id).update({papel:on?'cogm':''});
 async function excluirCamp(){if(!confirm('Excluir esta campanha para todos? Isso apaga mensagens, fichas e macros e não pode ser desfeito.'))return;const id=cid,b='campanhas/'+id,ms=membros.map(m=>m.id);desinscrever();
-try{for(const c of['msgs','macros','personagens','membros','leituras'])for(const d of(await db.collection(b+'/'+c).get()).docs)await db.doc(b+'/'+c+'/'+d.id).delete();for(const u of ms)await db.doc('data/users/'+u+'/c-'+id).delete();await db.doc(b).delete()}catch(e){alert('Não foi possível excluir a campanha por completo.')}inicio()}
+try{for(const c of['msgs','ooc','macros','personagens','membros','leituras'])for(const d of(await db.collection(b+'/'+c).get()).docs)await db.doc(b+'/'+c+'/'+d.id).delete();for(const u of ms)await db.doc('data/users/'+u+'/c-'+id).delete();await db.doc(b).delete()}catch(e){alert('Não foi possível excluir a campanha por completo.')}inicio()}
 /* ---------- chat ---------- */
 function vChat(){$('#ab').innerHTML=`<div id=msgs></div><div class=cmp><div id=dg class=mu style="font-size:12px"></div><div id=sb></div><div id=rb></div><div id=pv class=pv></div><div id=pd style="display:none"><div class=row><input id=ex value="d20" placeholder="Ex.: 2d6+3"><button onclick="rolarPainel()">Rolar</button></div><div class=q style="margin-top:6px">${['d4','d6','d8','d10','d12','d20','d%','4dF','2d6','d20+5'].map(d=>`<button onclick="$('#ex').value='${d}'">${d}</button>`).join('')}</div></div><div id=tbc class="${tbAb?'on':''}"><div id=tgl role=button aria-label="Mostrar ou esconder ferramentas" title="Ferramentas (toque ou arraste para cima)" onpointerdown="tbDown(event)"><span class=tab><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></span></div><div id=tbw><div><div class=row style="gap:6px"><button id=bd class=s onclick="$('#pd').style.display=$('#pd').style.display?'':'none'" title="Dados">🎲</button><button class=s onclick="$('#arq').click()" title="Enviar imagem, GIF ou vídeo">🖼️</button><button class=s onclick="aba='pers';ativo=null;tab()" title="Personagens e NPCs">👥</button><button id=bs class=s onclick="susAbre()" title="Sussurro">🤫</button><span id=fc class=mu style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right"></span></div></div></div></div><div class=row><span id=cab></span><div id=entw style="position:relative;flex:1;min-width:0;display:flex"><textarea id=ent rows=1 placeholder="Mensagem, /r 2d6, *negrito*, #macro" style="min-height:0;height:44px;max-height:120px;resize:none;flex:1;width:100%;color:transparent;caret-color:var(--tx)" oninput="previa();auto(this);dig();entM()" onscroll="entS()" onkeydown="teclaEnter(event)"></textarea><div id=entm aria-hidden=true><div></div></div></div><input id=arq type=file accept="image/*,video/*" style="display:none" onchange="enviarMidia(this)"><button onclick="enviar()">Enviar</button></div></div>`;cab();lista();aplicaTema();rb();$('#msgs').onscroll=()=>{if(Date.now()>semScroll&&noFundo())marcaLido()};if(monitor)$('#ab .cmp').innerHTML='<div class="ch">👁 Modo de monitoramento: somente leitura, invisível para os participantes.</div>'}
 function usaP(p){return p.dono===uid||(!!p.npc&&ehM())}
@@ -763,11 +763,7 @@ function dirDe(x,alvo,m){
   if(alvo&&alvo.closest&&alvo.closest('input,textarea,select,canvas,[contenteditable="true"]'))return 0;
   if(tl==='social')return homeOk?-1:0;
   if(tl==='home')return 1;
-  if(tl==='camp'){
-    if(alvo&&alvo.closest&&alvo.closest('#mpst,#mpc'))return 0; /* mapa: arrastar mexe no mapa */
-    if(m&&alvo&&alvo.closest&&alvo.closest('.m'))return 0; /* mouse sobre mensagem: seleciona texto */
-    return 1; /* dentro da campanha, arrastar da direita p/ esquerda em qualquer ponto abre os amigos */
-  }
+  if(tl==='camp')return 0; /* na campanha, a borda direita puxa o chat fora de contexto (bloco próprio) */
   return(!m&&x>=innerWidth-28)?1:0;
 }
 function inicia(x,y,alvo,m){ini=null;const d=dirDe(x,alvo,m);if(d)ini={x,y,d}}
@@ -954,4 +950,181 @@ window.tbDown=function(e){
   g.onpointerup=fim;g.onpointercancel=()=>{g.onpointermove=g.onpointerup=g.onpointercancel=null};
 };
 })();
+
+/* ---------- chat "fora de contexto": puxar da borda direita da campanha ---------- */
+(function(){
+let msgsO=[],pendO={},un=null,cidO=null,wrap=null,pn=null,aberto=false,naoO=0,vistoT=0,primeira=true,W=0,bloqO=0,mouseO=false,d=null,resO=0;
+const chave=()=>'mrpg_ooc_'+uid+'_'+cid;
+const lidoO=()=>{try{return Number(localStorage.getItem(chave()))||0}catch(e){return 0}};
+const salvaO=t=>{try{localStorage.setItem(chave(),String(t))}catch(e){}};
+const ultT=()=>msgsO.length?(msgsO[msgsO.length-1].t||0):0;
+const st=document.createElement('style');
+st.textContent='#oocw{position:fixed;top:0;bottom:0;overflow:hidden;z-index:11;pointer-events:none}'
++'#oocp{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);color:var(--tx);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);transform:translateX(100%);pointer-events:auto;box-shadow:-8px 0 24px rgba(0,0,0,.35);will-change:transform}'
++'#oocp.an{transition:transform .22s cubic-bezier(.2,.8,.3,1)}'
++'#oocm{flex:1;overflow:auto;padding:10px 8px;display:flex;flex-direction:column;gap:6px;min-height:0}'
++'#oocp .oocs{font-size:12px;font-weight:400;color:var(--mu);margin-left:6px}'
++'#oocb{position:fixed;z-index:8;width:26px;height:64px;top:45%;display:none;align-items:center;justify-content:center;flex-direction:column;gap:2px;background:var(--pr);color:#fff;border-radius:13px 0 0 13px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:-2px 2px 8px rgba(0,0,0,.3)}';
+document.head.appendChild(st);
+
+function pos(){const r=$('#app').getBoundingClientRect();wrap.style.left=r.left+'px';wrap.style.width=r.width+'px'}
+function criaPn(){
+  if(pn&&pn.isConnected)return pn;
+  wrap=document.createElement('div');wrap.id='oocw';
+  pn=document.createElement('div');pn.id='oocp';
+  pn.innerHTML='<header class=ch><button class=h onclick="oocFecha()" title="Fechar">'+ic('voltar')+'</button><span>Fora de contexto<span class=oocs>papo fora da história</span></span></header><div id=oocm></div><div class=cmp><div class=row><textarea id=oocx rows=1 placeholder="Mensagem fora de contexto…" style="min-height:0;height:44px;max-height:120px;resize:none;flex:1;width:100%" oninput="auto(this)" onkeydown="oocTecla(event)"></textarea><button onclick="oocEnvia()">Enviar</button></div></div>';
+  wrap.appendChild(pn);document.body.appendChild(wrap);pos();render(true);return pn;
+}
+function destroi(){if(wrap){wrap.remove()}wrap=pn=null;aberto=false;d=null}
+function badge(){
+  let b=document.getElementById('oocb');
+  const ver=tl==='camp'&&!monitor&&!aberto&&naoO>0&&camp;
+  if(!ver){if(b)b.style.display='none';return}
+  if(!b){b=document.createElement('div');b.id='oocb';b.title='Chat fora de contexto';b.onclick=()=>abre();document.body.appendChild(b)}
+  const r=$('#app').getBoundingClientRect();b.style.left=(r.right-26)+'px';
+  b.innerHTML='<span>💬</span><span>'+(naoO>99?'99+':naoO)+'</span>';b.style.display='flex';
+}
+function render(fundoSempre){
+  const e=document.getElementById('oocm');if(!e)return;
+  const fundo=fundoSempre||e.scrollHeight-e.scrollTop-e.clientHeight<80||!e.children.length;
+  const dono=camp&&camp.mestre;
+  e.innerHTML=msgsO.length?msgsO.map(m=>{const me=m.uid===uid;
+    return '<div class="m '+(me?'me':'')+'" id="o-'+esc(m.id)+'"><div class=n style="color:'+cor(m.uid)+'">'+esc(m.nome||m.uid)+(m.uid===dono?'<span class="tg g">MESTRE</span>':'')+'</div>'+fmt(m.texto)+'<div class=hrw><span class=mu>'+hora(m.t,m.id)+'</span>'+((me||dono===uid)&&!m._p?' <span style="cursor:pointer" title="Apagar" onclick="oocApaga(\''+esc(m.id)+'\')">🗑</span>':'')+'</div></div>'}).join('')
+    :'<p class=mu style="text-align:center">Nenhuma mensagem ainda. Aqui é o papo fora da história.</p>';
+  if(fundo)e.scrollTop=e.scrollHeight;
+}
+function marca(){const t=ultT();if(t>lidoO())salvaO(t);naoO=0;badge()}
+function iniciaO(){
+  if(monitor||!camp)return;
+  if(un&&cidO===cid)return;
+  if(un)un();
+  cidO=cid;msgsO=[];pendO={};primeira=true;naoO=0;vistoT=0;
+  const id=cid;
+  const u0=db.collection('campanhas/'+id+'/ooc').orderBy('t').limit(300).onSnapshot(sn=>{
+    if(id!==cid)return;
+    msgsO=sn.docs.map(x=>({id:x.id,...x.data()}));
+    for(const k in pendO){if(msgsO.some(x=>x.id===k))delete pendO[k];else{msgsO.push(pendO[k]);msgsO.sort((a,b)=>(a.t||0)-(b.t||0))}}
+    const lt=lidoO(),novas=msgsO.filter(m=>m.uid!==uid&&m.t>lt&&!m._p);
+    const chegou=!primeira&&msgsO.some(m=>m.uid!==uid&&m.t>vistoT&&!m._p);
+    vistoT=ultT();primeira=false;
+    if(aberto){marca();render()}else{naoO=novas.length;badge()}
+    if(chegou&&(!aberto||document.hidden)){try{if(!silencio(cid))som()}catch(e){}}
+  },()=>{});
+  un=()=>{u0();un=null;cidO=null};
+  subs.push(un);
+}
+const _om=ouveMsgs;ouveMsgs=function(){_om();iniciaO()};
+
+function abre(){
+  if(tl!=='camp'||monitor)return;
+  criaPn();pos();W=wrap.getBoundingClientRect().width;
+  aberto=true;pn.classList.add('an');pn.style.transform='translateX(0)';
+  marca();render(true);
+  setTimeout(()=>{const x=document.getElementById('oocx');if(x&&!matchMedia('(pointer:coarse)').matches)x.focus()},240);
+}
+function fecha(){
+  if(!pn)return;aberto=false;pn.classList.add('an');pn.style.transform='translateX(100%)';
+  const x=document.getElementById('oocx');if(x)x.blur();badge();
+}
+window.oocFecha=fecha;
+window.oocTecla=e=>{if(e.key==='Enter'&&!e.shiftKey&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();oocEnvia()}};
+window.oocEnvia=async function(){
+  const t=document.getElementById('oocx');if(!t||!camp||monitor)return;
+  const tx=t.value.trim();if(!tx)return;
+  t.value='';auto(t);
+  const m={t:agora(),uid,nome:eu.nome,texto:tx},r=db.collection('campanhas/'+cid+'/ooc').doc(),k=r.id;
+  pendO[k]={id:k,...m,_p:1};msgsO=msgsO.concat(pendO[k]);render(true);
+  try{await r.set(m)}catch(e){delete pendO[k];msgsO=msgsO.filter(x=>x.id!==k);render();alert('Não foi possível enviar a mensagem. Se é a primeira vez, aplique o SQL do chat fora de contexto no Supabase (arquivo chat-fora-de-contexto-e-amigos.sql).')}
+};
+window.oocApaga=async function(id){
+  if(!confirm('Apagar esta mensagem?'))return;
+  const ant=msgsO;msgsO=msgsO.filter(x=>x.id!==id);render();
+  try{await db.doc('campanhas/'+cid+'/ooc/'+id).delete()}catch(e){msgsO=ant;render();alert('Não foi possível apagar.')}
+};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&aberto)fecha()});
+addEventListener('resize',()=>{if(wrap)pos()});
+
+/* gesto: puxar da borda direita (abrir) / arrastar o cabeçalho para a direita (fechar) */
+function comecaOk(x,alvo,mouse){
+  if(!uid||tl!=='camp'||monitor||!camp||$('.ov')||$('#bsc'))return null;
+  if(alvo&&alvo.closest&&alvo.closest('input,textarea,select,canvas,#mpst,#mpc,[contenteditable="true"]'))return null;
+  if(aberto){return alvo&&alvo.closest&&alvo.closest('#oocp header')?'fecha':null}
+  const r=$('#app').getBoundingClientRect();
+  return(x>=r.right-36&&x<=r.right+1)?'abre':null;
+}
+function ini(x,y,alvo,mouse){d=null;const m=comecaOk(x,alvo,mouse);if(m)d={m,x,y,drag:false,p:0,lt:0,v:0}}
+function mov(x,y,e){
+  if(!d)return;
+  if(!d.drag){
+    const ax=Math.abs(x-d.x),ay=Math.abs(y-d.y);
+    if(ax<8&&ay<8)return;
+    const dir=d.m==='abre'?d.x-x:x-d.x;
+    if(ay>ax*.8||dir<=0){d=null;return}
+    criaPn();pos();W=wrap.getBoundingClientRect().width;pn.classList.remove('an');
+    d.drag=true;d.lt=Date.now();document.body.style.userSelect='none';
+  }
+  if(e&&e.cancelable)e.preventDefault();
+  let p=d.m==='abre'?d.x-x:W-(x-d.x);p=Math.max(0,Math.min(p,W));
+  const n=Date.now();if(n>d.lt){d.v=d.v*.3+((p-d.p)/(n-d.lt))*.7;d.lt=n}d.p=p;
+  pn.style.transform='translateX('+(W-p)+'px)';
+}
+function fim(cancel){
+  const x=d;d=null;document.body.style.userSelect='';
+  if(!x||!x.drag)return;
+  const abrir=!cancel&&(x.m==='abre'?(x.p>W*.28||(x.v>.45&&x.p>30)):!(x.p<W*.72||(x.v<-.45&&x.p<W-30)));
+  pn.classList.add('an');
+  if(abrir){aberto=true;pn.style.transform='translateX(0)';marca();render(true)}
+  else{aberto=false;pn.style.transform='translateX(100%)';badge()}
+}
+document.addEventListener('touchstart',e=>{if(e.touches.length>1){fim(true);return}const t=e.touches[0];ini(t.clientX,t.clientY,e.target,false)},{passive:true});
+document.addEventListener('touchmove',e=>{if(!d)return;const t=e.touches[0];mov(t.clientX,t.clientY,e)},{passive:false});
+document.addEventListener('touchend',()=>{const g=d&&d.drag;fim(false);if(g)bloqO=Date.now()});
+document.addEventListener('touchcancel',()=>fim(true));
+document.addEventListener('mousedown',e=>{if(e.button!==0)return;mouseO=true;ini(e.clientX,e.clientY,e.target,true)});
+document.addEventListener('mousemove',e=>{if(mouseO)mov(e.clientX,e.clientY,e)});
+document.addEventListener('mouseup',()=>{if(!mouseO)return;mouseO=false;const g=d&&d.drag;fim(false);if(g)bloqO=Date.now()});
+document.addEventListener('click',e=>{if(Date.now()-bloqO<350){e.stopPropagation();e.preventDefault()}},true);
+
+/* limpeza ao sair da campanha e atualização da etiqueta de não lidas */
+setInterval(()=>{
+  if(tl!=='camp'||!camp){if(wrap)destroi();naoO=0;badge();return}
+  if(wrap&&!aberto&&!d)pos();
+  badge();
+},500);
+})();
+
+/* ---------- adicionar amigos direto na campanha ---------- */
+window.addAmigosCamp=async function(){
+  if($('.ov')||!camp||monitor)return;
+  const o=document.createElement('div');o.className='ov';o.onclick=e=>{if(e.target===o)o.remove()};
+  o.innerHTML='<div class=card style="max-height:80vh;overflow:auto"><h3>Adicionar amigos</h3><p class=mu>Carregando…</p></div>';
+  document.body.appendChild(o);
+  let am=[];
+  try{
+    am=(await db.collection('data/users/'+uid).get()).docs.map(x=>x.data()).filter(x=>x.fr);
+    await Promise.all(am.map(async x=>{try{const p=await db.doc('usuarios/'+x.fr).get();if(p.exists){const u=p.data();x.nome=u.nome;x.foto=u.foto||''}}catch(e){}}));
+  }catch(e){}
+  am.sort((a,b)=>String(a.nome||a.fr).localeCompare(String(b.nome||b.fr),'pt-BR'));
+  const ja=new Set(membros.map(m=>m.id));
+  const c=o.firstChild;
+  c.innerHTML='<h3>Adicionar amigos</h3><p class=mu>Quem você adicionar já entra na campanha e recebe um aviso.</p>'
+    +(am.length?am.map(x=>'<div class="card it" style="cursor:default" data-f="'+esc(x.fr)+'"><span class=av style="width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex:none">'+(x.foto?'<img src="'+esc(x.foto)+'" alt="" style="width:100%;height:100%;object-fit:cover">':'👤')+'</span><b>'+esc(x.nome||x.fr)+'</b>'+(ja.has(x.fr)?'<span class=mu>Na campanha</span>':'<button data-add="'+esc(x.fr)+'" data-n="'+esc(x.nome||x.fr)+'">Adicionar</button>')+'</div>').join(''):'<p class=mu>Você ainda não tem amigos adicionados. Use a aba Amigos da tela inicial.</p>')
+    +'<button class=s style="width:100%;margin-top:8px" id=addfx>Fechar</button>';
+  c.querySelector('#addfx').onclick=()=>o.remove();
+  c.querySelectorAll('button[data-add]').forEach(b=>b.onclick=async()=>{
+    const fr=b.dataset.add,nome=b.dataset.n;b.disabled=true;b.textContent='…';
+    try{
+      const{data,error}=await db.cl.rpc('adicionar_amigo_campanha',{c:cid,amigo:fr});
+      if(error)throw error;
+      const nm=(data&&data.nome)||nome;
+      b.replaceWith(Object.assign(document.createElement('span'),{className:'mu',textContent:'Adicionado ✓'}));
+      db.collection('campanhas/'+cid+'/msgs').add({t:agora(),uid,tipo:'sys',nome:nm,texto:'foi adicionado à campanha'}).catch(()=>{});
+      db.collection('dm/'+par(uid,fr)+'/msgs').add({t:agora(),uid,texto:'📜 Te adicionei na campanha "'+camp.nome+'". Ela já está na sua lista!',tipo:'addcamp',cid}).catch(()=>{});
+    }catch(e){
+      b.disabled=false;b.textContent='Adicionar';
+      const msg=String((e&&e.message)||e);
+      alert(/Could not find the function|PGRST202|schema cache/i.test(msg)?'Falta aplicar o SQL no Supabase (arquivo chat-fora-de-contexto-e-amigos.sql).':'Não foi possível adicionar: '+msg);
+    }
+  });
+};
 </script></body></html>
