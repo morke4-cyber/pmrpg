@@ -714,6 +714,39 @@ document.addEventListener('click',e=>{if(feito){feito=0;e.stopPropagation();e.pr
 document.addEventListener('contextmenu',e=>{const el=e.target.closest&&e.target.closest('#msgs .m');if(el&&!monitor){e.preventDefault();lim();msgMenu(el.id.slice(2))}});
 })();
 
+/* ---------- arrastar o balão para a direita = responder (como no WhatsApp) ---------- */
+(function(){
+const st=document.createElement('style');
+st.textContent='#msgs{overflow-x:hidden}#msgs .m{touch-action:pan-y}'
++'.swi{position:absolute;top:50%;left:0;width:30px;height:30px;margin-top:-15px;border-radius:50%;background:var(--bd);color:var(--tx);display:flex;align-items:center;justify-content:center;font-size:17px;line-height:1;pointer-events:none;opacity:0}'
++'.swi.ok{background:var(--pr);color:#fff}';
+document.head.appendChild(st);
+const LIM=60;let el=null,ic=null,id=null,x0=0,y0=0,dx=0,modo=0,passou=0;
+const volta=resp=>{if(!el)return;const e=el,i=ic;e.style.transition='transform .2s';e.style.transform='';
+ setTimeout(()=>{e.style.transition='';if(i&&i.parentNode)i.remove()},220);
+ const ok=resp&&dx>=LIM,rid=id;el=null;ic=null;id=null;dx=0;modo=0;passou=0;
+ if(ok){try{if(navigator.vibrate)navigator.vibrate(12)}catch(x){}responder(rid)}};
+document.addEventListener('pointerdown',e=>{
+ if(el)volta(0);
+ if(e.pointerType==='mouse'||monitor)return;
+ const b=e.target.closest&&e.target.closest('#msgs .m');if(!b)return;
+ const m=msgs.find(x=>x.id===b.id.slice(2));if(!m||m.apagada||m._p||m.tipo==='sys')return;
+ el=b;id=m.id;x0=e.clientX;y0=e.clientY;dx=0;modo=0;passou=0},{passive:true});
+document.addEventListener('pointermove',e=>{
+ if(!el)return;const mx=e.clientX-x0,my=e.clientY-y0;
+ if(!modo){
+  if(Math.abs(my)>10&&Math.abs(my)>Math.abs(mx)){el=null;return}
+  if(mx>12&&mx>Math.abs(my)*1.5){modo=1;ic=document.createElement('span');ic.className='swi';ic.textContent='↩';el.appendChild(ic);el.style.transition='none'}
+  else return}
+ dx=Math.max(0,Math.min(mx,LIM+20));
+ el.style.transform='translateX('+dx+'px)';
+ const p=Math.min(1,dx/LIM);ic.style.opacity=p;ic.style.left=(-dx/2-15)+'px';ic.style.transform='scale('+(.6+.4*p)+')';
+ if(dx>=LIM&&!passou){passou=1;ic.classList.add('ok');try{if(navigator.vibrate)navigator.vibrate(8)}catch(x){}}
+ else if(dx<LIM&&passou){passou=0;ic.classList.remove('ok')}},{passive:true});
+document.addEventListener('pointerup',()=>volta(1),true);
+document.addEventListener('pointercancel',()=>volta(0),true);
+})();
+
 /* ---------- seletor rápido de macros (botão ⚡ no chat) ---------- */
 async function usaMacro(m,dir){
  if(dir){try{await enviarMsg(quem(),processa('#'+m.nome))}catch(e){alert('Não foi possível enviar a mensagem.')}return}
