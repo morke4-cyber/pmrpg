@@ -266,7 +266,15 @@ const par=p=>p.slice(0,p.lastIndexOf('/')),fim=p=>p.split('/').pop();
 const snap=r=>({id:fim(r.path),exists:true,data:()=>r.data});
 async function ler(p){const{data,error}=await cl.from('docs').select('*').eq('path',p).maybeSingle();if(error)throw error;return data?snap(data):{id:fim(p),exists:false,data:()=>undefined}}
 async function gravar(p,d){if(monitor){alert(MSGRO);throw new Error("ro")}const{error}=await cl.from('docs').upsert({path:p,parent:par(p),data:d});if(error)throw error}
-function ouvir(campo,val,f,er){let vivo=true,busy=false,again=false,tent=0,sub=0;const run=async()=>{if(!vivo)return;if(busy){again=true;return}busy=true;try{await f();tent=0}catch(e){if(er)er(e);if(tent<4){tent++;again=true;await new Promise(r=>setTimeout(r,1500*tent))}}busy=false;if(again&&vivo){again=false;run()}};run();const ch=cl.channel('c'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'docs',filter:campo+'=eq.'+val},run).subscribe(st=>{if(st==='SUBSCRIBED'){if(sub)run();sub=1}});return()=>{vivo=false;cl.removeChannel(ch)}}
+const _ouv=new Set();
+function ouvir(campo,val,f,er){let vivo=true,busy=false,again=false,tent=0,ult=0;
+const run=async()=>{if(!vivo)return;if(busy){again=true;return}busy=true;try{await f();tent=0}catch(e){if(er)er(e);if(tent<4){tent++;again=true;await new Promise(r=>setTimeout(r,1500*tent))}else tent=0}ult=Date.now();busy=false;if(again&&vivo){again=false;run()}};
+run();_ouv.add(run);
+/* recarrega sempre que o canal (re)conecta, inclusive na 1ª vez: o que chegar entre a busca inicial e a conexão não se perde */
+const ch=cl.channel('c'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'docs',filter:campo+'=eq.'+val},run).subscribe(st=>{if(st==='SUBSCRIBED'||st==='CHANNEL_ERROR'||st==='TIMED_OUT')run()});
+/* rede de segurança: chats conferem o servidor a cada 20 s caso o tempo real tenha caído sem aviso */
+const poll=/\/msgs$/.test(String(val))?setInterval(()=>{if(!document.hidden&&Date.now()-ult>15000)run()},20000):0;
+return()=>{vivo=false;_ouv.delete(run);if(poll)clearInterval(poll);cl.removeChannel(ch)}}
 function doc(p){return{id:fim(p),get:()=>ler(p),set:d=>gravar(p,d),
 async update(d){const s=await ler(p);await gravar(p,{...(s.data()||{}),...d})},
 async delete(){if(monitor){alert(MSGRO);throw new Error("ro")}const{error}=await cl.from('docs').delete().eq('path',p);if(error)throw error},
@@ -277,7 +285,7 @@ doc:id=>doc(p+'/'+(id||Math.random().toString(36).slice(2,10))),
 async add(d){const r=q.doc();await r.set(d);return r},
 orderBy:(f,d)=>col(p,{...o,f,d}),limit:n=>col(p,{...o,n}),
 onSnapshot(cb,er){return ouvir('parent',p,async()=>cb(await q.get()),er)}};return q}
-return{cl,canal(nome,onB,o){o=o||{};const ch=cl.channel(nome,{config:{broadcast:{self:false},presence:{key:o.key||'anon'}}});if(onB)ch.on('broadcast',{event:'dig'},x=>onB(x.payload));if(o.sync)ch.on('presence',{event:'sync'},()=>o.sync(Object.keys(ch.presenceState())));ch.subscribe(st=>{if(st==='SUBSCRIBED'&&o.key)ch.track({t:Date.now()})});return{env:p=>{try{ch.send({type:'broadcast',event:'dig',payload:p})}catch(e){}},fim:()=>cl.removeChannel(ch)}},doc,collection:col,async entrar(c){const{data,error}=await cl.rpc('entrar_campanha',{c});if(error)throw error;return data},async souAdmin(){const{data,error}=await cl.rpc('sou_admin');return error?false:!!data},observa(p,cb){const ch=cl.channel('o'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'INSERT',schema:'public',table:'docs',filter:'parent=eq.'+p},x=>{try{cb({id:fim(x.new.path),...x.new.data})}catch(e){}}).subscribe();return()=>cl.removeChannel(ch)},
+return{cl,resync(){try{if(cl.realtime&&!cl.realtime.isConnected())cl.realtime.connect()}catch(e){}_ouv.forEach(r=>r())},canal(nome,onB,o){o=o||{};const ch=cl.channel(nome,{config:{broadcast:{self:false},presence:{key:o.key||'anon'}}});if(onB)ch.on('broadcast',{event:'dig'},x=>onB(x.payload));if(o.sync)ch.on('presence',{event:'sync'},()=>o.sync(Object.keys(ch.presenceState())));ch.subscribe(st=>{if(st==='SUBSCRIBED'&&o.key)ch.track({t:Date.now()})});return{env:p=>{try{ch.send({type:'broadcast',event:'dig',payload:p})}catch(e){}},fim:()=>cl.removeChannel(ch)}},doc,collection:col,async entrar(c){const{data,error}=await cl.rpc('entrar_campanha',{c});if(error)throw error;return data},async souAdmin(){const{data,error}=await cl.rpc('sou_admin');return error?false:!!data},observa(p,cb){const ch=cl.channel('o'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'INSERT',schema:'public',table:'docs',filter:'parent=eq.'+p},x=>{try{cb({id:fim(x.new.path),...x.new.data})}catch(e){}}).subscribe();return()=>cl.removeChannel(ch)},
 async naoLidas(p,t,u){const{count,error}=await cl.from('docs').select('path',{count:'exact',head:true}).eq('parent',p).filter('data->>t','gt',String(t)).neq('data->>uid',u);return error?0:(count||0)},
 async ultima(p){const{data,error}=await cl.from('docs').select('data').eq('parent',p).order('data->>t',{ascending:false}).limit(1);return error||!data||!data[0]?null:data[0].data},
 async pedidos(){const{data,error}=await cl.from('docs').select('path,data').like('parent','dm/%/msgs').eq('data->>tipo','pedido').order('data->>t',{ascending:false}).limit(50);return error||!data?[]:data.map(r=>({id:fim(r.path),...r.data}))},
@@ -495,7 +503,7 @@ function marcaOnline(){document.querySelectorAll('[data-on]').forEach(e=>{e.styl
 const pHtml=()=>'👤'+(dmNl?` <span class=bdg style="display:inline-flex;vertical-align:middle">${dmNl>99?'99+':dmNl}</span>`:'');
 const badgeP=()=>{const e=document.getElementById('bn-a'),n=dmNl+pedN;if(e){e.textContent=n>99?'99+':n;e.style.display=n?'inline-flex':'none'}};
 async function iniciaWatchDM(){let am=[];try{am=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.fr)}catch(e){}
-amigIds=new Set(am.map(x=>x.fr));const cs=await Promise.all(am.map(x=>db.naoLidas('dm/'+par(uid,x.fr)+'/msgs',x.lido||0,uid).catch(()=>0)));dmNl=cs.reduce((a,b)=>a+b,0);badgeP();recarregaPedidos();
+amigIds=new Set(am.map(x=>x.fr));const cs=await Promise.all(am.map(x=>db.naoLidas('dm/'+par(uid,x.fr)+'/msgs',x.lido||0,uid).catch(()=>0)));am.forEach((x,i)=>{nlF[x.fr]=cs[i]||0});dmNl=cs.reduce((a,b)=>a+b,0);badgeP();recarregaPedidos();
 const k=am.map(x=>x.fr).join();if(k===watchKD)return;watchKD=k;watchD.forEach(f=>f());
 watchD=am.map(x=>db.observa('dm/'+par(uid,x.fr)+'/msgs',m=>{if(m.t&&m.t>=(ativF[x.fr]||0)&&m.tipo!=='pedido'){ativF[x.fr]=m.t;ultD[x.fr]=m;linhaAmigAt(x.fr);reordenaAmig()}if(m.uid===uid)return;if(!(dmFr===x.fr&&!document.hidden)){dmNl++;nlF[x.fr]=(nlF[x.fr]||0)+1;badgeP();linhaAmigAt(x.fr)}if(!silencio('dm'))som()}))}
 async function social(h){tl='social';desinscrever();monitor=false;dmNl=0;if(typeof h!=='string')h=await socialHtml();socH=h;tela(h);marcaOnline()}
@@ -887,5 +895,24 @@ function atualiza(){
 document.addEventListener('scroll',e=>{const t=e.target;if(t&&(t.id==='msgs'||t.id==='dmm'))atualiza()},true);
 addEventListener('resize',atualiza);
 setInterval(atualiza,400);
+})();
+
+/* ao voltar para a aba, voltar a ter internet ou reabrir o app: reconecta o tempo real e recarrega o que estava aberto */
+(function(){let t=0;const rs=()=>{clearTimeout(t);t=setTimeout(()=>{if(!document.hidden&&typeof db!=='undefined'&&db&&db.resync)db.resync()},300)};
+addEventListener('online',rs);addEventListener('focus',rs);addEventListener('pageshow',rs);document.addEventListener('visibilitychange',rs)})();
+
+/* bolinha vermelha na seta de voltar: mensagens não lidas em outras campanhas / chats enquanto você está em um chat */
+(function(){
+const st=document.createElement('style');
+st.textContent='header.ch button.h.nv{position:relative}header.ch button.h.nv::after{content:"";position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50%;background:#ef4444;border:2px solid var(--hb,#fff)}';
+document.head.appendChild(st);
+function conta(){let n=0;try{
+ if(tl==='camp'){for(const k in naoLidas)if(k!==cid)n+=naoLidas[k]||0;for(const k in nlF)n+=nlF[k]||0}
+ else if(tl==='dm'){for(const k in naoLidas)n+=naoLidas[k]||0;for(const k in nlF)if(k!==dmFr)n+=nlF[k]||0}
+}catch(e){}return n}
+function atualiza(){const b=document.querySelector('header.ch button.h[title="Voltar"]');
+document.querySelectorAll('header.ch button.h.nv').forEach(x=>{if(x!==b)x.classList.remove('nv')});
+if(b)b.classList.toggle('nv',conta()>0)}
+setInterval(atualiza,500);
 })();
 </script></body></html>
