@@ -972,15 +972,22 @@ if(foco){const q=$('#bq');if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch
 
 function dskInit(){if($('#dtb'))return;
 const t=document.createElement('div');t.id='dtb';
-t.innerHTML=`<div class="dlg">${ic('logo')}</div><span class="dtt" id="dtt"></span><button class="dbt" id="dbl" onclick="dskSinoT()" title="Notificações"></button><button class="dbt" id="dtm" onclick="dskTema()" title="Alternar modo claro / escuro"></button><button class="dbt dav" id="dav" onclick="social()" title="Perfil e amigos"></button><button class="dbt" onclick="menuTopo()" title="Menu" aria-label="Menu">⋮</button>`;
+t.innerHTML=`<div class="dlg">${ic('logo')}</div><span class="dtt" id="dtt"></span><button class="dbt" id="dbl" onclick="dskSinoT()" title="Notificações"></button><button class="dbt" id="dtm" onclick="dskTema()" title="Alternar modo claro / escuro"></button><button class="dbt dav" id="dav" onclick="dskAmigos()" title="Perfil e amigos"></button><button class="dbt" onclick="menuTopo()" title="Menu" aria-label="Menu">⋮</button>`;
 const s=document.createElement('div');s.id='dsb';
-s.innerHTML=`<div class="dnav"><button data-n="inicio" onclick="inicio()">${ic('inicio')}<span>Início</span></button><button data-n="amigos" onclick="social()">${ic('navAmigos')}<span>Amigos</span><span class="bdg" id="dn-a" style="display:none"></span></button><button data-n="config" onclick="menuTopo()">${ic('navConfig')}<span>Configurações</span></button></div><div id="dsl"></div><div class="dsd">${ic('decoLateral')}</div>`;
+s.innerHTML=`<div class="dnav"><button data-n="inicio" onclick="inicio()">${ic('inicio')}<span>Início</span></button><button data-n="amigos" onclick="dskAmigos()" onmouseenter="dskPre()">${ic('navAmigos')}<span>Amigos</span><span class="bdg" id="dn-a" style="display:none"></span></button><button data-n="config" onclick="menuTopo()">${ic('navConfig')}<span>Configurações</span></button></div><div id="dsl"></div><div class="dsd">${ic('decoLateral')}</div>`;
 document.body.appendChild(t);document.body.appendChild(s)}
 
 const dskModoAt=()=>document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
 function dskModo(){let m='';try{m=localStorage.getItem('mrpg_modo')||''}catch(e){}const h=document.documentElement;
 if(DQ.matches&&(m==='dark'||m==='light')){if(h.getAttribute('data-theme')!==m)h.setAttribute('data-theme',m)}else if(h.hasAttribute('data-theme'))h.removeAttribute('data-theme')}
 function dskTema(){const n=dskModoAt()==='dark'?'light':'dark';try{localStorage.setItem('mrpg_modo',n)}catch(e){}dskModo();dskBarra()}
+/* Amigos: mostra na hora o que já foi carregado e atualiza em segundo plano (antes esperava a busca inteira) */
+let dskPreT=0,dskAmgTk=0;
+function dskPre(r){if(!r&&Date.now()-dskPreT<10000)return;dskPreT=Date.now();const tk=++dskAmgTk;
+return socialHtml().then(h=>{socH=h;if(r&&tl==='social'&&tk===dskAmgTk){const a=document.activeElement;if(!(a&&a.matches&&a.matches('input,textarea')&&a.closest('#app'))){tela(h);marcaOnline()}}}).catch(()=>{dskPreT=0})}
+function dskAmigos(){if(tl==='social')return dskPre(1);
+if(socH)social(socH);else{tl='social';monitor=false;desinscrever();tela('<header class="th"><span>Amigos</span></header><div class="c sc"><p class="mu">Carregando…</p></div>')}
+dskPre(1)}
 function dskSinoT(){mudoT();dskBarra()}
 function dskSino(){if(!cid)return;mudoC(cid);const b=document.querySelector('#app .dkb');if(b)b.innerHTML=ic((mu().c||{})[cid]?'sinoMudo':'sino')}
 
@@ -999,6 +1006,7 @@ if(d.textContent!==s.textContent)d.textContent=s.textContent;const v=s.style.dis
 
 function dskSync(){dskModo();const on=DQ.matches&&!!uid&&!!eu&&tl!=='auth';document.body.classList.toggle('dsk',on);if(!on)return;
 dskInit();dskBarra();dskNav();dskSel();dskCab();dskBdg();
+if(homeOk&&!socH&&!dskPreT)dskPre();
 if(homeOk&&dskSg!==dsbSg(listaC))dsbRender(listaC,listaAd||[])}
 
 /* liga o layout às telas que já existem, sem mexer nelas */
