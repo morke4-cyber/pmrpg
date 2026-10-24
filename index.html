@@ -626,19 +626,18 @@ $('#ab').innerHTML=`<div class=c>${capa(gm)}<h3>Configurações</h3><div class=c
 <h3>Participantes (${membros.length})</h3>${membros.slice().sort((a,b)=>(b.id===camp.mestre)-(a.id===camp.mestre)||az(a,b)).map(m=>`<div class="card it" style="cursor:default;flex-wrap:wrap">${avP(m.id)}<b>${esc(m.nome)}</b><span class="tg ${m.id===camp.mestre?'g':''}">${papel(m)}</span>${m.id!==uid&&amigIds&&!amigIds.has(m.id)?`<button class=s onclick="addAmigo('${m.id}')">+ Amigo</button>`:''}${dono&&m.id!==camp.mestre?`<button class=s onclick="coroa('${m.id}')" title="Cargos de GM" style="padding:9px 12px">👑</button>`:''}${gm&&m.id!==camp.mestre&&m.id!==uid&&(dono||m.papel!=='cogm')?`<button class=x onclick="expulsar('${m.id}')">Remover</button>`:''}</div>`).join('')}
 ${!monitor?'<button class=s style="width:100%;margin-top:12px" onclick="sairCamp()">Sair da campanha</button>':''}${dono?'<p class=mu>O co-GM faz quase tudo que o Mestre faz, exceto excluir a campanha.</p><button class=x style="width:100%" onclick="excluirCamp()">Excluir campanha</button>':''}</div>`}
 const nomeM=id=>(membros.find(m=>m.id===id)||{}).nome||id;
-async function passarGM(id,sai){const velho=camp.mestre,b='campanhas/'+cid;
-await db.doc(b).update({mestre:id,mestreNome:nomeM(id)});
-await db.doc(b+'/membros/'+id).update({papel:''});
-if(!sai)await db.doc(b+'/membros/'+velho).update({papel:''}).catch(()=>{});
+async function passarGM(id,sai){const b='campanhas/'+cid;
+const{error}=await db.cl.rpc('passar_gm',{c:cid,novo:id,sai:!!sai});if(error)throw error;
 db.collection(b+'/msgs').add({t:agora(),uid,tipo:'sys',nome:eu.nome,texto:'passou o cargo de GM para '+nomeM(id)}).catch(()=>{})}
-async function passarMestre(id){if(!confirm('Passar o cargo de GM para '+nomeM(id)+'? Você passará a ser jogador.'))return;try{await passarGM(id,false)}catch(e){alert('Não foi possível passar o cargo de GM.')}}
+const errGM=(e,pad)=>{const m=String((e&&e.message)||e);return /Could not find the function|PGRST202|schema cache/i.test(m)?'Falta aplicar o SQL no Supabase (arquivo passar-gm.sql).':/mestre atual|não está na campanha|outra pessoa/i.test(m)?m:pad}
+async function passarMestre(id){if(!confirm('Passar o cargo de GM para '+nomeM(id)+'? Você passará a ser jogador.'))return;try{await passarGM(id,false)}catch(e){alert(errGM(e,'Não foi possível passar o cargo de GM.'))}}
 function escolherGM(titulo,lista,cb){const o=document.createElement('div');o.className='ov';o.innerHTML=`<div class=card><h3>${esc(titulo)}</h3>${lista.map(m=>`<button class=s style="width:100%;margin-top:6px" data-i="${esc(m.id)}">${esc(m.nome)}${m.papel==='cogm'?' (co-GM)':''}</button>`).join('')}<button class=x style="width:100%;margin-top:10px" id=ec>Cancelar</button></div>`;document.body.appendChild(o);o.querySelector('#ec').onclick=()=>o.remove();o.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{o.remove();cb(b.dataset.i)})}
 async function sairCamp(){if(monitor)return;const outros=membros.filter(m=>m.id!==uid).sort(az);
 if(camp.mestre===uid){if(!outros.length)return alert('Você é a única pessoa aqui. Para encerrar a campanha, use "Excluir campanha".');
 return escolherGM('Quem será o novo GM?',outros.slice().sort((a,b)=>(b.papel==='cogm')-(a.papel==='cogm')),id=>saindo(id))}
 if(confirm('Sair desta campanha? Você perde o acesso às mensagens dela.'))saindo(null)}
 async function saindo(novo){const id=cid;try{if(novo)await passarGM(novo,true);else try{await db.collection('campanhas/'+id+'/msgs').add({t:agora(),uid,tipo:'sys',nome:eu.nome,texto:'saiu da campanha'})}catch(e){}
-desinscrever();await db.doc('campanhas/'+id+'/membros/'+uid).delete();await db.doc('data/users/'+uid+'/c-'+id).delete()}catch(e){alert('Não foi possível sair da campanha.')}inicio()}
+desinscrever();await db.doc('campanhas/'+id+'/membros/'+uid).delete();await db.doc('data/users/'+uid+'/c-'+id).delete()}catch(e){alert(errGM(e,'Não foi possível sair da campanha.'))}inicio()}
 async function carregaAmigos(){try{amigIds=new Set((await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.fr).map(x=>x.fr))}catch(e){amigIds=new Set()}if(tl==='camp'&&aba==='cfg'&&camp&&!document.activeElement.closest('#ab'))vCfg()}
 function coroa(id){const m=membros.find(x=>x.id===id);if(!m||camp.mestre!==uid)return;const co=m.papel==='cogm',o=document.createElement('div');o.className='ov';
 o.innerHTML=`<div class=card><h3>👑 ${esc(m.nome)}</h3><button class=s style="width:100%;margin-top:6px" id=cg1>${co?'Remover co-GM':'Tornar co-GM'}</button><button class=s style="width:100%;margin-top:6px" id=cg2>Passar GM</button><button class=x style="width:100%;margin-top:10px" id=cg0>Cancelar</button></div>`;
