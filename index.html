@@ -264,6 +264,10 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 #ac .acI{display:flex;gap:8px;align-items:center;padding:8px 10px;cursor:pointer}#ac .acI b{flex:none}
 #ac .acI .mu{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
 #ac .acI.on{background:var(--me)}#ac .acH{padding:8px 10px;color:var(--mu);font-size:13px}
+.acx{max-height:28vh;overflow:auto;border:1px solid var(--bd);border-radius:12px;background:var(--cd);margin-top:6px}.acx:empty{display:none}
+.acx .acI{display:flex;gap:8px;align-items:center;padding:8px 10px;cursor:pointer}.acx .acI b{flex:none}
+.acx .acI .mu{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+.acx .acI.on{background:var(--me)}.acx .acH{padding:8px 10px;color:var(--mu);font-size:13px}
 </style></head><body><div id="app"><div class="c"><h2>mRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
@@ -334,7 +338,7 @@ if(!rolar(m[1]))return{erro:'Expressão de dados inválida.'};const alvo=+m[2];
 for(let i=0;i<30000;i++){const r=rolar(m[1]);if(r.t===alvo)return{r}}
 return{erro:'Não deu para chegar a '+alvo+' com essa rolagem.'}}
 function processa(tx){tx=tx.replace(/#([\wÀ-ÿ-]+)/g,(a,n)=>{const m=achaMacro(n);return m?m.texto:a});
-return tx.replace(/\/\/([^/]+)\/\//g,(a,x)=>{const t=tentaAt(x),r=t.erro?null:rolar(t.s);return r?'🎲 '+(t.u.length?t.u.join(', ')+' — ':'')+r.txt:a})}
+return tx.replace(/\/\/([^/]+)\/\//g,(a,x)=>{const t=tentaAt(x),r=t.erro?null:rolar(t.s);return r?'🎲 '+r.txt:a})}
 function quem(){if(falar[0]==='a'&&falar[1]===':'){const x=avl.find(y=>y.id===falar.slice(2));return{tipo:'npc',nome:x?x.nome:'NPC'}}if(falar==='gm'&&isCo())return{tipo:'gm',co:1,nome:(narr&&narr.n)||'Co-narrador',av:(narr&&narr.av)||'',avg:(narr&&narr.avg)||''};if(falar==='gm')return{tipo:'gm',nome:'Mestre',av:(camp&&camp.imgGm)||''};if(falar==='npc')return{tipo:'npc',nome:npcN||'NPC'};if(falar[1]===':'){const p=pers.find(x=>x.id===falar.slice(2));if(p)return{tipo:falar[0]==='n'?'npc':'pers',nome:p.nome,av:p.img||'',avg:p.imgG||'',pid:p.id}}return{tipo:'eu',nome:eu.nome,av:eu.foto||'',avg:eu.fotoG||''}}
 var pend={},pendD={};
 const enviarMsg=async(q,texto,dado,midia)=>{const m={t:agora(),uid,tipo:dado?'dado':q.tipo,nome:q.nome,texto};if(q.av)m.av=q.av;if(q.avg)m.avg=q.avg;if(q.pid)m.pid=q.pid;if(q.co)m.co=1;if(eu.cor)m.bc=eu.cor;if(susU)m.sus=susU;if(resp){m.re=resp;resp=null;rb()}if(midia)m.midia=midia;
@@ -342,16 +346,16 @@ const c=cid,r=db.collection('campanhas/'+c+'/msgs').doc(),p=r.id,px={id:p,...m,_
 try{await r.set(m)}catch(e){delete pend[p];msgs=msgs.filter(x=>x.id!==p);if(aba==='chat'&&c===cid)lista();throw e}return r};
 async function enviar(){const i=$('#ent');const tx=i.value.trim();if(!tx)return;const q=quem();
 const fc=cmdForca(tx);if(fc){if(fc.erro)return alert(fc.erro);i.value='';i.style.height='44px';previa();if(fc.r){try{await enviarMsg(q,fc.r.txt,1)}catch(e){alert('Não foi possível enviar a mensagem.')}}return}
-if(/^\/dano(\s|$)/i.test(tx)){const a=danoPlan(tx);if(a.erro)return alert(a.erro);i.value='';i.style.height='44px';previa();try{await db.doc('campanhas/'+cid+'/personagens/'+a.p.id).update({pv:a.novo});a.p.pv=a.novo;await enviarMsg(q,a.msg,0)}catch(e){alert('Não foi possível aplicar o dano.')}cab();return}
+if(/^\/(dano|cura)(\s|$)/i.test(tx)){const a=danoPlan(tx);if(a.erro)return alert(a.erro);i.value='';i.style.height='44px';previa();try{await db.doc('campanhas/'+cid+'/personagens/'+a.p.id).update({pv:a.novo});a.p.pv=a.novo;await enviarMsg(q,a.msg,0)}catch(e){alert('Não foi possível alterar a vida.')}cab();return}
 const ra=/^\/r(\s|$)/.test(tx),at=ra?tentaAt(tx.slice(2)):null;if(at&&at.erro)return alert(at.erro);
 const r=ra?rolar(at.s):/d/i.test(tx)?rolar(tx):null;
 if(ra&&!r)return alert('Expressão de dados inválida. Exemplos: /r 2d6+3, /r d20, /r 4dF');
 i.value='';i.style.height='44px';previa();
-try{if(r)await enviarMsg(q,(at&&at.u.length?at.u.join(', ')+' — ':'')+r.txt,1);else await enviarMsg(q,processa(tx))}catch(e){alert('Não foi possível enviar a mensagem.')}}
+try{if(r)await enviarMsg(q,r.txt,1);else await enviarMsg(q,processa(tx))}catch(e){alert('Não foi possível enviar a mensagem.')}}
 function previa(){const i=$('#ent'),e=$('#pv');if(!i||!e)return;const t=i.value;let h='',d=0;const ok=x=>`<div class="ch ok">${x}</div>`,er=x=>`<div class="ch er">${x}</div>`;
 const rr=t.match(/^\/r(?:\s+(.*))?$/),ff=/^\/f(\s|$)/i.test(t);
 if(ff){if(admin){d=1;h=/^\/f\s+.+=\s*[+-]?\d+\s*$/i.test(t)?ok('🎲 Rolagem forçada ✓'):er('🎲 Use: /f d20=17')}}
-else if(/^\/dano(\s|$)/i.test(t)){const a=danoPlan(t);h=a.erro?er('💥 '+esc(a.erro)):ok(esc(a.msg)+' ✓ será aplicado ao enviar')}
+else if(/^\/(dano|cura)(\s|$)/i.test(t)){const a=danoPlan(t);h=a.erro?er('💥 '+esc(a.erro)):ok(esc(a.msg)+' ✓ será aplicado ao enviar')}
 else if(rr){d=1;const x=(rr[1]||'').trim(),a=x?tentaAt(x):{};h=!x?er('🎲 Dados: digite a rolagem, ex.: 2d6+3, d20+@, 4dF'):a.erro?er('🎲 '+esc(a.erro)):rolar(a.s)?ok('🎲 Rolagem de dados: <b>'+esc(x)+'</b>'+(a.s!==x?' → '+esc(a.s):'')+' ✓ será rolada ao enviar'):er('🎲 Expressão de dados inválida: '+esc(x))}
 else if(/d/i.test(t)&&rolar(t)){d=1;h=ok('🎲 Rolagem de dados: <b>'+esc(t.trim())+'</b> ✓ será rolada ao enviar')}
 else{for(const m of t.matchAll(/#([\wÀ-ÿ-]+)/g)){const k=achaMacro(m[1]);h+=k?ok('⚡ Macro <b>#'+esc(k.nome)+'</b> ✓ '+fmt(k.texto)):er('⚡ #'+esc(m[1])+': macro não encontrada')}
@@ -373,25 +377,26 @@ function statsDe(p){const L=[];if(!p||!camp||!camp.modelo)return L;for(const s o
 function resAt(tx,p,u){return String(tx).replace(/@([\wÀ-ÿ-]+?)(\.mod)?(?![\wÀ-ÿ-])/g,(a,n,mo)=>{if(!p)throw new Error('Escolha um personagem em "Falar como" para usar @.');const L=statsDe(p).filter(x=>!!x.mod===!!mo),k=nz(n),s=L.find(x=>x.nm===k)||unico(L.filter(x=>x.nm.startsWith(k)));if(!s)throw new Error('@'+n+': atributo não encontrado na ficha de '+p.nome+'.');u.push(s.n);return s.v}).replace(/\+-/g,'-').replace(/--/g,'+')}
 function tentaAt(x){const u=[];try{const s=resAt(x,persFala(),u);return{s,u:[...new Set(u)]}}catch(e){return{erro:e.message}}}
 /* /dano "Nome" +3  → tira 3 PV (negativo = cura). Aceita nome de personagem, NPC/inimigo ou jogador. */
-function danoPlan(t){const m=t.match(/^\/dano\s+(.+?)\s+([+-]?\d+)\s*$/i);if(!m)return{erro:'Use: /dano "Nome" +3'};
-const nome=m[1].replace(/^["“”']+|["“”']+$/g,'').trim(),n=+m[2],k=nz(nome),f=g=>pers.filter(g);
+function danoPlan(t){const m=t.match(/^\/(dano|cura)\s+(.+?)\s+([+-]?\d+)\s*$/i);if(!m)return{erro:'Use: /dano "Nome" +3  ou  /cura "Nome" +3'};
+const nome=m[2].replace(/^["“”']+|["“”']+$/g,'').trim(),n=m[1].toLowerCase()==='cura'?-(+m[3]):+m[3],k=nz(nome),f=g=>pers.filter(g);
 let c=f(p=>nz(p.nome)===k);if(!c.length)c=f(p=>!p.npc&&nz(p.donoNome)===k);if(!c.length)c=f(p=>nz(p.nome).startsWith(k));if(!c.length)c=f(p=>nz(p.nome).includes(k));
 if(!c.length)return{erro:'Ninguém encontrado com o nome "'+nome+'".'};
 if(c.length>1)return{erro:'Mais de um encontrado: '+c.map(p=>p.nome).join(', ')+'. Digite o nome completo.'};
-const p=c[0];if(!ehM()&&p.dono!==uid)return{erro:'Só o Mestre pode dar dano em outros personagens.'};
+const p=c[0];if(!ehM()&&p.dono!==uid)return{erro:'Só o Mestre pode mexer na vida de outros personagens.'};
 if(p.pv==null)return{erro:p.nome+' ainda não tem PV preenchidos na ficha.'};
 const novo=Math.min(p.pvmax??1e9,Math.max(0,p.pv-n));
 return{p,novo,msg:n>=0?'💥 '+p.nome+' sofreu '+n+' de dano (PV '+p.pv+' → '+novo+')':'💚 '+p.nome+' recuperou '+(-n)+' PV (PV '+p.pv+' → '+novo+')'}}
 /* lista de sugestões acima do campo: #macro, @atributo (dentro de /r) e nome após /dano */
 let acL=[],acI=0,acR=null;
 const subq=(s,k)=>{let i=0;for(const c of s)if(c===k[i])i++;return i===k.length};
-function acDesenha(){const e=$('#ac');if(!e)return;e.onpointerdown=ev=>{const c=ev.target.closest('.acI');ev.preventDefault();if(c)acPick(+c.dataset.i)};e.innerHTML=acL.map((x,i)=>x.ins?`<div class="acI${i===acI?' on':''}" data-i="${i}"><b>${esc(x.t)}</b><span class=mu>${esc(x.s||'')}</span></div>`:`<div class=acH>${esc(x.t)}</div>`).join('');const o=e.querySelector('.on');if(o)o.scrollIntoView({block:'nearest'})}
+let acT=null,acB=null;
+function acDesenha(){const e=acB||$('#ac');if(!e)return;e.onpointerdown=ev=>{const c=ev.target.closest('.acI');ev.preventDefault();if(c)acPick(+c.dataset.i)};e.innerHTML=acL.map((x,i)=>x.ins?`<div class="acI${i===acI?' on':''}" data-i="${i}"><b>${esc(x.t)}</b><span class=mu>${esc(x.s||'')}</span></div>`:`<div class=acH>${esc(x.t)}</div>`).join('');const o=e.querySelector('.on');if(o)o.scrollIntoView({block:'nearest'})}
 function acFecha(){acL=[];acR=null;acDesenha()}
-function acPick(i){const x=acL[i],t=$('#ent');if(!x||!x.ins||!acR||!t)return;const r=acR,p=r[0]+x.ins.length;t.value=t.value.slice(0,r[0])+x.ins+t.value.slice(r[1]);t.focus();try{t.setSelectionRange(p,p)}catch(e){}acFecha();previa();auto(t);dig();entM()}
-function acLista(){const t=$('#ent');if(!t)return;const pos=t.selectionStart,a=t.value.slice(0,pos);let m;acL=[];acR=null;acI=0;
+function acPick(i){const x=acL[i],t=acT||$('#ent');if(!x||!x.ins||!acR||!t)return;const r=acR,p=r[0]+x.ins.length;t.value=t.value.slice(0,r[0])+x.ins+t.value.slice(r[1]);t.focus();try{t.setSelectionRange(p,p)}catch(e){}acFecha();if(t.id==='ent'){previa();auto(t);dig();entM()}else if(t._pv)t._pv()}
+function acLista(t,b){t=t&&t.nodeType?t:$('#ent');if(!t)return;acT=t;acB=b||$('#ac');const pos=t.selectionStart,a=t.value.slice(0,pos);let m;acL=[];acR=null;acI=0;
 if(m=a.match(/(?:^|\s)#([\wÀ-ÿ-]*)$/)){const k=nz(m[1]);acR=[pos-m[1].length-1,pos];acL=macros.filter(x=>(x.publica||x.dono===uid)&&(!k||nz(x.nome).includes(k)||subq(nz(x.nome),k)||nz(x.texto).includes(k))).sort((x,y)=>(nz(y.nome).startsWith(k)-nz(x.nome).startsWith(k))||x.nome.localeCompare(y.nome,'pt')).slice(0,30).map(x=>({t:'#'+x.nome,s:x.texto,ins:'#'+x.nome+' '}))}
 else if((/^\/r(\s|$)/.test(t.value)||(a.match(/\/\//g)||[]).length%2)&&(m=a.match(/(?:^|[\s+\-*(\/])@([\wÀ-ÿ.-]*)$/))){const p=persFala();acR=[pos-m[1].length-1,pos];if(!p)acL=[{t:'Escolha um personagem em "Falar como" para usar @.'}];else{const k=nz(m[1].replace(/\..*$/,''));acL=statsDe(p).filter(x=>!k||nz(x.n).includes(k)).map(x=>({t:x.n,s:(x.mod&&x.v>0?'+':'')+x.v,ins:x.tk}))}}
-else if(m=a.match(/^(\/dano\s+)"?([^"]*)$/i)){const k=nz(m[2]);acR=[m[1].length,pos];acL=pers.filter(p=>!k||nz(p.nome).includes(k)).map(p=>({t:p.nome,s:(hpTxt(p)||'sem PV')+(p.npc?' · NPC':''),ins:'"'+p.nome+'" '}))}
+else if(m=a.match(/^(\/(?:dano|cura)\s+)"?([^"]*)$/i)){const k=nz(m[2]);acR=[m[1].length,pos];acL=pers.filter(p=>!k||nz(p.nome).includes(k)).map(p=>({t:p.nome,s:(hpTxt(p)||'sem PV')+(p.npc?' · NPC':''),ins:'"'+p.nome+'" '}))}
 acDesenha()}
 function teclaEnter(e){if(acL.some(x=>x.ins)){const n=acL.length;if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();acI=(acI+(e.key==='ArrowDown'?1:n-1))%n;acDesenha();return}if(e.key==='Tab'||(e.key==='Enter'&&!e.shiftKey&&!matchMedia('(pointer:coarse)').matches)){e.preventDefault();return acPick(acI)}if(e.key==='Escape'){acFecha();return}}
 if(e.key==='Enter'&&!e.shiftKey&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();enviar()}}
@@ -813,7 +818,7 @@ if(m.tipo==='sys')return(m.id===pri?`<div class=nl id=dvn>Mensagens não lidas (
 if(!entrou){entrou=true;semScroll=Date.now()+800;const dv=$('#dvn');if(dv)e.scrollTop=Math.max(0,dv.getBoundingClientRect().top-e.getBoundingClientRect().top+e.scrollTop-60);else e.scrollTop=e.scrollHeight;setTimeout(()=>{if(!document.hidden&&noFundo())marcaLido()},2500)}
 else if(b){e.scrollTop=e.scrollHeight;if(!sem&&nl.length&&!document.hidden)marcaLido()}}
 /* ---------- macros ---------- */
-function vMacros(){const v=macros.filter(m=>m.publica||m.dono===uid);$('#ab').innerHTML=`<div class=c><button onclick="novaMacro()" style="width:100%">+ Nova macro</button><p class=mu>Use no chat digitando #nome. Dados dentro de //…// são rolados. Ex.: Josias atacou ferozmente! //2d20+5//</p>${v.map(m=>`<div class=card><b>#${esc(m.nome)}</b> <span class=tg>${m.publica?'Pública':'Particular'}</span><div class=mu>${esc(m.texto)}</div>${m.dono===uid||ehM()?`<button class="s" style="margin-top:8px" onclick="delMacro('${m.id}')">Excluir</button>`:''}</div>`).join('')||'<p class=mu>Nenhuma macro criada.</p>'}</div>`}
+function vMacros(){const v=macros.filter(m=>m.publica||m.dono===uid);$('#ab').innerHTML=`<div class=c><button onclick="novaMacro()" style="width:100%">+ Nova macro</button><p class=mu>Use no chat digitando #nome. Dados dentro de //…// são rolados. Ex.: Josias atacou ferozmente! //2d20+@Força// (o @ puxa o valor da ficha)</p>${v.map(m=>`<div class=card><b>#${esc(m.nome)}</b> <span class=tg>${m.publica?'Pública':'Particular'}</span><div class=mu>${esc(m.texto)}</div>${m.dono===uid||ehM()?`<button class="s" style="margin-top:8px" onclick="delMacro('${m.id}')">Excluir</button>`:''}</div>`).join('')||'<p class=mu>Nenhuma macro criada.</p>'}</div>`}
 /* ---------- botão "ir para as mensagens novas" + menu de toque longo no balão ---------- */
 (function(){
 const st=document.createElement('style');
@@ -912,7 +917,16 @@ function macroPicker(){
   o.querySelectorAll('.mcI').forEach(c=>{const s=!t||c.dataset.n.includes(t);c.style.display=s?'':'none';if(s)n++});
   o.querySelectorAll('.mcS').forEach(s=>{s.style.display=[...s.querySelectorAll('.mcI')].some(c=>c.style.display!=='none')?'':'none'});
   o.querySelector('#mcN').style.display=n?'none':''}}
-function novaMacro(){modal('Nova macro',[{l:'Nome (sem espaços)'},{l:'Texto da macro',ml:1},{l:'Pública? Digite "sim" para todos usarem'}],([n,t,p])=>{n=n.replace(/\s+/g,'');if(!n||!t)return alert('Preencha o nome e o texto da macro.');db.collection('campanhas/'+cid+'/macros').add({nome:n,texto:t,dono:uid,publica:/^s/i.test(p)})})}
+function novaMacro(){const o=document.createElement('div');o.className='ov';
+o.innerHTML=`<div class=card style="max-height:90vh;overflow:auto"><h3>Nova macro</h3><label>Nome (sem espaços)</label><input id=mN><label>Texto da macro</label><textarea id=mT style="min-height:90px" placeholder="Ex.: Ataquei com força! //1d20+@Força//"></textarea><div id=mA class=acx></div><label style="display:flex;gap:6px;align-items:center;color:var(--tx)"><input type=checkbox id=mP style="width:auto;margin:0"> Pública (todos podem usar)</label><label>Prévia (dados rolam de verdade, só para testar)</label><div id=mV class=ch></div><button class=s id=mR style="width:100%;margin-top:6px">🎲 Testar de novo</button><div class=row style="margin-top:12px"><button class=s id=mC>Cancelar</button><button id=mS>Salvar</button></div></div>`;
+document.body.appendChild(o);const q=s=>o.querySelector(s),T=q('#mT'),A=q('#mA');
+const pv=()=>{const tx=T.value.trim(),e=q('#mV'),p=persFala();if(!tx){e.className='ch';e.textContent='Escreva o texto para ver a prévia.';return}
+const bad=[...tx.matchAll(/\/\/([^/]+)\/\//g)].map(m=>tentaAt(m[1])).filter((t,i)=>t.erro||!rolar(t.s));
+e.className='ch '+(bad.length?'er':'ok');e.style.whiteSpace='pre-wrap';
+e.innerHTML=(bad.length?bad.map(t=>'⚠️ '+esc(t.erro||'Dado inválido')).join('<br>')+'<hr>':'')+fmt(processa(tx))+(p&&/@/.test(tx)?'<div class=mu style="margin-top:6px">Ficha usada: '+esc(p.nome)+'</div>':'')};
+T._pv=pv;T.oninput=()=>{pv();acLista(T,A)};T.onblur=()=>setTimeout(acFecha,150);q('#mR').onclick=pv;pv();
+q('#mC').onclick=()=>{acFecha();o.remove()};
+q('#mS').onclick=()=>{const n=q('#mN').value.replace(/\s+/g,''),t=T.value.trim();if(!n||!t)return alert('Preencha o nome e o texto da macro.');db.collection('campanhas/'+cid+'/macros').add({nome:n,texto:t,dono:uid,publica:q('#mP').checked});acFecha();o.remove()}}
 const delMacro=id=>db.doc('campanhas/'+cid+'/macros/'+id).delete();
 /* ---------- fichas ---------- */
 function vPers(){const p=pers.find(x=>x.id===ativo);if(p)return fichaDe(p);
