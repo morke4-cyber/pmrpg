@@ -918,7 +918,7 @@ function macroPicker(){
   o.querySelectorAll('.mcS').forEach(s=>{s.style.display=[...s.querySelectorAll('.mcI')].some(c=>c.style.display!=='none')?'':'none'});
   o.querySelector('#mcN').style.display=n?'none':''}}
 function novaMacro(){const o=document.createElement('div');o.className='ov';
-o.innerHTML=`<div class=card style="max-height:90vh;overflow:auto"><h3>Nova macro</h3><label>Nome (sem espaços)</label><input id=mN><label>Texto da macro</label><textarea id=mT style="min-height:90px" placeholder="Ex.: Ataquei com força! //1d20+@Força//"></textarea><div id=mA class=acx></div><label style="display:flex;gap:6px;align-items:center;color:var(--tx)"><input type=checkbox id=mP style="width:auto;margin:0"> Pública (todos podem usar)</label><label>Prévia (dados rolam de verdade, só para testar)</label><div id=mV class=ch></div><button class=s id=mR style="width:100%;margin-top:6px">🎲 Testar de novo</button><div class=row style="margin-top:12px"><button class=s id=mC>Cancelar</button><button id=mS>Salvar</button></div></div>`;
+o.innerHTML=`<div class=card style="max-height:90vh;overflow:auto"><h3>Nova macro</h3><label>Nome (sem espaços)</label><input id=mN><label>Texto da macro</label><textarea id=mT style="min-height:90px" placeholder="Ex.: Ataquei com força! //1d20+@Força//"></textarea><div id=mA class=acx></div>${ehM()?`<label style="display:flex;gap:6px;align-items:center;color:var(--tx)"><input type=checkbox id=mP style="width:auto;margin:0"> Pública (todos podem usar)</label>`:`<p class=mu>Esta macro será só sua. Macros públicas são criadas pelo Mestre ou Co-GM.</p>`}<label>Prévia (dados rolam de verdade, só para testar)</label><div id=mV class=ch></div><button class=s id=mR style="width:100%;margin-top:6px">🎲 Testar de novo</button><div class=row style="margin-top:12px"><button class=s id=mC>Cancelar</button><button id=mS>Salvar</button></div></div>`;
 document.body.appendChild(o);const q=s=>o.querySelector(s),T=q('#mT'),A=q('#mA');
 const pv=()=>{const tx=T.value.trim(),e=q('#mV'),p=persFala();if(!tx){e.className='ch';e.textContent='Escreva o texto para ver a prévia.';return}
 const bad=[...tx.matchAll(/\/\/([^/]+)\/\//g)].map(m=>tentaAt(m[1])).filter((t,i)=>t.erro||!rolar(t.s));
@@ -926,7 +926,7 @@ e.className='ch '+(bad.length?'er':'ok');e.style.whiteSpace='pre-wrap';
 e.innerHTML=(bad.length?bad.map(t=>'⚠️ '+esc(t.erro||'Dado inválido')).join('<br>')+'<hr>':'')+fmt(processa(tx))+(p&&/@/.test(tx)?'<div class=mu style="margin-top:6px">Ficha usada: '+esc(p.nome)+'</div>':'')};
 T._pv=pv;T.oninput=()=>{pv();acLista(T,A)};T.onblur=()=>setTimeout(acFecha,150);q('#mR').onclick=pv;pv();
 q('#mC').onclick=()=>{acFecha();o.remove()};
-q('#mS').onclick=()=>{const n=q('#mN').value.replace(/\s+/g,''),t=T.value.trim();if(!n||!t)return alert('Preencha o nome e o texto da macro.');db.collection('campanhas/'+cid+'/macros').add({nome:n,texto:t,dono:uid,publica:q('#mP').checked});acFecha();o.remove()}}
+q('#mS').onclick=()=>{const n=q('#mN').value.replace(/\s+/g,''),t=T.value.trim();if(!n||!t)return alert('Preencha o nome e o texto da macro.');db.collection('campanhas/'+cid+'/macros').add({nome:n,texto:t,dono:uid,publica:ehM()&&!!q('#mP')&&q('#mP').checked});acFecha();o.remove()}}
 const delMacro=id=>db.doc('campanhas/'+cid+'/macros/'+id).delete();
 /* ---------- fichas ---------- */
 function vPers(){const p=pers.find(x=>x.id===ativo);if(p)return fichaDe(p);
