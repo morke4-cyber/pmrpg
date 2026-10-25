@@ -344,12 +344,13 @@ var pend={},pendD={};
 const enviarMsg=async(q,texto,dado,midia)=>{const m={t:agora(),uid,tipo:dado?'dado':q.tipo,nome:q.nome,texto};if(q.av)m.av=q.av;if(q.avg)m.avg=q.avg;if(q.pid)m.pid=q.pid;if(q.co)m.co=1;if(eu.cor)m.bc=eu.cor;if(susU)m.sus=susU;if(resp){m.re=resp;resp=null;rb()}if(midia)m.midia=midia;
 const c=cid,r=db.collection('campanhas/'+c+'/msgs').doc(),p=r.id,px={id:p,...m,_p:1,_c:c};pend[p]=px;msgs=msgs.concat(px);if(aba==='chat')lista();
 try{await r.set(m)}catch(e){delete pend[p];msgs=msgs.filter(x=>x.id!==p);if(aba==='chat'&&c===cid)lista();throw e}return r};
-async function enviar(){const i=$('#ent');const tx=i.value.trim();if(!tx)return;const q=quem();
+async function enviar(){const i=$('#ent');let tx=i.value.trim();if(!tx)return;const q=quem();const mm=tx.match(/^#([\wÀ-ÿ-]+)$/),mk=mm&&achaMacro(mm[1]);if(mk&&/^\/(r|dano|cura)(\s|$)/i.test(mk.texto.trim()))tx=mk.texto.trim();
 const fc=cmdForca(tx);if(fc){if(fc.erro)return alert(fc.erro);i.value='';i.style.height='44px';previa();if(fc.r){try{await enviarMsg(q,fc.r.txt,1)}catch(e){alert('Não foi possível enviar a mensagem.')}}return}
 if(/^\/(dano|cura)(\s|$)/i.test(tx)){const a=danoPlan(tx);if(a.erro)return alert(a.erro);i.value='';i.style.height='44px';previa();try{await db.doc('campanhas/'+cid+'/personagens/'+a.p.id).update({pv:a.novo});a.p.pv=a.novo;await enviarMsg(q,a.msg,0)}catch(e){alert('Não foi possível alterar a vida.')}cab();return}
 const ra=/^\/r(\s|$)/.test(tx),at=ra?tentaAt(tx.slice(2)):null;if(at&&at.erro)return alert(at.erro);
 const r=ra?rolar(at.s):/d/i.test(tx)?rolar(tx):null;
 if(ra&&!r)return alert('Expressão de dados inválida. Exemplos: /r 2d6+3, /r d20, /r 4dF');
+if(!r){const e1=erroAt(tx);if(e1)return alert(e1)}
 i.value='';i.style.height='44px';previa();
 try{if(r)await enviarMsg(q,r.txt,1);else await enviarMsg(q,processa(tx))}catch(e){alert('Não foi possível enviar a mensagem.')}}
 function previa(){const i=$('#ent'),e=$('#pv');if(!i||!e)return;const t=i.value;let h='',d=0;const ok=x=>`<div class="ch ok">${x}</div>`,er=x=>`<div class="ch er">${x}</div>`;
@@ -372,6 +373,8 @@ prevMidia(f,i.value.trim(),cid,async(url,v,leg)=>{if(leg===i.value.trim()){i.val
 const nz=t=>sem(t).replace(/[\s_]+/g,'');
 const unico=a=>a.length===1?a[0]:null;
 function achaMacro(n){const v=macros.filter(m=>m.publica||m.dono===uid),k=nz(n);return v.find(m=>m.nome.toLowerCase()===String(n).toLowerCase())||v.find(m=>nz(m.nome)===k)||unico(v.filter(m=>nz(m.nome).startsWith(k)))||unico(v.filter(m=>nz(m.nome).includes(k)))}
+const expM=tx=>tx.replace(/#([\wÀ-ÿ-]+)/g,(a,n)=>{const m=achaMacro(n);return m?m.texto:a});
+const erroAt=tx=>{for(const m of expM(tx).matchAll(/\/\/([^/]+)\/\//g)){const t=tentaAt(m[1]);if(t.erro)return t.erro}return null};
 function persFala(){const q=quem();let p=q.pid?pers.find(x=>x.id===q.pid):null;if(!p){const m=pers.filter(x=>!x.npc&&x.dono===uid);if(m.length===1)p=m[0]}return p}
 function statsDe(p){const L=[];if(!p||!camp||!camp.modelo)return L;for(const s of camp.modelo.secoes)for(const c of s.campos)if(c.k==='attr'||c.k==='num'||c.k==='calc'){const v=Math.round(valCampo(c.n,p,0)),tk='@'+c.n.replace(/\s+/g,'_');L.push({n:c.n,nm:nz(c.n),v,tk});if(c.k==='attr')L.push({n:c.n+' (mod)',nm:nz(c.n),mod:1,v:Math.floor((v-10)/2),tk:tk+'.mod'})}return L}
 function resAt(tx,p,u){return String(tx).replace(/@([\wÀ-ÿ-]+?)(\.mod)?(?![\wÀ-ÿ-])/g,(a,n,mo)=>{if(!p)throw new Error('Escolha um personagem em "Falar como" para usar @.');const L=statsDe(p).filter(x=>!!x.mod===!!mo),k=nz(n),s=L.find(x=>x.nm===k)||unico(L.filter(x=>x.nm.startsWith(k)));if(!s)throw new Error('@'+n+': atributo não encontrado na ficha de '+p.nome+'.');u.push(s.n);return s.v}).replace(/\+-/g,'-').replace(/--/g,'+')}
@@ -895,7 +898,7 @@ document.addEventListener('pointercancel',()=>volta(0),true);
 
 /* ---------- seletor rápido de macros (botão ⚡ no chat) ---------- */
 async function usaMacro(m,dir){
- if(dir){try{await enviarMsg(quem(),processa('#'+m.nome))}catch(e){alert('Não foi possível enviar a mensagem.')}return}
+ if(dir){const i0=$('#ent');if(i0&&/^\/(r|dano|cura)(\s|$)/i.test(m.texto.trim())){const pre=i0.value;i0.value='#'+m.nome;await enviar();i0.value=pre;previa();entM();return}const e1=erroAt('#'+m.nome);if(e1)return alert(e1);try{await enviarMsg(quem(),processa('#'+m.nome))}catch(e){alert('Não foi possível enviar a mensagem.')}return}
  const i=$('#ent');if(!i)return;
  const pre=i.value,ins=(pre&&!/\s$/.test(pre)?' ':'')+'#'+m.nome+' ';
  i.value=pre+ins;i.focus();try{i.setSelectionRange(i.value.length,i.value.length)}catch(e){}
@@ -918,9 +921,10 @@ function macroPicker(){
   o.querySelectorAll('.mcS').forEach(s=>{s.style.display=[...s.querySelectorAll('.mcI')].some(c=>c.style.display!=='none')?'':'none'});
   o.querySelector('#mcN').style.display=n?'none':''}}
 function novaMacro(){const o=document.createElement('div');o.className='ov';
-o.innerHTML=`<div class=card style="max-height:90vh;overflow:auto"><h3>Nova macro</h3><label>Nome (sem espaços)</label><input id=mN><label>Texto da macro</label><textarea id=mT style="min-height:90px" placeholder="Ex.: Ataquei com força! //1d20+@Força//"></textarea><div id=mA class=acx></div>${ehM()?`<label style="display:flex;gap:6px;align-items:center;color:var(--tx)"><input type=checkbox id=mP style="width:auto;margin:0"> Pública (todos podem usar)</label>`:`<p class=mu>Esta macro será só sua. Macros públicas são criadas pelo Mestre ou Co-GM.</p>`}<label>Prévia (dados rolam de verdade, só para testar)</label><div id=mV class=ch></div><button class=s id=mR style="width:100%;margin-top:6px">🎲 Testar de novo</button><div class=row style="margin-top:12px"><button class=s id=mC>Cancelar</button><button id=mS>Salvar</button></div></div>`;
+o.innerHTML=`<div class=card style="max-height:90vh;overflow:auto"><h3>Nova macro</h3><label>Nome (sem espaços)</label><input id=mN><label>Texto da macro</label><textarea id=mT style="min-height:90px" placeholder="Ex.: Ataquei! //1d20+@Força//   ou   /r 1d20+@Força"></textarea><div id=mA class=acx></div>${ehM()?`<label style="display:flex;gap:6px;align-items:center;color:var(--tx)"><input type=checkbox id=mP style="width:auto;margin:0"> Pública (todos podem usar)</label>`:`<p class=mu>Esta macro será só sua. Macros públicas são criadas pelo Mestre ou Co-GM.</p>`}<label>Prévia (dados rolam de verdade, só para testar)</label><div id=mV class=ch></div><button class=s id=mR style="width:100%;margin-top:6px">🎲 Testar de novo</button><div class=row style="margin-top:12px"><button class=s id=mC>Cancelar</button><button id=mS>Salvar</button></div></div>`;
 document.body.appendChild(o);const q=s=>o.querySelector(s),T=q('#mT'),A=q('#mA');
 const pv=()=>{const tx=T.value.trim(),e=q('#mV'),p=persFala();if(!tx){e.className='ch';e.textContent='Escreva o texto para ver a prévia.';return}
+const c=tx.match(/^\/(r|dano|cura)(\s|$)/i);if(c){let h2;if(c[1].toLowerCase()==='r'){const t=tentaAt(tx.slice(2)),r=t.erro?null:rolar(t.s);h2=r?['ok','🎲 '+esc(r.txt)]:['er','⚠️ '+esc(t.erro||'Expressão de dados inválida.')]}else{const a=danoPlan(tx);h2=a.erro?['er','⚠️ '+esc(a.erro)]:['ok',esc(a.msg)+' (só prévia, nada foi aplicado)']}e.className='ch '+h2[0];e.innerHTML=h2[1];return}
 const bad=[...tx.matchAll(/\/\/([^/]+)\/\//g)].map(m=>tentaAt(m[1])).filter((t,i)=>t.erro||!rolar(t.s));
 e.className='ch '+(bad.length?'er':'ok');e.style.whiteSpace='pre-wrap';
 e.innerHTML=(bad.length?bad.map(t=>'⚠️ '+esc(t.erro||'Dado inválido')).join('<br>')+'<hr>':'')+fmt(processa(tx))+(p&&/@/.test(tx)?'<div class=mu style="margin-top:6px">Ficha usada: '+esc(p.nome)+'</div>':'')};
