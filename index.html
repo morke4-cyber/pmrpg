@@ -275,7 +275,7 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 </style></head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.1.4';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.1.5';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -900,7 +900,7 @@ if(m.tipo==='sys')return(m.id===pri?`<div class=nl id=dvn>Mensagens não lidas (
 if(!entrou){entrou=true;semScroll=Date.now()+800;const dv=$('#dvn');if(dv)e.scrollTop=Math.max(0,dv.getBoundingClientRect().top-e.getBoundingClientRect().top+e.scrollTop-60);else e.scrollTop=e.scrollHeight;setTimeout(()=>{if(!document.hidden&&noFundo())marcaLido()},2500)}
 else if(b){e.scrollTop=e.scrollHeight;if(!sem&&nl.length&&!document.hidden)marcaLido()}}
 /* ---------- macros ---------- */
-function vMacros(){const v=macros.filter(m=>m.publica||m.dono===uid);$('#ab').innerHTML=`<div class=c><button onclick="novaMacro()" style="width:100%">+ Nova macro</button><p class=mu>Use no chat digitando #nome. Dados dentro de //…// são rolados. Ex.: Josias atacou ferozmente! //2d20+@Força// (o @ puxa o valor da ficha)</p>${v.map(m=>`<div class=card><b>#${esc(m.nome)}</b> <span class=tg>${m.publica?'Pública':'Particular'}</span><div class=mu>${esc(m.texto)}</div>${m.dono===uid||ehM()?`<button class="s" style="margin-top:8px" onclick="delMacro('${m.id}')">Excluir</button>`:''}</div>`).join('')||'<p class=mu>Nenhuma macro criada.</p>'}</div>`}
+function vMacros(){const v=macros.filter(m=>m.publica||m.dono===uid);$('#ab').innerHTML=`<div class=c><button onclick="novaMacro()" style="width:100%">+ Nova macro</button><p class=mu>Use no chat digitando #nome. Dados dentro de //…// são rolados. Ex.: Josias atacou ferozmente! //2d20+@Força// (o @ puxa o valor da ficha)</p>${v.map(m=>`<div class=card><b>#${esc(m.nome)}</b> <span class=tg>${m.publica?'Pública':'Particular'}</span><div class=mu>${esc(m.texto)}</div>${m.dono===uid||ehM()?`<div class=row style="margin-top:8px"><button class=s onclick="novaMacro('${m.id}')">Editar</button><button class=s onclick="delMacro('${m.id}')">Excluir</button></div>`:''}</div>`).join('')||'<p class=mu>Nenhuma macro criada.</p>'}</div>`}
 /* ---------- botão "ir para as mensagens novas" + menu de toque longo no balão ---------- */
 (function(){
 const st=document.createElement('style');
@@ -999,17 +999,17 @@ function macroPicker(){
   o.querySelectorAll('.mcI').forEach(c=>{const s=!t||c.dataset.n.includes(t);c.style.display=s?'':'none';if(s)n++});
   o.querySelectorAll('.mcS').forEach(s=>{s.style.display=[...s.querySelectorAll('.mcI')].some(c=>c.style.display!=='none')?'':'none'});
   o.querySelector('#mcN').style.display=n?'none':''}}
-function novaMacro(){const o=document.createElement('div');o.className='ov';
-o.innerHTML=`<div class=card style="max-height:90vh;overflow:auto"><h3>Nova macro</h3><label>Nome (sem espaços)</label><input id=mN><label>Texto da macro</label><textarea id=mT style="min-height:90px" placeholder="Ex.: Ataquei! //1d20+@Força//   ou   /r 1d20+@Força"></textarea><div id=mA class=acx></div>${ehM()?`<label style="display:flex;gap:6px;align-items:center;color:var(--tx)"><input type=checkbox id=mP style="width:auto;margin:0"> Pública (todos podem usar)</label>`:`<p class=mu>Esta macro será só sua. Macros públicas são criadas pelo Mestre ou Co-GM.</p>`}<label>Prévia (dados rolam de verdade, só para testar)</label><div id=mV class=ch></div><button class=s id=mR style="width:100%;margin-top:6px">🎲 Testar de novo</button><div class=row style="margin-top:12px"><button class=s id=mC>Cancelar</button><button id=mS>Salvar</button></div></div>`;
+function novaMacro(eid){const mx=eid?macros.find(x=>x.id===eid):null;const o=document.createElement('div');o.className='ov';
+o.innerHTML=`<div class=card style="max-height:90vh;overflow:auto"><h3>${mx?'Editar macro':'Nova macro'}</h3><label>Nome (sem espaços)</label><input id=mN><label>Texto da macro</label><textarea id=mT style="min-height:90px" placeholder="Ex.: Ataquei! //1d20+@Força//   ou   /r 1d20+@Força"></textarea><div id=mA class=acx></div>${ehM()?`<label style="display:flex;gap:6px;align-items:center;color:var(--tx)"><input type=checkbox id=mP style="width:auto;margin:0"> Pública (todos podem usar)</label>`:`<p class=mu>Esta macro será só sua. Macros públicas são criadas pelo Mestre ou Co-GM.</p>`}<label>Prévia (dados rolam de verdade, só para testar)</label><div id=mV class=ch></div><button class=s id=mR style="width:100%;margin-top:6px">🎲 Testar de novo</button><div class=row style="margin-top:12px"><button class=s id=mC>Cancelar</button><button id=mS>Salvar</button></div></div>`;
 document.body.appendChild(o);const q=s=>o.querySelector(s),T=q('#mT'),A=q('#mA');
 const pv=()=>{const tx=T.value.trim(),e=q('#mV'),p=persFala();if(!tx){e.className='ch';e.textContent='Escreva o texto para ver a prévia.';return}
 const c=tx.match(/^\/(r|dano|cura)(\s|$)/i);if(c){let h2;if(c[1].toLowerCase()==='r'){const t=tentaAt(tx.slice(2)),r=t.erro?null:rolar(t.s);h2=r?['ok','🎲 '+esc(r.txt)]:['er','⚠️ '+esc(t.erro||'Expressão de dados inválida.')]}else{const a=danoPlan(tx);h2=a.erro?['er','⚠️ '+esc(a.erro)]:['ok',esc(a.msg)+' (só prévia, nada foi aplicado)']}e.className='ch '+h2[0];e.innerHTML=h2[1];return}
 const bad=[...tx.matchAll(/\/\/((?:[^/]|\/(?!\/))+)\/\//g)].map(m=>tentaAt(m[1])).filter((t,i)=>t.erro||!rolar(t.s));
 e.className='ch '+(bad.length?'er':'ok');e.style.whiteSpace='pre-wrap';
 e.innerHTML=(bad.length?bad.map(t=>'⚠️ '+esc(t.erro||'Dado inválido')).join('<br>')+'<hr>':'')+fmt(processa(tx))+(p&&/@/.test(tx)?'<div class=mu style="margin-top:6px">Ficha usada: '+esc(p.nome)+'</div>':'')};
-T._pv=pv;T.oninput=()=>{pv();acLista(T,A)};T.onblur=()=>setTimeout(acFecha,150);q('#mR').onclick=pv;pv();
+T._pv=pv;T.oninput=()=>{pv();acLista(T,A)};T.onblur=()=>setTimeout(acFecha,150);if(mx){q('#mN').value=mx.nome;T.value=mx.texto;if(q('#mP'))q('#mP').checked=!!mx.publica}q('#mR').onclick=pv;pv();
 q('#mC').onclick=()=>{acFecha();o.remove()};
-q('#mS').onclick=()=>{const n=q('#mN').value.replace(/\s+/g,''),t=T.value.trim();if(!n||!t)return alert('Preencha o nome e o texto da macro.');db.collection('campanhas/'+cid+'/macros').add({nome:n,texto:t,dono:uid,publica:ehM()&&!!q('#mP')&&q('#mP').checked});acFecha();o.remove()}}
+q('#mS').onclick=async()=>{const n=q('#mN').value.replace(/\s+/g,''),t=T.value.trim();if(!n||!t)return alert('Preencha o nome e o texto da macro.');const pub=ehM()&&!!q('#mP')&&q('#mP').checked;try{if(mx)await db.doc('campanhas/'+cid+'/macros/'+mx.id).update({nome:n,texto:t,publica:pub});else await db.collection('campanhas/'+cid+'/macros').add({nome:n,texto:t,dono:uid,publica:pub})}catch(e){return alert('Não foi possível salvar a macro.')}acFecha();o.remove()}}
 const delMacro=id=>db.doc('campanhas/'+cid+'/macros/'+id).delete();
 /* ---------- fichas ---------- */
 function vPers(){const p=pers.find(x=>x.id===ativo);if(p)return fichaDe(p);
