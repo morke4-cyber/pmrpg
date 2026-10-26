@@ -1539,4 +1539,67 @@ window.addAmigosCamp=async function(){
     }
   });
 };
-</script></body></html>
+</script>
+<script>
+/* ===== Rascunhos: não perder o texto digitado ao trocar de aba do navegador =====
+   Causa: ao voltar para a aba o app ressincroniza (db.resync) e algumas telas são
+   redesenhadas do zero, apagando os campos. Aqui:
+   A) se um campo com texto for recriado numa re-renderização, o texto volta;
+   B) mensagem (chat, DM e fora de contexto) é guardada como rascunho e sobrevive
+      até a um recarregamento da página. */
+(function(){
+  const SEL='textarea[id],input[id]',OKT=/^(text|search|url|email|tel|number|)$/i;
+  const ok=e=>!!(e&&e.id&&(e.tagName==='TEXTAREA'||(e.tagName==='INPUT'&&OKT.test(e.type||''))));
+  const ctx=()=>{let a='',b='';try{if(typeof cid!=='undefined')a=cid||''}catch(e){}try{if(typeof dmPar!=='undefined')b=dmPar||''}catch(e){}return a+'|'+b};
+  const lista=n=>ok(n)?[n]:(n.querySelectorAll?[...n.querySelectorAll(SEL)].filter(ok):[]);
+
+  /* A) re-renderização */
+  let foco=null;
+  document.addEventListener('focusin',e=>{foco=ok(e.target)?e.target.id:null},true);
+  document.addEventListener('focusout',e=>{const t=e.target;setTimeout(()=>{if(t&&t.isConnected&&foco===t.id)foco=null},0)},true);
+  document.addEventListener('input',e=>{if(ok(e.target))e.target._cx=ctx()},true);
+  new MutationObserver(recs=>{
+    const perdidos={};
+    for(const r of recs)for(const n of r.removedNodes){
+      if(n.nodeType!==1)continue;
+      for(const e of lista(n))if(e.value&&e.value!==e.defaultValue&&e._cx)perdidos[e.id]={v:e.value,c:e._cx};
+    }
+    if(!Object.keys(perdidos).length)return;
+    const rest=[];
+    for(const r of recs)for(const n of r.addedNodes){
+      if(n.nodeType!==1)continue;
+      for(const e of lista(n)){
+        const p=perdidos[e.id];
+        if(p&&p.c===ctx()&&e.isConnected&&e.value===e.defaultValue){e.value=p.v;e._cx=p.c;delete perdidos[e.id];rest.push(e)}
+      }
+    }
+    rest.forEach(e=>{
+      e.dispatchEvent(new Event('input',{bubbles:true}));
+      if(foco===e.id&&(!document.activeElement||document.activeElement===document.body)){
+        try{e.focus({preventScroll:true});e.setSelectionRange(e.value.length,e.value.length)}catch(x){}
+      }
+    });
+  }).observe(document.body,{childList:true,subtree:true});
+
+  /* B) rascunho persistente (sobrevive a recarregar a página) */
+  const DR=['ent','dmt','oocx'];
+  const chave=id=>{let u='',c='';try{if(typeof uid!=='undefined')u=uid||''}catch(e){}
+    try{c=id==='dmt'?(typeof dmPar!=='undefined'?dmPar:''):(typeof cid!=='undefined'?cid:'')}catch(e){}
+    return(u&&c)?'mrpg_rasc_'+u+'_'+id+'_'+c:null};
+  const ler=k=>{try{const o=JSON.parse(localStorage.getItem(k)||'null');if(o&&o.v&&Date.now()-o.t<864e5)return o.v}catch(e){}return ''};
+  setInterval(()=>{
+    for(const id of DR){
+      const e=document.getElementById(id),k=e&&chave(id);if(!e||!k)continue;
+      if(e._u===undefined){            /* 1ª vez que este campo aparece */
+        const d=e.value?'':ler(k);
+        if(d){e.value=d;e._cx=ctx();e.dispatchEvent(new Event('input',{bubbles:true}))}
+        e._u=e.value;continue;
+      }
+      if(e.value===e._u)continue;
+      e._u=e.value;
+      try{e.value?localStorage.setItem(k,JSON.stringify({v:e.value,t:Date.now()})):localStorage.removeItem(k)}catch(x){}
+    }
+  },500);
+})();
+</script>
+</body></html>
