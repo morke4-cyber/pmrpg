@@ -275,7 +275,7 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 </style></head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.1.5';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.1.6';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -503,7 +503,7 @@ const p=await db.doc('usuarios/'+id).get();if(!p.exists)await db.doc('usuarios/'
 async function init(){if(!window.supabase||SUPA_URL.includes('COLE_AQUI'))return tela('<div class=c><h2>NeroRPG</h2><p>Falta configurar o Supabase. Abra o arquivo index.html e preencha SUPA_URL e SUPA_KEY no começo do script.</p></div>');db=criaDb();
 if(REC)return login('nova','Digite a sua nova senha.');
 try{const{data}=await db.cl.auth.getSession();if(data.session)return carregaPerfil()}catch(e){}login()}
-async function sair(){try{await db.cl.auth.signOut()}catch(e){}desinscrever();if(pres){pres.fim();pres=null}watchD.forEach(f=>f());watchD=[];watchKD="";watch.forEach(f=>f());watch=[];watchK='';amigIds=null;uid=null;eu=null;admin=false;login()}
+async function sair(){try{window.pushSair&&await window.pushSair()}catch(e){}try{await db.cl.auth.signOut()}catch(e){}desinscrever();if(pres){pres.fim();pres=null}watchD.forEach(f=>f());watchD=[];watchKD="";watch.forEach(f=>f());watch=[];watchK='';amigIds=null;uid=null;eu=null;admin=false;login()}
 /* ---------- campanhas ---------- */
 var inicioTk=0,sgHome='';const sgL=x=>JSON.stringify(x.map(y=>[y.cid,y.nome,y.img,y.desc,y.mestre,!!y.arq,naoLidas[y.cid]||0,(ultM[y.cid]||{}).t||0]));
 async function inicio(){tl='home';const tkI=++inicioTk;let pw=Promise.resolve();if(camp&&aba==='chat'&&!monitor&&msgs.length&&noFundo()){const u=msgs[msgs.length-1].t;if(u>lido){lido=u;const c0=cid,n0=eu.nome;naoLidas[c0]=0;pw=(async()=>{try{await db.doc('data/users/'+uid+'/c-'+c0).update({lido:u});await db.doc('campanhas/'+c0+'/leituras/'+uid).set({nome:n0,t:u})}catch(e){}})()}}desinscrever();monitor=false;if(listaC&&listaC.length){homeOk=true;sgHome=sgL(listaC);tela(homeHtml(listaC,listaAd||[]));contaNl()}await pw;if(tkI!==inicioTk)return;let l=[],ad=[];try{l=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.cid)}catch(e){}await Promise.all(l.map(async x=>{try{const c=await db.doc('campanhas/'+x.cid).get();if(c.exists){const d=c.data();x.nome=d.nome;x.img=d.img||'';x.desc=d.descricao||'';x.mestre=d.mestreNome||''}else x.gone=1}catch(e){}}));l=l.filter(x=>!x.gone);await Promise.all(l.map(async x=>{x.nl=x.lido!=null?await db.naoLidas('campanhas/'+x.cid+'/msgs',x.lido,uid):0;naoLidas[x.cid]=x.nl;try{const u=await db.ultima('campanhas/'+x.cid+'/msgs');if(u){const t=Number(u.t)||0;if(t>=(ativ[x.cid]||0)){ativ[x.cid]=t;ultM[x.cid]=u}}}catch(e){}}));if(tkI!==inicioTk)return;l.sort(ordC);iniciaWatch(l);listaC=l;iniciaWatchDM();
@@ -525,7 +525,7 @@ function filtro(f){fAt=f;const a=$('#ft-todos'),b=$('#ft-nao'),c=$('#ft-arq');if
 /* menu ⋮ do topo */
 function menuTopo(){if($('.ov'))return;const o=document.createElement('div');o.className='ov';o.style.cssText='align-items:flex-start;justify-content:flex-end;padding:54px 12px 0;background:rgba(0,0,0,.25)';o.onclick=e=>{if(e.target===o)o.remove()};const t=mu().todos;
 const it=(i,x,f)=>`<div onclick="this.closest('.ov').remove();${f}"><span>${i}</span><span>${x}</span></div>`;
-o.innerHTML=`<div class="card pm">${it('➕','Nova campanha','novaCamp()')}${it('🔑','Entrar com código','entrarCod()')}${it(t?'🔔':'🔕',t?'Ativar todas as notificações':'Silenciar todas as notificações','mudoT()')}${it('💬','Dicas de comandos','dicasCmd()')}${it('🚪','Sair','sair()')}</div>`;document.body.appendChild(o)}
+o.innerHTML=`<div class="card pm">${it('➕','Nova campanha','novaCamp()')}${it('🔑','Entrar com código','entrarCod()')}${it(t?'🔔':'🔕',t?'Ativar todas as notificações':'Silenciar todas as notificações','mudoT()')}${it('📲',(window.pushOn&&window.pushOn())?'Desativar notificações push':'Ativar notificações push','pushMenu()')}${it('💬','Dicas de comandos','dicasCmd()')}${it('🚪','Sair','sair()')}</div>`;document.body.appendChild(o)}
 /* barra de baixo: Campanhas | Amigos */
 function setAba(a){document.querySelectorAll('#bn button').forEach(b=>b.classList.toggle('on',b.dataset.a===a))}
 function sincBn(){let b=document.getElementById('bn');
@@ -671,7 +671,7 @@ const desbloq=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&camp&&aba==='chat'&&noFundo())marcaLido()});
 function som(){if(!ac)return;try{const t=ac.currentTime;[[880,0],[1175,.13]].forEach(([f,d])=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t+d);g.gain.exponentialRampToValueAtTime(.25,t+d+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d+.25);o.connect(g);g.connect(ac.destination);o.start(t+d);o.stop(t+d+.3)})}catch(e){}}
 const mu=()=>{try{return JSON.parse(localStorage.getItem('mrpg_mudo_'+uid)||'{}')}catch(e){return{}}};
-const gmu=m=>{try{localStorage.setItem('mrpg_mudo_'+uid,JSON.stringify(m))}catch(e){}};
+const gmu=m=>{try{localStorage.setItem('mrpg_mudo_'+uid,JSON.stringify(m))}catch(e){}try{window.pushMudos&&window.pushMudos()}catch(e){}};
 const silencio=c=>{const m=mu();return!!m.todos||!!(m.c&&m.c[c])};
 function mudoT(){const m=mu();m.todos=!m.todos;gmu(m);const e=$('#mt');if(e)e.textContent=m.todos?'🔕':'🔔'}
 function mudoC(c){const m=mu();m.c=m.c||{};m.c[c]=!m.c[c];gmu(m);const e=document.getElementById('mu-'+c);if(e)e.textContent=m.c[c]?'🔕':''}
@@ -1649,6 +1649,51 @@ window.addAmigosCamp=async function(){
     if(!isTxt(document.activeElement)){B.classList.remove('kb');if(!aberto)zera()}
   },150),true);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(()=>{base=Math.max(base,vv.height);medir()},300)});
+})();
+
+/* ---------- notificações push (Web Push) ----------
+   Ativar: menu ⋮ → "Ativar notificações push". O aparelho se inscreve e o Supabase (função enviar-push) avisa
+   quando chega mensagem nova, mesmo com o app fechado. 🔕 silenciar também vale para o push. */
+(function(){
+const VAPID='BKy5sw18WyXvcfiV_15hgHqyignt-HNfaODcsLMSbAG5MFgZoI9AdOXCHMlciXqbyrrBVC6Jvw7VAyB8NddtJqI';
+const sup=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
+const fl=()=>'mrpg_push_'+uid;
+const on=()=>{try{return !!uid&&localStorage.getItem(fl())==='1'}catch(e){return false}};
+const set=v=>{try{v?localStorage.setItem(fl(),'1'):localStorage.removeItem(fl())}catch(e){}};
+const k64=t=>{const b=(t+'='.repeat((4-t.length%4)%4)).replace(/-/g,'+').replace(/_/g,'/'),r=atob(b),u=new Uint8Array(r.length);for(let i=0;i<r.length;i++)u[i]=r.charCodeAt(i);return u};
+async function inscr(criar){const r=await navigator.serviceWorker.ready;let s=await r.pushManager.getSubscription();if(!s&&criar)s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:k64(VAPID)});return s}
+async function envia(s){const{error}=await db.cl.rpc('push_registrar',{p_sub:s.toJSON(),p_mudos:mu()});if(error)throw error}
+const falta=e=>/Could not find the function|PGRST202|schema cache/i.test(String((e&&e.message)||e));
+window.pushOn=on;
+window.pushMenu=async function(){
+ if(!sup())return alert('Este aparelho/navegador não suporta notificações push. No iPhone: abra o site no Safari, toque em Compartilhar → Adicionar à Tela de Início e abra o app por lá.');
+ if(on()){
+  if(!confirm('Desativar as notificações push neste aparelho?'))return;
+  try{const s=await inscr(false);if(s){try{await db.cl.rpc('push_remover',{p_endpoint:s.endpoint})}catch(e){}await s.unsubscribe()}}catch(e){}
+  set(false);return alert('Notificações push desativadas neste aparelho.')}
+ if(Notification.permission==='denied')return alert('As notificações estão bloqueadas para este site. Libere nas configurações do navegador (ou do app) e tente de novo.');
+ try{
+  const p=await Notification.requestPermission();
+  if(p!=='granted')return alert('Sem permissão não dá para avisar. Toque em Permitir quando o celular perguntar.');
+  const s=await inscr(true);await envia(s);set(true);
+  alert('Pronto! Você vai receber avisos de mensagens novas neste aparelho, mesmo com o app fechado.')
+ }catch(e){alert(falta(e)?'Falta aplicar o SQL no Supabase (arquivo push.sql).':'Não foi possível ativar as notificações. '+((e&&e.message)||''))}
+};
+let tm;window.pushMudos=()=>{if(!on()||!sup())return;clearTimeout(tm);tm=setTimeout(async()=>{try{const s=await inscr(false);if(s)await envia(s)}catch(e){}},1500)};
+window.pushSair=async()=>{if(!on()||!sup())return;try{const s=await inscr(false);if(s)await db.cl.rpc('push_remover',{p_endpoint:s.endpoint})}catch(e){}};
+/* ao entrar na conta: renova a inscrição deste aparelho e manda o estado atual dos 🔕 */
+let ult=null;
+async function sinc(){if(!sup()||!on()||Notification.permission!=='granted')return;try{const s=await inscr(true);await envia(s)}catch(e){}}
+setInterval(()=>{if(uid&&uid!==ult){ult=uid;sinc()}if(!uid)ult=null},2000);
+/* tocar na notificação: abre a campanha ou a conversa */
+const vai=(cid,dm)=>{try{if(dm)abreDM(dm);else if(cid)abrir(cid)}catch(e){}};
+if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{const d=e.data||{};if(d.tipo==='push-abrir')vai(d.cid,d.dm)});
+try{const ab=new URLSearchParams(location.search).get('abrir');
+ if(ab){history.replaceState(null,'',location.pathname);let n=0;const t=setInterval(()=>{n++;if(n>60)return clearInterval(t);
+  if(!uid)return;const k=ab.slice(0,2),v=ab.slice(2);
+  if(k==='c:'&&typeof listaC!=='undefined'&&listaC.length){clearInterval(t);vai(v,'')}
+  else if(k==='d:'&&typeof amigos!=='undefined'&&amigos.length){clearInterval(t);vai('',v)}
+  else if(n>20){clearInterval(t)}},500)}}catch(e){}
 })();
 </script>
 </body></html>
