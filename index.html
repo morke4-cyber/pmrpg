@@ -260,7 +260,7 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 .wlc .row{justify-content:center;flex:none}
 .wlc .row>*{flex:none}
 }
-#ac{max-height:34vh;overflow:auto;border:1px solid var(--bd);border-radius:12px;background:var(--cd)}
+#ac{max-height:34vh;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;border:1px solid var(--bd);border-radius:12px;background:var(--cd)}
 #ac .acI{display:flex;gap:8px;align-items:center;padding:8px 10px;cursor:pointer}#ac .acI b{flex:none}
 #ac .acI .mu{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
 #ac .acI.on{background:var(--me)}#ac .acH{padding:8px 10px;color:var(--mu);font-size:13px}
@@ -275,7 +275,7 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 </style></head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.1.1';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.1.2';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -430,7 +430,7 @@ return{p,novo,msg:n>=0?'💥 '+p.nome+' sofreu '+n+' de dano (PV '+p.pv+' → '+
 let acL=[],acI=0,acR=null;
 const subq=(s,k)=>{let i=0;for(const c of s)if(c===k[i])i++;return i===k.length};
 let acT=null,acB=null;
-function acDesenha(){const e=acB||$('#ac');if(!e)return;e.onpointerdown=ev=>{const c=ev.target.closest('.acI');ev.preventDefault();if(c)acPick(+c.dataset.i)};e.innerHTML=acL.map((x,i)=>x.ins?`<div class="acI${i===acI?' on':''}" data-i="${i}"><b>${esc(x.t)}</b><span class=mu>${esc(x.s||'')}</span></div>`:`<div class=acH>${esc(x.t)}</div>`).join('');const o=e.querySelector('.on');if(o)o.scrollIntoView({block:'nearest'})}
+function acDesenha(){const e=acB||$('#ac');if(!e)return;let d0=null;e.onpointerdown=ev=>{d0={x:ev.clientX,y:ev.clientY,sc:e.scrollTop,c:ev.target.closest('.acI')}};e.onpointercancel=()=>{d0=null};e.onpointerup=ev=>{const d=d0;d0=null;if(!d||!d.c)return;if(Math.abs(ev.clientX-d.x)>8||Math.abs(ev.clientY-d.y)>8||Math.abs(e.scrollTop-d.sc)>2)return;acPick(+d.c.dataset.i)};e.onmousedown=ev=>ev.preventDefault();e.innerHTML=acL.map((x,i)=>x.ins?`<div class="acI${i===acI?' on':''}" data-i="${i}"><b>${esc(x.t)}</b><span class=mu>${esc(x.s||'')}</span></div>`:`<div class=acH>${esc(x.t)}</div>`).join('');const o=e.querySelector('.on');if(o)o.scrollIntoView({block:'nearest'})}
 function acFecha(){acL=[];acR=null;acDesenha()}
 function acPick(i){const x=acL[i],t=acT||$('#ent');if(!x||!x.ins||!acR||!t)return;const r=acR,p=r[0]+x.ins.length;t.value=t.value.slice(0,r[0])+x.ins+t.value.slice(r[1]);t.focus();try{t.setSelectionRange(p,p)}catch(e){}acFecha();if(t.id==='ent'){previa();auto(t);dig();entM()}else if(t._pv)t._pv()}
 function acLista(t,b){t=t&&t.nodeType?t:$('#ent');if(!t)return;acT=t;acB=b||$('#ac');const pos=t.selectionStart,a=t.value.slice(0,pos);let m;acL=[];acR=null;acI=0;const ln=a.slice(a.lastIndexOf('\n')+1);
