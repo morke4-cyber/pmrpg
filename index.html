@@ -275,7 +275,7 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 </style></head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.1.0';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.1.1';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -514,7 +514,7 @@ function filtro(f){fAt=f;const a=$('#ft-todos'),b=$('#ft-nao'),c=$('#ft-arq');if
 /* menu ⋮ do topo */
 function menuTopo(){if($('.ov'))return;const o=document.createElement('div');o.className='ov';o.style.cssText='align-items:flex-start;justify-content:flex-end;padding:54px 12px 0;background:rgba(0,0,0,.25)';o.onclick=e=>{if(e.target===o)o.remove()};const t=mu().todos;
 const it=(i,x,f)=>`<div onclick="this.closest('.ov').remove();${f}"><span>${i}</span><span>${x}</span></div>`;
-o.innerHTML=`<div class="card pm">${it('➕','Nova campanha','novaCamp()')}${it('🔑','Entrar com código','entrarCod()')}${it(t?'🔔':'🔕',t?'Ativar todas as notificações':'Silenciar todas as notificações','mudoT()')}${it('🚪','Sair','sair()')}</div>`;document.body.appendChild(o)}
+o.innerHTML=`<div class="card pm">${it('➕','Nova campanha','novaCamp()')}${it('🔑','Entrar com código','entrarCod()')}${it(t?'🔔':'🔕',t?'Ativar todas as notificações':'Silenciar todas as notificações','mudoT()')}${it('💬','Dicas de comandos','dicasCmd()')}${it('🚪','Sair','sair()')}</div>`;document.body.appendChild(o)}
 /* barra de baixo: Campanhas | Amigos */
 function setAba(a){document.querySelectorAll('#bn button').forEach(b=>b.classList.toggle('on',b.dataset.a===a))}
 function sincBn(){let b=document.getElementById('bn');
@@ -808,8 +808,34 @@ async function minhaCor(c){eu.cor=c;try{await db.doc('usuarios/'+uid).update({co
 const segVis=new Set();
 const hora=(t,id)=>new Date(t).toLocaleTimeString('pt-BR',segVis.has(id)?{hour:'2-digit',minute:'2-digit',second:'2-digit'}:{hour:'2-digit',minute:'2-digit'});
 function horaSeg(el,id,t){if(segVis.has(id))segVis.delete(id);else segVis.add(id);el.textContent=hora(t,id)}
+/* ---------- dicas de comandos de texto (Configurações) ---------- */
+function dicasCmd(){const o=document.createElement('div');o.className='ov';o.onclick=e=>{if(e.target===o)o.remove()};
+const c=x=>'<code>'+esc(x)+'</code>';
+const g=(t,l)=>`<h3 style="margin:14px 0 6px">${t}</h3>`+l.map(([k,d])=>`<div style="margin:0 0 9px"><div style="white-space:pre-wrap">${c(k)}</div><div class=mu style="margin-top:2px">${d}</div></div>`).join('');
+o.innerHTML=`<div class=card style="max-height:85vh;overflow:auto;max-width:560px;width:100%"><h3 style="margin-top:0">💬 Dicas de comandos</h3><p class=mu style="margin:0">Escreva no campo de mensagem do chat. Ao digitar <code>#</code>, <code>@</code> ou <code>&gt;</code> aparece uma lista de sugestões para tocar.</p>`
++g('🎲 Dados',[
+['/r 2d6+3','Rola os dados e mostra o resultado no chat. Também dá para digitar só a conta, como d20+5.'],
+['Ataquei! //1d20+5//','Rola no meio da frase: o que fica entre // // vira rolagem.'],
+['d20  4d6  4dF  d%','Tipos de dado: normal, Fate (dF) e percentil (d%).'],
+['4d6kh3  2d20kl1','Mantém só os maiores (kh) ou os menores (kl).']])
++g('📋 Ficha',[
+['/r 1d20+@Força','O @ puxa o valor do atributo da ficha do personagem que está falando.'],
+['@Força.mod','Puxa o modificador do atributo em vez do valor.']])
++g('⚡ Macros',[
+['#nome','Envia o texto da macro. No meio da frase, troca pelo texto dela. Digite # para ver a lista.']])
++g('❤️ Vida',[
+['/dano "Goblin" 5','Tira 5 PV do personagem ou NPC e avisa no chat.'],
+['/cura "Elara" 3','Devolve 3 PV.']])
++g('🗣️ Vários personagens',[
+['>Goblin: Quem vai lá?','Uma linha por fala, cada uma sai no balão do personagem. Digite > e a letra inicial para escolher na lista.'],
+['>Goblin: Atacar!\n>Elara: Cuidado!','Várias linhas seguidas mandam várias falas, uma atrás da outra.']])
++g('✏️ Formatação',[
+['*negrito*','Texto em negrito.'],['_itálico_','Texto em itálico.'],['~riscado~','Texto riscado.'],['`código`','Texto em destaque.'],['||segredo||','Texto escondido: toque para revelar.']])
++(admin?g('🛡️ Administração (só você vê)',[['/f d20=17','Força o resultado da rolagem. Sai como um dado normal para os outros.']]):'')
++`<button style="width:100%;margin-top:12px" onclick="this.closest('.ov').remove()">Fechar</button></div>`;
+document.body.appendChild(o)}
 function vCfg(){carregaPerfis();if(!amigIds)carregaAmigos();const gm=ehM(),dono=camp.mestre===uid,base=location.href.split('#')[0];const papel=m=>m.id===camp.mestre?'Mestre (GM)':m.papel==='cogm'?'Co-GM':'Jogador';
-$('#ab').innerHTML=`<div class=c>${capa(gm)}<h3>Configurações</h3><div class=card><div class=it onclick="aba='pers';tab()"><b>👥 Personagens e NPCs</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='galeria';tab()"><b>🖼️ Galeria de imagens</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='diario';tab()"><b>📓 Meu diário e notas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='tema';tab()"><b>🎨 Temas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="expMod()"><b>⬇️ Exportar modelo de ficha</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='macros';tab()"><b>⚡ Macros</b><span class=mu>›</span></div>${gm?`<hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='modelo';mod=null;tab()"><b>🛠 Modelo de ficha</b><span class=mu>›</span></div>`:''}</div>
+$('#ab').innerHTML=`<div class=c>${capa(gm)}<h3>Configurações</h3><div class=card><div class=it onclick="aba='pers';tab()"><b>👥 Personagens e NPCs</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='galeria';tab()"><b>🖼️ Galeria de imagens</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='diario';tab()"><b>📓 Meu diário e notas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='tema';tab()"><b>🎨 Temas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="expMod()"><b>⬇️ Exportar modelo de ficha</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='macros';tab()"><b>⚡ Macros</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="dicasCmd()"><b>💬 Dicas de comandos</b><span class=mu>›</span></div>${gm?`<hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='modelo';mod=null;tab()"><b>🛠 Modelo de ficha</b><span class=mu>›</span></div>`:''}</div>
 <h3>Convidar amigos</h3><div class=card><label>Código de convite</label><input readonly value="${esc(cid)}"><label>Link de convite</label><input readonly value="${esc(base+'#convite='+cid)}">${gm&&!monitor?`<button style="width:100%;margin-top:10px" onclick="addAmigosCamp()">👥 Adicionar amigos</button>`:''}</div>
 <h3>Participantes (${membros.length})</h3>${membros.slice().sort((a,b)=>(b.id===camp.mestre)-(a.id===camp.mestre)||az(a,b)).map(m=>`<div class="card it" style="cursor:default;flex-wrap:wrap">${avP(m.id)}<b>${esc(m.nome)}</b><span class="tg ${m.id===camp.mestre?'g':''}">${papel(m)}</span>${m.id!==uid&&amigIds&&!amigIds.has(m.id)?`<button class=s onclick="addAmigo('${m.id}')">+ Amigo</button>`:''}${dono&&m.id!==camp.mestre?`<button class=s onclick="coroa('${m.id}')" title="Cargos de GM" style="padding:9px 12px">👑</button>`:''}${gm&&m.id!==camp.mestre&&m.id!==uid&&(dono||m.papel!=='cogm')?`<button class=x onclick="expulsar('${m.id}')">Remover</button>`:''}</div>`).join('')}
 ${!monitor?`<button class=s style="width:100%;margin-top:12px" onclick="arquivaCfg()">${(listaC.find(y=>y.cid===cid)||{}).arq?'📤 Desarquivar campanha':'📦 Arquivar campanha'}</button>`:''}${!monitor?'<button class=s style="width:100%;margin-top:12px" onclick="sairCamp()">Sair da campanha</button>':''}${dono?'<p class=mu>O co-GM faz quase tudo que o Mestre faz, exceto excluir a campanha.</p><button class=x style="width:100%" onclick="excluirCamp()">Excluir campanha</button>':''}</div>`}
