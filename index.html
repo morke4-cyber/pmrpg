@@ -332,11 +332,22 @@ const hpm=m=>{const t=m.pid?hpTxt(pers.find(x=>x.id===m.pid)):'';return t?` <b>$
 const az=(a,b)=>a.nome.localeCompare(b.nome,'pt-BR',{sensitivity:'base'});
 function modal(t,cs,cb){const o=document.createElement('div');o.className='ov';o.innerHTML=`<div class=card><h3>${esc(t)}</h3>${cs.map((c,i)=>`<label>${esc(c.l)}</label>${c.sel?`<select id=mo${i}>${c.sel.map(o=>`<option value="${esc(o.v)}"${o.v===c.v?' selected':''}>${esc(o.t)}</option>`).join('')}</select>`:c.ml?`<textarea id=mo${i}>${esc(c.v||'')}</textarea>`:`<input id=mo${i} value="${esc(c.v||'')}">`}`).join('')}<div class=row style="margin-top:12px"><button class=s id=moc>Cancelar</button><button id=mok>Salvar</button></div></div>`;document.body.appendChild(o);o.querySelector('#moc').onclick=()=>o.remove();o.querySelector('#mok').onclick=()=>{cb(cs.map((c,i)=>o.querySelector('#mo'+i).value.trim()));o.remove()}}
 /* ---------- dados ---------- */
-function rolar(e){e=String(e).replace(/\s+/g,'').toLowerCase();if(!/^[+-]?(\d*d(\d+|f|%)(k[hl]\d*)?|\d+)([+-](\d*d(\d+|f|%)(k[hl]\d*)?|\d+))*$/.test(e))return null;let tot=0,out=[];
-for(const m of e.matchAll(/([+-]?)(\d*)d(\d+|f|%)(?:k([hl])(\d*))?|([+-]?)(\d+)/g)){
-if(m[3]){const sg=m[1]==='-'?-1:1,f=m[3]==='%'?100:m[3]==='f'?0:Math.min(+m[3],1000);let n=Math.min(m[2]?+m[2]:1,100),k=m[4];if(k&&n===0){n=2;k='l'}if(f<0||(m[3]!=='f'&&!f))return null;let r=[];for(let i=0;i<n;i++)r.push(m[3]==='f'?Math.floor(Math.random()*3)-1:1+Math.floor(Math.random()*f));let a=r,sh=r;if(k){const kn=Math.max(1,+m[5]||1),ix=r.map((v,i)=>i).sort((x,y)=>k==='h'?r[y]-r[x]:r[x]-r[y]),ok=new Set(ix.slice(0,kn));a=r.filter((v,i)=>ok.has(i));sh=r.map((v,i)=>ok.has(i)?v:'('+v+')')}tot+=sg*a.reduce((x,y)=>x+y,0);out.push((sg<0?'−':'')+'['+sh.join(', ')+']')}
-else{const v=(m[6]==='-'?-1:1)*+m[7];tot+=v;out.push((v<0?'−':'+')+Math.abs(v))}}
-return{e,t:tot,txt:e+': '+out.join(' ').replace(/ ([+−])/g,' $1')+' = '+tot}}
+function rolar(e){e=String(e).replace(/\s+/g,'').toLowerCase();
+const F='(?:\\d*d(?:\\d+|f|%)(?:k[hl]\\d*)?|\\d+)',T=F+'(?:[*/]-?'+F+')*';
+if(!new RegExp('^[+-]?'+T+'(?:[+-]'+T+')*$').test(e))return null;let tot=0,out=[];
+for(const m of e.matchAll(new RegExp('([+-]?)('+T+')','g'))){const neg=m[1]==='-';let val=null,txt='',dadoPrim=false;
+for(const f of m[2].matchAll(new RegExp('([*/]?)(-?)('+F+')','g'))){const op=f[1],fs=f[2]==='-'?-1:1,fa=f[3];let v,t;
+const d=fa.match(/^(\d*)d(\d+|f|%)(?:k([hl])(\d*))?$/);
+if(d){const fc=d[2]==='%'?100:d[2]==='f'?0:Math.min(+d[2],1000);let n=Math.min(d[1]?+d[1]:1,100),k=d[3];if(k&&n===0){n=2;k='l'}if(d[2]!=='f'&&!fc)return null;
+let r=[];for(let q=0;q<n;q++)r.push(d[2]==='f'?Math.floor(Math.random()*3)-1:1+Math.floor(Math.random()*fc));let a=r,sh=r;
+if(k){const kn=Math.max(1,+d[4]||1),ix=r.map((x,y)=>y).sort((x,y)=>k==='h'?r[y]-r[x]:r[x]-r[y]),ok=new Set(ix.slice(0,kn));a=r.filter((x,y)=>ok.has(y));sh=r.map((x,y)=>ok.has(y)?x:'('+x+')')}
+v=a.reduce((x,y)=>x+y,0);t='['+sh.join(', ')+']';if(val===null)dadoPrim=true}
+else{v=+fa;t=String(v)}
+v*=fs;if(fs<0)t='−'+t;
+if(val===null){val=v;txt=t}else if(op==='*'){val*=v;txt+='×'+t}else{if(v===0)return null;val/=v;txt+='÷'+t}}
+tot+=neg?-val:val;out.push((neg?'−':dadoPrim?'':'+')+txt)}
+tot=Math.round(tot*100)/100;
+return{e,t:tot,txt:e+': '+out.join(' ')+' = '+tot}}
 /* /f EXPRESSÃO=RESULTADO  (só admin) — ex.: /f d20=17, /f 2d6+3=11. Sai como dado normal. Para não-admin: some sem aviso. */
 function cmdForca(tx){if(!/^\/f(\s|$)/i.test(tx))return;if(!admin)return{mudo:1};
 const m=tx.match(/^\/f\s+(.+?)\s*=\s*([+-]?\d+)\s*$/i);if(!m)return{erro:'Use: /f d20=17  ou  /f 2d6+3=11'};
@@ -344,7 +355,7 @@ if(!rolar(m[1]))return{erro:'Expressão de dados inválida.'};const alvo=+m[2];
 for(let i=0;i<30000;i++){const r=rolar(m[1]);if(r.t===alvo)return{r}}
 return{erro:'Não deu para chegar a '+alvo+' com essa rolagem.'}}
 function processa(tx){tx=tx.replace(/#([\wÀ-ÿ-]+)/g,(a,n)=>{const m=achaMacro(n);return m?m.texto:a});
-return tx.replace(/\/\/([^/]+)\/\//g,(a,x)=>{const t=tentaAt(x),r=t.erro?null:rolar(t.s);return r?'🎲 '+r.txt:a})}
+return tx.replace(/\/\/((?:[^/]|\/(?!\/))+)\/\//g,(a,x)=>{const t=tentaAt(x),r=t.erro?null:rolar(t.s);return r?'🎲 '+r.txt:a})}
 function quem(){if(falar[0]==='a'&&falar[1]===':'){const x=avl.find(y=>y.id===falar.slice(2));return{tipo:'npc',nome:x?x.nome:'NPC'}}if(falar==='gm'&&isCo())return{tipo:'gm',co:1,nome:(narr&&narr.n)||'Co-narrador',av:(narr&&narr.av)||'',avg:(narr&&narr.avg)||''};if(falar==='gm')return{tipo:'gm',nome:'Mestre',av:(camp&&camp.imgGm)||''};if(falar==='npc')return{tipo:'npc',nome:npcN||'NPC'};if(falar[1]===':'){const p=pers.find(x=>x.id===falar.slice(2));if(p)return{tipo:falar[0]==='n'?'npc':'pers',nome:p.nome,av:p.img||'',avg:p.imgG||'',pid:p.id}}return{tipo:'eu',nome:eu.nome,av:eu.foto||'',avg:eu.fotoG||''}}
 var pend={},pendD={};
 const enviarMsg=async(q,texto,dado,midia)=>{const m={t:agora(),uid,tipo:dado?'dado':q.tipo,nome:q.nome,texto};if(q.av)m.av=q.av;if(q.avg)m.avg=q.avg;if(q.pid){m.pid=q.pid;marcaUlt(q.pid)}if(q.co)m.co=1;if(eu.cor)m.bc=eu.cor;if(susU)m.sus=susU;if(resp){m.re=resp;resp=null;rb()}if(midia)m.midia=midia;
@@ -397,7 +408,7 @@ else if(/^\/(dano|cura)(\s|$)/i.test(t)){const a=danoPlan(t);h=a.erro?er('💥 '
 else if(rr){d=1;const x=(rr[1]||'').trim(),a=x?tentaAt(x):{};h=!x?er('🎲 Dados: digite a rolagem, ex.: 2d6+3, d20+@, 4dF'):a.erro?er('🎲 '+esc(a.erro)):rolar(a.s)?ok('🎲 Rolagem de dados: <b>'+esc(x)+'</b>'+(a.s!==x?' → '+esc(a.s):'')+' ✓ será rolada ao enviar'):er('🎲 Expressão de dados inválida: '+esc(x))}
 else if(/d/i.test(t)&&rolar(t)){d=1;h=ok('🎲 Rolagem de dados: <b>'+esc(t.trim())+'</b> ✓ será rolada ao enviar')}
 else{for(const m of t.matchAll(/#([\wÀ-ÿ-]+)/g)){const k=achaMacro(m[1]);h+=k?ok('⚡ Macro <b>#'+esc(k.nome)+'</b> ✓ '+fmt(k.texto)):er('⚡ #'+esc(m[1])+': macro não encontrada')}
-if([...t.matchAll(/\/\/([^/]+)\/\//g)].some(m=>rolar(tentaAt(m[1]).s||''))){d=1;h+=ok('🎲 Rolagem dentro da mensagem ✓')}
+if([...t.matchAll(/\/\/((?:[^/]|\/(?!\/))+)\/\//g)].some(m=>rolar(tentaAt(m[1]).s||''))){d=1;h+=ok('🎲 Rolagem dentro da mensagem ✓')}
 }
 e.innerHTML=h;entM();const b=$('#bd');if(b)b.classList.toggle('on',!!d)}
 function prevMidia(f,leg0,pasta,send){const u=URL.createObjectURL(f),v=f.type.startsWith('video'),o=document.createElement('div');o.className='ov';
@@ -411,7 +422,7 @@ const nz=t=>sem(t).replace(/[\s_]+/g,'');
 const unico=a=>a.length===1?a[0]:null;
 function achaMacro(n){const v=macros.filter(m=>m.publica||m.dono===uid),k=nz(n);return v.find(m=>m.nome.toLowerCase()===String(n).toLowerCase())||v.find(m=>nz(m.nome)===k)||unico(v.filter(m=>nz(m.nome).startsWith(k)))||unico(v.filter(m=>nz(m.nome).includes(k)))}
 const expM=tx=>tx.replace(/#([\wÀ-ÿ-]+)/g,(a,n)=>{const m=achaMacro(n);return m?m.texto:a});
-const erroAt=tx=>{for(const m of expM(tx).matchAll(/\/\/([^/]+)\/\//g)){const t=tentaAt(m[1]);if(t.erro)return t.erro}return null};
+const erroAt=tx=>{for(const m of expM(tx).matchAll(/\/\/((?:[^/]|\/(?!\/))+)\/\//g)){const t=tentaAt(m[1]);if(t.erro)return t.erro}return null};
 function persFala(){const q=quem();let p=q.pid?pers.find(x=>x.id===q.pid):null;if(!p){const m=pers.filter(x=>!x.npc&&x.dono===uid);if(m.length===1)p=m[0]}return p}
 function statsDe(p){const L=[];if(!p||!camp||!camp.modelo)return L;for(const s of camp.modelo.secoes)for(const c of s.campos)if(c.k==='attr'||c.k==='num'||c.k==='calc'){const v=Math.round(valCampo(c.n,p,0)),tk='@'+c.n.replace(/\s+/g,'_');L.push({n:c.n,nm:nz(c.n),v,tk});if(c.k==='attr')L.push({n:c.n+' (mod)',nm:nz(c.n),mod:1,v:Math.floor((v-10)/2),tk:tk+'.mod'})}return L}
 function resAt(tx,p,u){return String(tx).replace(/@([\wÀ-ÿ-]+?)(\.mod)?(?![\wÀ-ÿ-])/g,(a,n,mo)=>{if(!p)throw new Error('Escolha um personagem em "Falar como" para usar @.');const L=statsDe(p).filter(x=>!!x.mod===!!mo),k=nz(n),s=L.find(x=>x.nm===k)||unico(L.filter(x=>x.nm.startsWith(k)));if(!s)throw new Error('@'+n+': atributo não encontrado na ficha de '+p.nome+'.');u.push(s.n);return s.v}).replace(/\+-/g,'-').replace(/--/g,'+')}
@@ -745,7 +756,7 @@ if(b)e.scrollTop=e.scrollHeight;const u=dmMsgs.length?dmMsgs[dmMsgs.length-1]:nu
 if(u&&u.uid!==uid&&!document.hidden&&u.t>dmLido){dmLido=u.t;db.doc('dm/'+dmPar+'/leituras/'+uid).set({t:u.t}).catch(()=>{});db.doc('data/users/'+uid+'/f-'+dmFr).update({lido:u.t}).catch(()=>{})}}
 const dmSend=(texto,extra)=>{const c=dmPar,m={t:agora(),uid,texto,...extra,...dmRe()},r=db.collection('dm/'+c+'/msgs').doc(),p=r.id,px={id:p,...m,_p:1,_c:c};pendD[p]=px;dmMsgs=dmMsgs.concat(px);dmLista();return r.set(m).catch(()=>{delete pendD[p];dmMsgs=dmMsgs.filter(x=>x.id!==p);if(c===dmPar)dmLista();alert('Não foi possível enviar a mensagem.')})};
 function dmEnviar(){const i=$('#dmt'),t=i.value.trim();if(!t)return;const fc=cmdForca(t);if(fc){if(fc.erro)return alert(fc.erro);i.value='';i.style.height='44px';if(fc.r)dmSend(fc.r.txt,{dado:1});return}const rc=/^\/r(\s|$)/.test(t),r=rc?rolar(t.slice(2)):/d/i.test(t)?rolar(t):null;if(rc&&!r)return alert('Expressão de dados inválida. Exemplos: /r 2d6+3, /r d20, /r 4dF');
-i.value='';i.style.height='44px';if(r)dmSend(r.txt,{dado:1});else dmSend(t.replace(/\/\/([^/]+)\/\//g,(a,x)=>{const q=rolar(x);return q?'🎲 '+q.txt:a}))}
+i.value='';i.style.height='44px';if(r)dmSend(r.txt,{dado:1});else dmSend(t.replace(/\/\/((?:[^/]|\/(?!\/))+)\/\//g,(a,x)=>{const q=rolar(x);return q?'🎲 '+q.txt:a}))}
 function dmRolar(){const r=rolar($('#ex').value);if(!r)return alert('Expressão de dados inválida. Exemplos: 1d20, 2d6, d20+5, 4dF, d%');dmSend(r.txt,{dado:1})}
 /* ---- chat privado: responder, editar e apagar ---- */
 const dmRe=()=>{const r=dmResp;dmResp=null;drb();return r?{re:r}:{}};
@@ -819,6 +830,7 @@ o.innerHTML=`<div class=card style="max-height:85vh;overflow:auto;max-width:560p
 ['d20  4d6  4dF  d%','Tipos de dado: normal, Fate (dF) e percentil (d%).'],
 ['4d6kh3  2d20kl1','Mantém só os maiores (kh) ou os menores (kl).']])
 +g('📋 Ficha',[
+['/r 20*10  ou  /r 20/10','Multiplica (*) ou divide (/). Também funciona no meio da frase: //20*10// e //20/10//. Multiplicação e divisão são feitas antes de somar e subtrair.'],
 ['/r 1d20+@Força','O @ puxa o valor do atributo da ficha do personagem que está falando.'],
 ['@Força.mod','Puxa o modificador do atributo em vez do valor.']])
 +g('⚡ Macros',[
@@ -992,7 +1004,7 @@ o.innerHTML=`<div class=card style="max-height:90vh;overflow:auto"><h3>Nova macr
 document.body.appendChild(o);const q=s=>o.querySelector(s),T=q('#mT'),A=q('#mA');
 const pv=()=>{const tx=T.value.trim(),e=q('#mV'),p=persFala();if(!tx){e.className='ch';e.textContent='Escreva o texto para ver a prévia.';return}
 const c=tx.match(/^\/(r|dano|cura)(\s|$)/i);if(c){let h2;if(c[1].toLowerCase()==='r'){const t=tentaAt(tx.slice(2)),r=t.erro?null:rolar(t.s);h2=r?['ok','🎲 '+esc(r.txt)]:['er','⚠️ '+esc(t.erro||'Expressão de dados inválida.')]}else{const a=danoPlan(tx);h2=a.erro?['er','⚠️ '+esc(a.erro)]:['ok',esc(a.msg)+' (só prévia, nada foi aplicado)']}e.className='ch '+h2[0];e.innerHTML=h2[1];return}
-const bad=[...tx.matchAll(/\/\/([^/]+)\/\//g)].map(m=>tentaAt(m[1])).filter((t,i)=>t.erro||!rolar(t.s));
+const bad=[...tx.matchAll(/\/\/((?:[^/]|\/(?!\/))+)\/\//g)].map(m=>tentaAt(m[1])).filter((t,i)=>t.erro||!rolar(t.s));
 e.className='ch '+(bad.length?'er':'ok');e.style.whiteSpace='pre-wrap';
 e.innerHTML=(bad.length?bad.map(t=>'⚠️ '+esc(t.erro||'Dado inválido')).join('<br>')+'<hr>':'')+fmt(processa(tx))+(p&&/@/.test(tx)?'<div class=mu style="margin-top:6px">Ficha usada: '+esc(p.nome)+'</div>':'')};
 T._pv=pv;T.oninput=()=>{pv();acLista(T,A)};T.onblur=()=>setTimeout(acFecha,150);q('#mR').onclick=pv;pv();
