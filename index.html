@@ -275,7 +275,7 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 </style></head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.1.8';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.1.9';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1701,6 +1701,9 @@ setInterval(()=>{if(uid&&uid!==ult){ult=uid;sinc()}if(!uid)ult=null},2000);
 /* tocar na notificação: abre a campanha ou a conversa */
 const vai=(cid,dm)=>{try{if(dm)abreDM(dm);else if(cid)abrir(cid)}catch(e){}};
 if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{const d=e.data||{};if(d.tipo==='push-abrir')vai(d.cid,d.dm)});
+// ao abrir o app: tira a bolinha do ícone e limpa as notificações que ficaram na bandeja
+function limpaAvisos(){try{if(navigator.clearAppBadge)navigator.clearAppBadge()}catch(_){}try{navigator.serviceWorker&&navigator.serviceWorker.ready.then(r=>r.getNotifications().then(l=>l.forEach(n=>n.close()))).catch(()=>{})}catch(_){}}
+limpaAvisos();document.addEventListener('visibilitychange',()=>{if(!document.hidden)limpaAvisos()});
 try{const ab=new URLSearchParams(location.search).get('abrir');
  if(ab){history.replaceState(null,'',location.pathname);let n=0;const t=setInterval(()=>{n++;if(n>60)return clearInterval(t);
   if(!uid)return;const k=ab.slice(0,2),v=ab.slice(2);

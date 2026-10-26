@@ -23,10 +23,13 @@ self.addEventListener('push',e=>{
     await self.registration.showNotification(d.titulo||'NeroRPG',{
       body:d.corpo||'Mensagem nova',
       icon:'icone-180.png',
+      badge:'badge-96.png',
       tag:d.tag||undefined,
       renotify:!!d.tag,
       data:{cid:d.cid||'',dm:d.dm||''}
     });
+    // bolinha/número no ícone do app = quantas notificações estão pendentes
+    try{const n=(await self.registration.getNotifications()).length;if(self.navigator.setAppBadge)await self.navigator.setAppBadge(n||1)}catch(_){}
   })());
 });
 // Tocar na notificação abre (ou traz para frente) o app e vai direto para a campanha ou conversa.
