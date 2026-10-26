@@ -6,7 +6,7 @@ self.addEventListener('fetch',e=>{
   if(r.method!=='GET')return;
   if(new URL(r.url).origin!==location.origin)return;
   e.respondWith(fetch(r,{cache:'no-store'}).then(res=>{
-    if(res.ok){const c=res.clone();caches.open('mrpg-offline').then(x=>x.put(r,c))}
+    if(res.ok){const c=res.clone();caches.open('nerorpg-offline').then(x=>x.put(r,c))}
     return res;
   }).catch(()=>caches.match(r,{ignoreSearch:true}).then(m=>m||caches.match('index.html'))));
 });
