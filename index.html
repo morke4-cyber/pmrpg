@@ -296,7 +296,7 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 </style></head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.2.4';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.2.5';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -350,7 +350,7 @@ const fmt=t=>esc(t).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\|\|([^|\
 const mid=x=>x?x.t==='v'?`<video controls preload=none playsinline src="${esc(x.u)}"></video>`:`<img loading=lazy decoding=async src="${esc(x.u)}" onclick="ampliar(this.src)">`:'';
 const hpTxt=p=>p&&p.pvmax!=null&&p.pv!=null?'PV:'+(p.pv===p.pvmax?p.pv:p.pv+'/'+p.pvmax):'';
 const hpm=m=>{const t=m.pid?hpTxt(pers.find(x=>x.id===m.pid)):'';return t?` <b>${t}</b>`:''};
-const az=(a,b)=>a.nome.localeCompare(b.nome,'pt-BR',{sensitivity:'base'});
+const az=(a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR',{sensitivity:'base'});
 function modal(t,cs,cb){const o=document.createElement('div');o.className='ov';o.innerHTML=`<div class=card><h3>${esc(t)}</h3>${cs.map((c,i)=>`<label>${esc(c.l)}</label>${c.sel?`<select id=mo${i}>${c.sel.map(o=>`<option value="${esc(o.v)}"${o.v===c.v?' selected':''}>${esc(o.t)}</option>`).join('')}</select>`:c.ml?`<textarea id=mo${i}>${esc(c.v||'')}</textarea>`:`<input id=mo${i} value="${esc(c.v||'')}">`}`).join('')}<div class=row style="margin-top:12px"><button class=s id=moc>Cancelar</button><button id=mok>Salvar</button></div></div>`;document.body.appendChild(o);o.querySelector('#moc').onclick=()=>o.remove();o.querySelector('#mok').onclick=()=>{cb(cs.map((c,i)=>o.querySelector('#mo'+i).value.trim()));o.remove()}}
 /* ---------- dados ---------- */
 function rolar(e){e=String(e).replace(/\s+/g,'').toLowerCase();
@@ -491,7 +491,7 @@ const ch=cl.channel('c'+Math.random().toString(36).slice(2)).on('postgres_change
 const poll=/\/(msgs|ooc)$/.test(String(val))?setInterval(()=>{if(!document.hidden&&Date.now()-ult>15000)run()},20000):0;
 return()=>{vivo=false;_ouv.delete(run);if(poll)clearInterval(poll);cl.removeChannel(ch)}}
 function doc(p){return{id:fim(p),get:()=>ler(p),set:d=>gravar(p,d),
-async update(d){const s=await ler(p);await gravar(p,{...(s.data()||{}),...d})},
+async update(d){const s=await ler(p);if(!s.exists&&/\/personagens\//.test(p))throw new Error('doc inexistente');await gravar(p,{...(s.data()||{}),...d})},
 async delete(){if(monitor){alert(MSGRO);throw new Error("ro")}const{error}=await cl.from('docs').delete().eq('path',p);if(error)throw error},
 onSnapshot(cb,er){return ouvir('path',p,async()=>cb(await ler(p)),er)}}}
 function col(p,o={}){const q={
@@ -595,7 +595,7 @@ if(!monitor){leit=[];digit={};canalDig=db.canal('dig-'+id,p=>{digit[p.u]={n:p.n,
 subs.push(db.collection(b+'/leituras').onSnapshot(s=>{leit=s.docs.map(d=>({id:d.id,...d.data()}));if(aba==='chat'&&!window._lT)window._lT=setTimeout(()=>{window._lT=0;if(aba==='chat'&&tl==='camp')lista()},1200)},()=>{}));
 (async()=>{try{if(!monitor){const x=await db.doc('data/users/'+uid+'/c-'+id).get();if(x.exists&&x.data().lido!=null)lido=x.data().lido}}catch(e){}if(tk!==abrTk)return;ouveLix(id);ouveMsgs()})();
 subs.push(db.collection(b+'/macros').onSnapshot(s=>{macros=s.docs.map(d=>({id:d.id,...d.data()}));if(aba==='macros')tab()},()=>{}));
-subs.push(db.collection(b+'/personagens').onSnapshot(s=>{pers=s.docs.map(d=>({id:d.id,...d.data()}));if(aba==='chat'){cab();lista()}else if(aba==='pers'&&!document.activeElement.closest('#ab'))tab()},()=>{}));
+subs.push(db.collection(b+'/personagens').onSnapshot(s=>{pers=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.nome);if(aba==='chat'){cab();lista()}else if(aba==='pers'&&!document.activeElement.closest('#ab'))tab()},()=>{}));
 subs.push(db.collection(b+'/mapas').onSnapshot(s=>{mapas=s.docs.map(d=>({id:d.id,...d.data()}));mpRender()},()=>{}));subs.push(db.collection(b+'/tokens').onSnapshot(s=>{toks=s.docs.map(d=>({id:d.id,...d.data()}));mpRender()},()=>{}));
 const cbM=s=>{const n=s.docs.map(d=>({id:d.id,...d.data()})),sg=JSON.stringify(n.map(m=>[m.id,m.papel||'',m.nome]));if(sg===sigM)return;sigM=sg;membros=n;if(!monitor&&camp&&camp.mestre===uid&&!membros.some(m=>m.id===uid)&&!curou){curou=1;db.doc(b+'/membros/'+uid).set({nome:eu.nome}).then(()=>db.collection(b+'/membros').get()).then(s=>{if(s.docs.some(d=>d.id===uid))cbM(s);else alert('O servidor aceitou o registro, mas não mostra você na lista de participantes (provável problema de permissão de leitura no Supabase).')}).catch(e=>alert('Não foi possível registrar você como participante desta campanha.\n\nDetalhe: '+((e&&e.message)||e)))}if(!monitor&&camp&&camp.mestre!==uid&&membros.length&&!membros.some(m=>m.id===uid)){alert('Você foi removido desta campanha.');return inicio()}if(camp&&$('#pin')){pin();if(aba==='cfg'&&!document.activeElement.closest('#ab'))tab();else if(aba==='chat')cab()}};subs.push(db.collection(b+'/membros').onSnapshot(cbM,()=>{}));const ivM=setInterval(()=>{if(!document.hidden)db.collection(b+'/membros').get().then(cbM).catch(()=>{})},6000);subs.push(()=>clearInterval(ivM))}
 const ehM=()=>!!camp&&(monitor||camp.mestre===uid||membros.some(m=>m.id===uid&&m.papel==='cogm'));
@@ -678,7 +678,7 @@ document.body.appendChild(o);const mk=()=>o.querySelectorAll('#fc2 button').forE
 o.querySelectorAll('#fc2 button').forEach(b=>b.onclick=()=>{c=b.dataset.k;mk()});o.querySelector('#fn').onclick=()=>o.remove();
 o.querySelector('#fs').onclick=()=>{db.doc('campanhas/'+cid).update({fixa:o.querySelector('#fx').value.trim(),fixaCor:c});o.remove()}}
 function info(){const base=location.href.split('#')[0];modal('Convidar amigos',[{l:'Código de convite',v:cid},{l:'Link de convite',v:base+'#convite='+cid}],()=>{});const o=document.querySelector('.ov');o.querySelectorAll('input').forEach(i=>i.readOnly=1);o.querySelector('#moc').textContent='Fechar';o.querySelector('#mok').remove();const p=document.createElement('p');p.className='mu';p.textContent='Envie o código ou o link. Quem recebe usa "Entrar com código" na tela inicial. Membros: '+membros.map(m=>m.nome).join(', ');o.querySelector('.card').insertBefore(p,o.querySelector('.row'))}
-function tab(){({chat:vChat,pers:vPers,cfg:vCfg,macros:vMacros,modelo:vModelo,tema:vTema,diario:vDiario,galeria:vGaleria})[aba]()}
+function tab(){const f=({chat:vChat,pers:vPers,cfg:vCfg,macros:vMacros,modelo:vModelo,tema:vTema,diario:vDiario,galeria:vGaleria})[aba];try{f()}catch(e){console.error(e);if(ativo){ativo=null;try{f()}catch(e2){console.error(e2)}}}}
 const tit=()=>{const t=$('#tt');if(t)t.textContent=camp.nome;const i=$('#ti');if(i){i.src=camp.img||'';i.style.display=camp.img?'':'none'}const d=$('#td');if(d)d.style.display=camp.img?'none':''};
 function ampliar(u){const o=document.createElement('div');o.className='ov';o.onclick=()=>o.remove();o.innerHTML=`<button class=s style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;padding:6px 14px">✕</button><img src="${esc(u)}" style="max-width:100%;max-height:85vh;border-radius:14px" onclick="event.stopPropagation()">`;document.body.appendChild(o)}
 const capa=g=>`<div class=card><div class=row><div class=big style="width:64px;height:64px;overflow:hidden;${g?'cursor:pointer':''}" ${g?`onclick="$('#ci').click()"`:''}>${camp.img?`<img src="${esc(camp.img)}" style="width:100%;height:100%;object-fit:cover">`:'<span style="font-size:28px;line-height:64px;display:block;text-align:center">🎲</span>'}</div><div ${g?`onclick="editarCamp('nome')" style="cursor:pointer"`:''}><b style="font-size:17px">${esc(camp.nome)}</b>${g?' <span class=mu>✎</span>':''}</div></div>${g?'<input id=ci type=file accept="image/*" style="display:none" onchange="imgCamp(this)">':''}<div class=mu style="margin-top:10px;white-space:pre-wrap;${g?'cursor:pointer':''}" ${g?`onclick="editarCamp('descricao')"`:''}>${camp.descricao?fmt(camp.descricao):g?'Configurar descrição da campanha…':'Sem descrição.'}</div>${g?gmImg():''}</div>`;
@@ -1051,7 +1051,7 @@ const lst=npc=>{const v=pers.filter(x=>!!x.npc===!!npc&&(!npc||x.dono===uid||ehM
 $('#ab').innerHTML=`<div class=c>${lst(0)}${lst(1)}</div>`}
 const novoPers=npc=>!ehM()?alert('Somente o Mestre e o Co-GM podem criar personagens e NPCs.'):modal(npc?'Novo NPC':'Novo personagem',[{l:npc?'Nome do NPC':'Nome do personagem'},npc?{l:'Visível para os jogadores? Digite "sim" para mostrar (padrão: oculto)'}:{l:'Jogador responsável',v:uid,sel:membros.map(m=>({v:m.id,t:m.nome+(m.id===uid?' (você)':'')}))}],([n,vv])=>{if(!n)return;const id=gid(),al=!npc&&vv?membros.find(m=>m.id===vv):null;
 db.doc('campanhas/'+cid+'/personagens/'+id).set({nome:n,dono:al?al.id:uid,donoNome:al?al.nome:eu.nome,v:{},npc:!!npc,visivel:!!npc&&/^s/i.test(vv||'')}).then(()=>{ativo=id;tab()})});
-function imgPers(el){escolheImg(el,cid+'/avatares',async(m,g)=>{await db.doc('campanhas/'+cid+'/personagens/'+ativo).update({img:m,imgG:g});const p=pers.find(x=>x.id===ativo);if(p){p.img=m;p.imgG=g}tab()})}
+function imgPers(el){const id=ativo,c0=cid;if(!id)return;escolheImg(el,c0+'/avatares',async(m,g)=>{await db.doc('campanhas/'+c0+'/personagens/'+id).update({img:m,imgG:g});const p=pers.find(x=>x.id===id);if(p){p.img=m;p.imgG=g}if(ativo===id&&cid===c0)tab()})}
 const vida=p=>`<h3>❤️ Vida</h3><div class=card><div class=row><div><label>PV atuais</label><input type=number value="${p.pv??''}" onchange="sPV('pv',this.value)"></div><div><label>PV máximos</label><input type=number value="${p.pvmax??''}" onchange="sPV('pvmax',this.value)"></div></div><div class=row style="margin-top:8px"><button class=s onclick="pvD(-1)">− 1 (dano)</button><button class=s onclick="pvD(1)">+ 1 (cura)</button></div><p class=mu>${hpTxt(p)?'No chat aparece: '+hpTxt(p):'Preencha os PV para a vida aparecer no chat.'}</p></div>`;
 async function sPV(c,v){const p=pers.find(x=>x.id===ativo);p[c]=v===''?null:+v;if(c==='pv'&&p.pvmax==null)p.pvmax=p.pv;if(c==='pvmax'&&p.pv==null)p.pv=p.pvmax;await db.doc('campanhas/'+cid+'/personagens/'+ativo).update({pv:p.pv??null,pvmax:p.pvmax??null});tab()}
 async function pvD(d){const p=pers.find(x=>x.id===ativo);if(p.pv==null)return alert('Preencha os PV atuais primeiro.');p.pv=Math.min(p.pvmax??1e9,Math.max(0,p.pv+d));await db.doc('campanhas/'+cid+'/personagens/'+ativo).update({pv:p.pv});tab()}
