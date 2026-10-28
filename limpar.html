@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeroRPG - Atualizar</title>
+<style>
+body{margin:0;font-family:-apple-system,Helvetica,Arial,sans-serif;background:#15111f;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;box-sizing:border-box}
+.c{max-width:360px}
+h1{font-size:22px;margin:0 0 12px}
+p{font-size:16px;line-height:1.4;margin:0 0 14px;color:#d8d0ee}
+button{font-size:18px;padding:14px 22px;border:0;border-radius:12px;background:#7c3aed;color:#fff;width:100%}
+</style></head><body><div class="c">
+<h1>Atualizando o NeroRPG…</h1>
+<p id="st">Limpando a versão antiga guardada neste aparelho.</p>
+<button id="bt" style="display:none" onclick="ir()">Abrir o NeroRPG</button>
+</div>
+<script>
+/* Só apaga a cópia antiga do app (service worker e cache). Seu login e seus dados continuam. */
+function ir(){location.replace('./?atualizado='+Date.now())}
+(function(){
+  var st=document.getElementById('st'),bt=document.getElementById('bt'),fim=false;
+  function pronto(msg){
+    if(fim)return;fim=true;
+    st.textContent=msg;
+    bt.style.display='block';
+    setTimeout(ir,1500);
+  }
+  var tarefas=[];
+  try{
+    if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations){
+      tarefas.push(navigator.serviceWorker.getRegistrations().then(function(rs){
+        return Promise.all(rs.map(function(r){return r.unregister()}));
+      }));
+    }
+  }catch(e){}
+  try{
+    if(window.caches&&caches.keys){
+      tarefas.push(caches.keys().then(function(ks){
+        return Promise.all(ks.map(function(k){return caches.delete(k)}));
+      }));
+    }
+  }catch(e){}
+  Promise.all(tarefas).then(function(){
+    pronto('Pronto! Abrindo a versão nova…');
+  }).catch(function(){
+    pronto('Terminei o que foi possível. Abrindo…');
+  });
+  /* se algo travar, não deixa a pessoa presa nesta tela */
+  setTimeout(function(){pronto('Abrindo…')},5000);
+})();
+</script></body></html>
