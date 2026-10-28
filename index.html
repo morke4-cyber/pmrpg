@@ -296,7 +296,7 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 </style></head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.2.5';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.2.6';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -779,7 +779,7 @@ if(amigIds)amigIds.add(id);alert('Pedido enviado! '+p.data().nome+' verá o avis
 if(s)go(s);else modal('Adicionar amigo',[{l:'Nome de usuário do amigo'}],([n])=>n&&go(n))}
 const delAmigo=f=>{if(confirm('Remover este amigo da sua lista?'))db.doc('data/users/'+uid+'/f-'+f).delete().then(social)};
 async function abreDM(f){tl='dm';desinscrever();dmFr=f;dmResp=null;nlF[f]=0;dmPar=par(uid,f);dmMsgs=[];dmVisto=0;dmLido=0;const x=amigos.find(a=>a.fr===f)||{};dmNome=x.nome||f;
-tela(`<header class="ch"><button class="h" onclick="social()" title="Voltar">${ic('voltar')}</button><div class="tav">${x.foto?`<img src="${esc(x.foto)}" data-g="${esc(x.fotoG||'')}" alt="" onclick="ampliar(this.dataset.g||this.src)" style="cursor:zoom-in">`:'<span class="ep">👤</span>'}</div><span>${esc(dmNome)}</span><span class="pd" data-on="${f}" style="flex:none"></span><button class="h" onclick="menuDM()" title="Mais">⋮</button></header><div id=dmm style="flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:6px"></div><div class=cmp><div id=dgd class=mu style="font-size:12px"></div><div id=drb></div><div id=pd style="display:none"><div class=row><input id=ex value="d20" placeholder="Ex.: 2d6+3"><button onclick="dmRolar()">Rolar</button></div><div class=q style="margin-top:6px">${['d4','d6','d8','d10','d12','d20','d%','4dF','2d6','d20+5'].map(d=>`<button onclick="$('#ex').value='${d}'">${d}</button>`).join('')}</div></div><div class=row style="gap:6px"><button class=s onclick="$('#pd').style.display=$('#pd').style.display?'':'none'" title="Dados"><i class=nic-dado></i></button><button class=s onclick="$('#arq').click()" title="Enviar imagem, GIF ou vídeo"><i class=nic-galeria></i></button><input id=arq type=file accept="image/*,video/*" style="display:none" onchange="dmMidia(this)"></div><div class=row><textarea id=dmt rows=1 placeholder="Mensagem" style="min-height:0;height:44px;max-height:120px;resize:none" oninput="auto(this);dmDig()" onkeydown="dmTecla(event)"></textarea><button onclick="dmEnviar()">Enviar</button></div></div>`);marcaOnline();
+tela(`<header class="ch"><button class="h" onclick="social()" title="Voltar">${ic('voltar')}</button><div class="tav">${x.foto?`<img src="${esc(x.foto)}" data-g="${esc(x.fotoG||'')}" alt="" onclick="ampliar(this.dataset.g||this.src)" style="cursor:zoom-in">`:'<span class="ep">👤</span>'}</div><span>${esc(dmNome)}</span><span class="pd" data-on="${f}" style="flex:none"></span><button class="h" onclick="menuDM()" title="Mais">⋮</button></header><div id=dmm style="flex:1;overflow-y:auto;overflow-x:hidden;padding:10px;display:flex;flex-direction:column;gap:6px"></div><div class=cmp><div id=dgd class=mu style="font-size:12px"></div><div id=drb></div><div id=pd style="display:none"><div class=row><input id=ex value="d20" placeholder="Ex.: 2d6+3"><button onclick="dmRolar()">Rolar</button></div><div class=q style="margin-top:6px">${['d4','d6','d8','d10','d12','d20','d%','4dF','2d6','d20+5'].map(d=>`<button onclick="$('#ex').value='${d}'">${d}</button>`).join('')}</div></div><div class=row style="gap:6px"><button class=s onclick="$('#pd').style.display=$('#pd').style.display?'':'none'" title="Dados"><i class=nic-dado></i></button><button class=s onclick="$('#arq').click()" title="Enviar imagem, GIF ou vídeo"><i class=nic-galeria></i></button><input id=arq type=file accept="image/*,video/*" style="display:none" onchange="dmMidia(this)"></div><div class=row><textarea id=dmt rows=1 placeholder="Mensagem" style="min-height:0;height:44px;max-height:120px;resize:none" oninput="auto(this);dmDig()" onkeydown="dmTecla(event)"></textarea><button onclick="dmEnviar()">Enviar</button></div></div>`);marcaOnline();
 subs.push(db.collection('dm/'+dmPar+'/msgs').orderBy('t').limit(300).onSnapshot(s=>{dmMsgs=s.docs.map(d=>({id:d.id,...d.data()}));for(const k in pendD){if(dmMsgs.some(x=>x.id===k))delete pendD[k];else if(pendD[k]._c===dmPar){dmMsgs.push(pendD[k]);dmMsgs.sort((a,b)=>(a.t||0)-(b.t||0))}}dmLista()},()=>{}));
 subs.push(db.collection('dm/'+dmPar+'/leituras').onSnapshot(s=>{const o=s.docs.find(d=>d.id===f);dmVisto=o?o.data().t:0;dmLista()},()=>{}));
 dmCh=db.canal('dmd-'+dmPar,p=>{const e=$('#dgd');if(e&&p.u!==uid){e.textContent=dmNome+' está digitando…';clearTimeout(dmTm);dmTm=setTimeout(()=>{e.textContent=''},3000)}});subs.push(()=>dmCh.fim())}
@@ -794,7 +794,7 @@ i.value='';i.style.height='44px';if(r)dmSend(r.txt,{dado:1});else dmSend(t.repla
 function dmRolar(){const r=rolar($('#ex').value);if(!r)return alert('Expressão de dados inválida. Exemplos: 1d20, 2d6, d20+5, 4dF, d%');dmSend(r.txt,{dado:1})}
 /* ---- chat privado: responder, editar e apagar ---- */
 const dmRe=()=>{const r=dmResp;dmResp=null;drb();return r?{re:r}:{}};
-const dmAcoes=m=>m.apagada||m._p?'':` <span class=rbt onclick="dmResponder('${m.id}')" title="Responder">↩</span>`+(m.uid===uid&&!m.dado?`<span class=rbt onclick="dmEdita('${m.id}')" title="Editar">✎</span><span class=rbt onclick="dmApaga('${m.id}')" title="Apagar">🗑</span>`:'');
+const dmAcoes=m=>'';const dmAcoesAntigo=m=>m.apagada||m._p?'':` <span class=rbt onclick="dmResponder('${m.id}')" title="Responder">↩</span>`+(m.uid===uid&&!m.dado?`<span class=rbt onclick="dmEdita('${m.id}')" title="Editar">✎</span><span class=rbt onclick="dmApaga('${m.id}')" title="Apagar">🗑</span>`:'');
 function dmResponder(id){const m=dmMsgs.find(x=>x.id===id);if(!m)return;dmResp={id:m.id,nome:m.uid===uid?eu.nome:dmNome,u:m.uid,t:(m.texto||(m.midia?'📎 Mídia':'')).replace(/\s+/g,' ').slice(0,90)};drb();const i=$('#dmt');if(i)i.focus()}
 function drb(){const e=$('#drb');if(!e)return;e.innerHTML=dmResp?`<div class=ch style="display:flex;gap:8px;align-items:center"><span style="flex:1;border-left:3px solid ${cor(dmResp.u)};padding-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>↩ ${esc(dmResp.nome)}</b> ${esc(dmResp.t)}</span><button class=s style="padding:2px 10px" onclick="dmResp=null;drb()">✕</button></div>`:''}
 function dmEdita(id){const m=dmMsgs.find(x=>x.id===id);if(!m)return;modal('Editar mensagem',[{l:'Mensagem',v:m.texto,ml:1}],([t])=>{if(!t&&!m.midia)return alert('A mensagem não pode ficar vazia.');if(t.includes('🎲'))return alert('Mensagens editadas não podem conter o símbolo de dados 🎲.');db.doc('dm/'+dmPar+'/msgs/'+id).update({texto:t,ed:Date.now()}).catch(()=>alert('Não foi possível editar a mensagem.'))})}
@@ -940,7 +940,7 @@ function vMacros(){const v=macros.filter(m=>m.publica||m.dono===uid);$('#ab').in
 const st=document.createElement('style');
 st.textContent='#dn{position:absolute;right:12px;top:-54px;z-index:6;width:42px;height:42px;padding:0;border-radius:50%;align-items:center;justify-content:center;background:var(--cd);color:var(--tx);border:1px solid var(--bd);box-shadow:0 2px 8px rgba(0,0,0,.35)}'
 +'#dn #dnb{position:absolute;top:-6px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--pr);color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;box-sizing:border-box}'
-+'@media (pointer:coarse){#msgs .m{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}}'
++'@media (pointer:coarse){#msgs .m,#dmm .m{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}}'
 +'.mmi:active{background:var(--bd)}@media (hover:hover){.mmi:hover{background:var(--bd)}}';
 document.head.appendChild(st);
 window.dnAtual=function(){const b=document.getElementById('dn'),e=document.getElementById('msgs');if(!b||!e)return;
@@ -964,36 +964,49 @@ window.msgMenu=function(id){
  o.innerHTML='<div class=card style="max-width:300px;padding:6px">'+op.map((x,i)=>'<div class=mmi data-i="'+i+'" style="display:flex;gap:14px;align-items:center;padding:13px 14px;border-radius:10px;cursor:pointer;font-size:16px'+(x[3]?';color:'+x[3]:'')+'"><span style="width:22px;text-align:center">'+x[0]+'</span><span>'+x[1]+'</span></div>').join('')+'</div>';
  document.body.appendChild(o);
  o.querySelectorAll('.mmi').forEach(b=>b.onclick=()=>{o.remove();op[+b.dataset.i][2]()})};
+/* mesmo menu, para o chat de amigos */
+window.dmMenu=function(id){
+ if(document.querySelector('.mmn'))return;
+ const m=dmMsgs.find(x=>x.id===id);if(!m||m._p||m.apagada)return;
+ const d=!!m.dado,op=[];
+ op.push(['↩','Responder',()=>dmResponder(id)]);
+ if(m.texto&&!d)op.push(['📋','Copiar',()=>{try{navigator.clipboard.writeText(String(m.texto))}catch(e){}}]);
+ if(m.uid===uid&&!d&&!String(m.texto||'').includes('🎲')){op.push(['✎','Editar',()=>dmEdita(id)]);op.push(['🗑','Apagar',()=>dmApaga(id),'#e11d48'])}
+ const o=document.createElement('div');o.className='ov mmn';o.onclick=e=>{if(e.target===o)o.remove()};
+ o.innerHTML='<div class=card style="max-width:300px;padding:6px">'+op.map((x,i)=>'<div class=mmi data-i="'+i+'" style="display:flex;gap:14px;align-items:center;padding:13px 14px;border-radius:10px;cursor:pointer;font-size:16px'+(x[3]?';color:'+x[3]:'')+'"><span style="width:22px;text-align:center">'+x[0]+'</span><span>'+x[1]+'</span></div>').join('')+'</div>';
+ document.body.appendChild(o);
+ o.querySelectorAll('.mmi').forEach(b=>b.onclick=()=>{o.remove();op[+b.dataset.i][2]()})};
 let tm=null,x0=0,y0=0,feito=0;const lim=()=>{if(tm){clearTimeout(tm);tm=null}};
 document.addEventListener('pointerdown',e=>{feito=0;lim();
- const el=e.target.closest&&e.target.closest('#msgs .m');if(!el||monitor||(e.pointerType==='mouse'&&e.button!==0))return;
+ const el=e.target.closest&&e.target.closest('#msgs .m,#dmm .m');if(!el||(monitor&&!el.closest('#dmm'))||(e.pointerType==='mouse'&&e.button!==0))return;
  if(e.pointerType==='mouse')return; /* no PC usa o botão direito */
- x0=e.clientX;y0=e.clientY;const id=el.id.slice(2);
- tm=setTimeout(()=>{tm=null;feito=1;try{if(navigator.vibrate)navigator.vibrate(15)}catch(x){}msgMenu(id)},450)},{passive:true});
+ x0=e.clientX;y0=e.clientY;const id=el.id.slice(2),eDM=!!el.closest('#dmm');
+ tm=setTimeout(()=>{tm=null;feito=1;try{if(navigator.vibrate)navigator.vibrate(15)}catch(x){}(eDM?dmMenu:msgMenu)(id)},450)},{passive:true});
 document.addEventListener('pointermove',e=>{if(tm&&(Math.abs(e.clientX-x0)>8||Math.abs(e.clientY-y0)>8))lim()},{passive:true});
 ['pointerup','pointercancel'].forEach(k=>document.addEventListener(k,lim,true));
 document.addEventListener('click',e=>{if(feito){feito=0;e.stopPropagation();e.preventDefault()}},true);
-document.addEventListener('contextmenu',e=>{const el=e.target.closest&&e.target.closest('#msgs .m');if(el&&!monitor){e.preventDefault();lim();msgMenu(el.id.slice(2))}});
+document.addEventListener('contextmenu',e=>{const el=e.target.closest&&e.target.closest('#msgs .m,#dmm .m'),eDM=!!(el&&el.closest('#dmm'));if(el&&(eDM||!monitor)){e.preventDefault();lim();(eDM?dmMenu:msgMenu)(el.id.slice(2))}});
 })();
 
 /* ---------- arrastar o balão para a direita = responder (como no WhatsApp) ---------- */
 (function(){
 const st=document.createElement('style');
-st.textContent='#msgs{overflow-x:hidden}#msgs .m{touch-action:pan-y}'
+st.textContent='#msgs,#dmm{overflow-x:hidden}#msgs .m,#dmm .m{touch-action:pan-y}'
 +'.swi{position:absolute;top:50%;left:0;width:30px;height:30px;margin-top:-15px;border-radius:50%;background:var(--bd);color:var(--tx);display:flex;align-items:center;justify-content:center;font-size:17px;line-height:1;pointer-events:none;opacity:0}'
 +'.swi.ok{background:var(--pr);color:#fff}';
 document.head.appendChild(st);
-const LIM=60;let el=null,ic=null,id=null,x0=0,y0=0,dx=0,modo=0,passou=0;
+const LIM=60;let el=null,ic=null,id=null,kd=false,x0=0,y0=0,dx=0,modo=0,passou=0;
 const volta=resp=>{if(!el)return;const e=el,i=ic;e.style.transition='transform .2s';e.style.transform='';
  setTimeout(()=>{e.style.transition='';if(i&&i.parentNode)i.remove()},220);
- const ok=resp&&dx>=LIM,rid=id;el=null;ic=null;id=null;dx=0;modo=0;passou=0;
- if(ok){try{if(navigator.vibrate)navigator.vibrate(12)}catch(x){}responder(rid)}};
+ const ok=resp&&dx>=LIM,rid=id,kk=kd;el=null;ic=null;id=null;dx=0;modo=0;passou=0;
+ if(ok){try{if(navigator.vibrate)navigator.vibrate(12)}catch(x){}(kk?dmResponder:responder)(rid)}};
 document.addEventListener('pointerdown',e=>{
  if(el)volta(0);
- if(e.pointerType==='mouse'||monitor)return;
- const b=e.target.closest&&e.target.closest('#msgs .m');if(!b)return;
- const m=msgs.find(x=>x.id===b.id.slice(2));if(!m||m.apagada||m._p||m.tipo==='sys')return;
- el=b;id=m.id;x0=e.clientX;y0=e.clientY;dx=0;modo=0;passou=0},{passive:true});
+ if(e.pointerType==='mouse')return;
+ const b=e.target.closest&&e.target.closest('#msgs .m,#dmm .m');if(!b)return;
+ const k=!!b.closest('#dmm');if(!k&&monitor)return;
+ const m=(k?dmMsgs:msgs).find(x=>x.id===b.id.slice(2));if(!m||m.apagada||m._p||m.tipo==='sys')return;
+ kd=k;el=b;id=m.id;x0=e.clientX;y0=e.clientY;dx=0;modo=0;passou=0},{passive:true});
 document.addEventListener('pointermove',e=>{
  if(!el)return;const mx=e.clientX-x0,my=e.clientY-y0;
  if(!modo){
