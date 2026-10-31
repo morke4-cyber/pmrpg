@@ -296,7 +296,7 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 </style></head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.2.7';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.2.8';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1320,7 +1320,41 @@ const salvaAvl=()=>db.doc('data/users/'+uid+'/a-'+cid).set({l:avl,t:Date.now()})
 function novoAvl(){modal('Novo NPC avulso',[{l:'Nome do NPC'}],([n])=>{n=(n||'').trim().slice(0,40);if(!n)return;if(avl.length>=20)return alert('Limite de 20 NPCs avulsos.');const x={id:'a'+Date.now().toString(36),nome:n};avl.push(x);salvaAvl();falar='a:'+x.id;cab()})}
 function delAvl(id,el){if(!confirm('Apagar este NPC avulso?'))return;avl=avl.filter(x=>x.id!==id);salvaAvl();if(falar==='a:'+id){falar='eu';cab()}el.closest('.card').remove()}
 function trocaQuem(mid,v){const o=falar;falar=v;const q=quem();falar=o;document.querySelectorAll('.ov').forEach(e=>e.remove());db.doc('campanhas/'+cid+'/msgs/'+mid).update({tipo:q.tipo,nome:q.nome,av:q.av||'',avg:q.avg||'',pid:q.pid||null,co:q.co||null,ed:Date.now()}).catch(()=>alert('Não foi possível trocar quem enviou.'))}
-function vGaleria(){const l=msgs.filter(m=>m.midia&&m.midia.u&&!m.apagada).reverse();$('#ab').innerHTML=`<div class=c><h3><i class=nic-galeria></i> Galeria</h3><p class=mu>${l.length} arquivo(s) nas últimas ${msgs.length} mensagens carregadas.</p>${msgs.length>=lmMsg?'<button class=s style="width:100%;margin-bottom:8px" onclick="maisAntigas()">⬆ Carregar mensagens mais antigas</button>':''}<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">${l.map(m=>m.midia.t==='v'?`<video src="${esc(m.midia.u)}#t=0.1" controls preload=metadata style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px"></video>`:`<img src="${esc(m.midia.u)}" onclick="ampliar(this.src)" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:zoom-in">`).join('')||'<p class=mu>Nenhuma imagem enviada ainda.</p>'}</div></div>`}
+/* Galeria: busca as mídias direto no servidor, sem depender das mensagens carregadas no chat */
+let galL=null,galCid=null,galFim=false,galCar=false,galErro=false;
+const GAL_PG=60;
+async function galCarrega(mais){
+  if(galCar)return;galCar=true;galErro=false;const id=cid;
+  try{
+    let q=db.cl.from('docs').select('path,data').eq('parent','campanhas/'+id+'/msgs').not('data->midia->>u','is',null).order('data->>t',{ascending:false}).limit(GAL_PG);
+    if(mais&&galL&&galL.length){const t0=galL[galL.length-1].t;if(t0)q=q.filter('data->>t','lt',String(t0))}
+    const{data,error}=await q;if(error)throw error;
+    if(id!==cid||galCid!==id)return;
+    const novos=(data||[]).map(r=>({id:r.path.split('/').pop(),...r.data})).filter(m=>m.midia&&m.midia.u&&!m.apagada);
+    const mp=new Map((galL||[]).map(x=>[x.id,x]));
+    novos.forEach(m=>mp.set(m.id,m));
+    msgs.forEach(m=>{if(m.midia&&m.midia.u&&!m.apagada)mp.set(m.id,m)});
+    galL=[...mp.values()].sort((a,b)=>(b.t||0)-(a.t||0));
+    if((data||[]).length<GAL_PG)galFim=true;
+  }catch(e){console.error(e);galErro=true;if(!galL)galL=[]}
+  finally{galCar=false;if(aba==='galeria'&&id===cid)vGaleria()}
+}
+function galSync(){
+  if(!galL||!msgs.length)return;
+  const mp=new Map(msgs.map(m=>[m.id,m])),t0=msgs[0].t||0,tudo=msgs.length<lmMsg;
+  galL=galL.filter(x=>{const m=mp.get(x.id);if(m)return m.midia&&m.midia.u&&!m.apagada;return !(tudo||(x.t||0)>=t0)});
+  const ja=new Set(galL.map(x=>x.id));
+  msgs.forEach(m=>{if(m.midia&&m.midia.u&&!m.apagada&&!ja.has(m.id))galL.push(m)});
+  galL.sort((a,b)=>(b.t||0)-(a.t||0));
+}
+function vGaleria(){
+  if(galCid!==cid){galCid=cid;galL=null;galFim=false;galErro=false;galCar=false}
+  if(galL===null){
+    if(!galCar)galCarrega(false);
+    $('#ab').innerHTML=`<div class=c><h3><i class=nic-galeria></i> Galeria</h3><p class=mu>Carregando as imagens…</p></div>`;return}
+  galSync();
+  const l=galL;
+  $('#ab').innerHTML=`<div class=c><h3><i class=nic-galeria></i> Galeria</h3><p class=mu>${l.length} arquivo(s) carregado(s)${galFim?' (todos desta campanha)':''}.</p>${galErro?'<p class=mu style="color:#e66">Não foi possível carregar tudo. Confira a internet e toque em "Carregar mais".</p>':''}<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">${l.map(m=>m.midia.t==='v'?`<video src="${esc(m.midia.u)}#t=0.1" controls preload=metadata style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px"></video>`:`<img src="${esc(m.midia.u)}" loading=lazy decoding=async onclick="ampliar(this.src)" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:zoom-in">`).join('')||'<p class=mu>Nenhuma imagem enviada ainda.</p>'}</div>${!galFim?`<button class=s style="width:100%;margin-top:10px" ${galCar?'disabled':''} onclick="galCarrega(true)">${galCar?'Carregando…':'⬇ Carregar mais'}</button>`:''}</div>`}
 
 /* ---------- editar: trocar remetente / mais antigas / tiques / sussurro ---------- */
 var susU=null,lmMsg=300,subMsgs=null,ajM=null;
