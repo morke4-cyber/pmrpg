@@ -295,6 +295,13 @@ body.dsk #msgs{background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 .hm{display:flex;flex-direction:column}.hm>*{flex-shrink:0}
 .hm>.cred{position:sticky;bottom:0;margin-top:auto;padding:14px 0 6px}
 .wlc{position:relative}.wlc>.cred{position:absolute;left:0;right:0;bottom:10px;padding:0}
+/* ===== Relatos (bug / feedback) ===== */
+.rtg{font-size:11px;border-radius:999px;padding:2px 9px;background:var(--bd);color:var(--tx);white-space:nowrap;font-weight:600}.rtg.ab{background:rgba(245,180,0,.25)}.rtg.rs{background:rgba(34,197,94,.25)}.rtg.nv{background:var(--pk);color:#fff}
+.rcl{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;white-space:pre-wrap}
+.rmd img,.rmd video{max-width:100%;max-height:260px;border-radius:10px;display:block;margin-top:8px}
+body.relnovo header.th button[onclick*="menuTopo"],body.relnovo #dtb button[onclick*="menuTopo"],body.relnovo #dsb .dnav button[data-n="config"]{position:relative}
+body.relnovo header.th button[onclick*="menuTopo"]::after,body.relnovo #dtb button[onclick*="menuTopo"]::after{content:'';position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:#e11d48;border:2px solid var(--bg,#fff)}
+body.relnovo #dsb .dnav button[data-n="config"]::after{content:'';position:absolute;top:10px;left:34px;width:10px;height:10px;border-radius:50%;background:#e11d48}
 </style><style id="halo-css">
 /* ===== Tema de Halloween (todo outubro; dá para desligar em Configurações) ===== */
 html.halo,html.halo body,html.halo body.tabs,html.halo .pg.tt,html.halo body.dsk,html.halo body.dsk.tabs,html.halo header.ch,html.halo .ch{--bg:#130a04!important;--cd:#22130a!important;--tx:#ffeacc!important;--mu:#d1a67d!important;--bd:#5a2f10!important;--pr:#ff7a18!important;--pk:#ff4d00!important;--gm:#3a2206!important;--me:#4a2408!important;--ac:#ffb066!important;--ch:#4a2a10!important;--bi:#24150b!important;--ring:#ff9a3c!important;--ringg:0 0 6px rgba(255,122,24,.35)!important;--glf:drop-shadow(0 0 5px rgba(255,140,40,.8)) drop-shadow(0 0 14px rgba(255,100,0,.5))!important;--glf2:drop-shadow(0 0 7px rgba(255,190,110,.95)) drop-shadow(0 0 20px rgba(255,110,0,.75))!important;--lgf:drop-shadow(0 0 5px rgba(255,140,40,.8))!important;--hgr:linear-gradient(180deg,rgba(255,122,24,.38),rgba(255,122,24,0))!important;--navb:#7a3d12!important;--navg:0 -4px 12px rgba(255,122,24,.12)!important;--bdgb:#ffb066!important;--bdgt:#1a0d04!important;--chb:#7a3d12!important;--chbg:#1d1008!important;--navon:#fff!important;--navt:0 0 10px rgba(255,150,50,.9)!important;--hb:#2a1608!important;--hx:#ffe2bd!important;--hl:#5a2f10!important;--hc:#4a2a10!important;--bgimg:radial-gradient(circle at 20% 0,#4a1f06 0,transparent 60%),linear-gradient(#130a04,#130a04)!important;--dbgi:radial-gradient(1100px 520px at 18% -8%,#4a1f06 0,transparent 62%),linear-gradient(#100703,#100703)!important;--dpn:#1c0f06!important;--dbr:#5a2f10!important;--dac:#c2560c!important;--dhv:#2a1608!important;--dsel:#3d1f08!important;--dec:#ff7a18!important;color-scheme:dark!important}
@@ -401,7 +408,7 @@ html.xmas #haloMsg{background:#14261b;border-color:#e0262b;box-shadow:0 0 14px r
 </head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.3.0';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.4.0';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -634,7 +641,7 @@ if(m==='criar'){if(sn.length<6)return er.textContent='A senha precisa ter pelo m
 if(m==='esqueci'){const{error}=await c.resetPasswordForEmail(em,{redirectTo:url});if(error)throw error;return login('entrar','Se esse e-mail tiver conta, enviamos um link para criar uma nova senha.')}
 if(m==='nova'){if(sn.length<6)return er.textContent='A senha precisa ter pelo menos 6 caracteres.';const{error}=await c.updateUser({password:sn});if(error)throw error;history.replaceState(null,'',location.pathname);return carregaPerfil()}
 }catch(x){er.textContent=erroAuth(x)}}
-async function carregaPerfil(){try{const{data:s}=await db.cl.from('contas').select('slug').maybeSingle();if(!s)return perfilTela();uid=s.slug;const p=await db.doc('usuarios/'+uid).get();eu=p.exists?p.data():{nome:uid};if(!p.exists)await db.doc('usuarios/'+uid).set(eu);admin=await db.souAdmin();sincRel();if(!window._sr)window._sr=setInterval(sincRel,300000);if(!pres)pres=db.canal("online",null,{key:uid,sync:k=>{online=k;marcaOnline()}});inicio()}catch(e){login('entrar','Não foi possível carregar o seu perfil. Tente entrar de novo.')}}
+async function carregaPerfil(){try{const{data:s}=await db.cl.from('contas').select('slug').maybeSingle();if(!s)return perfilTela();uid=s.slug;const p=await db.doc('usuarios/'+uid).get();eu=p.exists?p.data():{nome:uid};if(!p.exists)await db.doc('usuarios/'+uid).set(eu);admin=await db.souAdmin();relIni();sincRel();if(!window._sr)window._sr=setInterval(sincRel,300000);if(!pres)pres=db.canal("online",null,{key:uid,sync:k=>{online=k;marcaOnline()}});inicio()}catch(e){login('entrar','Não foi possível carregar o seu perfil. Tente entrar de novo.')}}
 function perfilTela(){tl='auth';tela(`<header><span>NeroRPG</span><button class=h onclick="sair()">Sair</button></header><div class=c><h2>Escolha seu nome de usuário</h2><p class=mu>Se você já jogava antes, digite exatamente o nome que usava para continuar com o mesmo perfil, as mesmas campanhas e fichas. Se é novo, escolha um nome.</p><label>Nome de usuário</label><input id=nu maxlength=24 onkeydown="if(event.key===\'Enter\')escolheNome()"><p class=err id=er></p><button onclick="escolheNome()" style="width:100%">Continuar</button></div>`)}
 async function escolheNome(){const n=$('#nu').value.trim(),id=n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');if(id.length<2)return $('#er').textContent='Digite um nome de usuário com pelo menos 2 letras ou números.';
 try{const{data:u}=await db.cl.auth.getUser();const{error}=await db.cl.from('contas').insert({slug:id,auth_id:u.user.id});if(error)return $('#er').textContent=error.code==='23505'?'Esse nome de usuário já pertence a outra conta. Escolha outro ou peça ajuda ao administrador.':'Não foi possível salvar o nome de usuário.';
@@ -642,7 +649,7 @@ const p=await db.doc('usuarios/'+id).get();if(!p.exists)await db.doc('usuarios/'
 async function init(){if(!window.supabase||SUPA_URL.includes('COLE_AQUI'))return tela('<div class=c><h2>NeroRPG</h2><p>Falta configurar o Supabase. Abra o arquivo index.html e preencha SUPA_URL e SUPA_KEY no começo do script.</p></div>');db=criaDb();
 if(REC)return login('nova','Digite a sua nova senha.');
 try{const{data}=await db.cl.auth.getSession();if(data.session)return carregaPerfil()}catch(e){}login()}
-async function sair(){try{window.pushSair&&await window.pushSair()}catch(e){}try{await db.cl.auth.signOut()}catch(e){}desinscrever();if(pres){pres.fim();pres=null}watchD.forEach(f=>f());watchD=[];watchKD="";watch.forEach(f=>f());watch=[];watchK='';amigIds=null;uid=null;eu=null;admin=false;login()}
+async function sair(){try{window.pushSair&&await window.pushSair()}catch(e){}try{await db.cl.auth.signOut()}catch(e){}relFim();desinscrever();if(pres){pres.fim();pres=null}watchD.forEach(f=>f());watchD=[];watchKD="";watch.forEach(f=>f());watch=[];watchK='';amigIds=null;uid=null;eu=null;admin=false;login()}
 /* ---------- campanhas ---------- */
 var inicioTk=0,sgHome='';const sgL=x=>JSON.stringify(x.map(y=>[y.cid,y.nome,y.img,y.desc,y.mestre,!!y.arq,naoLidas[y.cid]||0,(ultM[y.cid]||{}).t||0]));
 async function inicio(){tl='home';const tkI=++inicioTk;let pw=Promise.resolve();if(camp&&aba==='chat'&&!monitor&&msgs.length&&noFundo()){const u=msgs[msgs.length-1].t;if(u>lido){lido=u;const c0=cid,n0=eu.nome;naoLidas[c0]=0;pw=(async()=>{try{await db.doc('data/users/'+uid+'/c-'+c0).update({lido:u});await db.doc('campanhas/'+c0+'/leituras/'+uid).set({nome:n0,t:u})}catch(e){}})()}}desinscrever();monitor=false;if(listaC&&listaC.length){homeOk=true;sgHome=sgL(listaC);tela(homeHtml(listaC,listaAd||[]));contaNl()}await pw;if(tkI!==inicioTk)return;let l=[],ad=[];try{l=(await db.collection('data/users/'+uid).get()).docs.map(d=>d.data()).filter(x=>x.cid)}catch(e){}await Promise.all(l.map(async x=>{try{const c=await db.doc('campanhas/'+x.cid).get();if(c.exists){const d=c.data();x.nome=d.nome;x.img=d.img||'';x.desc=d.descricao||'';x.mestre=d.mestreNome||''}else x.gone=1}catch(e){}}));l=l.filter(x=>!x.gone);await Promise.all(l.map(async x=>{x.nl=x.lido!=null?await db.naoLidas('campanhas/'+x.cid+'/msgs',x.lido,uid):0;naoLidas[x.cid]=x.nl;try{const u=await db.ultima('campanhas/'+x.cid+'/msgs');if(u){const t=Number(u.t)||0;if(t>=(ativ[x.cid]||0)){ativ[x.cid]=t;ultM[x.cid]=u}}}catch(e){}}));if(tkI!==inicioTk)return;l.sort(ordC);iniciaWatch(l);listaC=l;iniciaWatchDM();
@@ -664,7 +671,7 @@ function filtro(f){fAt=f;const a=$('#ft-todos'),b=$('#ft-nao'),c=$('#ft-arq');if
 /* menu ⋮ do topo */
 function menuTopo(){if($('.ov'))return;const o=document.createElement('div');o.className='ov';o.style.cssText='align-items:flex-start;justify-content:flex-end;padding:54px 12px 0;background:rgba(0,0,0,.25)';o.onclick=e=>{if(e.target===o)o.remove()};const t=mu().todos;
 const it=(i,x,f)=>`<div onclick="this.closest('.ov').remove();${f}"><span>${i}</span><span>${x}</span></div>`;
-o.innerHTML=`<div class="card pm">${it('➕','Nova campanha','novaCamp()')}${it('🔑','Entrar com código','entrarCod()')}${it(t?'🔔':'🔕',t?'Ativar todas as notificações':'Silenciar todas as notificações','mudoT()')}${it('📲',(window.pushOn&&window.pushOn())?'Desativar notificações push':'Ativar notificações push','pushMenu()')}${it('<i class=nic-dicas></i>','Dicas de comandos','dicasCmd()')}${it('🚪','Sair','sair()')}</div>`;document.body.appendChild(o)}
+o.innerHTML=`<div class="card pm">${it('➕','Nova campanha','novaCamp()')}${it('🔑','Entrar com código','entrarCod()')}${it(t?'🔔':'🔕',t?'Ativar todas as notificações':'Silenciar todas as notificações','mudoT()')}${it('📲',(window.pushOn&&window.pushOn())?'Desativar notificações push':'Ativar notificações push','pushMenu()')}${it('<i class=nic-dicas></i>','Dicas de comandos','dicasCmd()')}${it('🐞',admin?'Relatos recebidos'+(relNovos?' ('+relNovos+')':''):'Bug ou feedback'+(relNovos?' ('+relNovos+')':''),'relatos()')}${it('🚪','Sair','sair()')}</div>`;document.body.appendChild(o)}
 /* barra de baixo: Campanhas | Amigos */
 function setAba(a){document.querySelectorAll('#bn button').forEach(b=>b.classList.toggle('on',b.dataset.a===a))}
 function sincBn(){let b=document.getElementById('bn');
@@ -943,12 +950,146 @@ const sino=()=>{const m=(mu().c||{})[id];return ic(m?'sinoMudo':'sino')+'<span>'
 o.innerHTML=`<div class="card" style="max-height:88vh;overflow:auto"><h3>${esc(x.nome)}</h3>${x.img?`<img src="${esc(x.img)}" style="max-width:100%;max-height:50vh;border-radius:12px;display:block;margin:0 auto 10px">`:''}<div style="white-space:pre-wrap">${x.desc?fmt(x.desc):'<span class="mu">Esta campanha ainda não tem descrição.</span>'}</div><button class="s bl" id="snb" style="width:100%;margin-top:12px">${sino()}</button>${monitor?'':`<button class="s" style="width:100%;margin-top:8px" id="arqb">${x.arq?'📤 Desarquivar campanha':'<i class=nic-arquivar></i> Arquivar campanha'}</button>`}<button class="s" style="width:100%;margin-top:8px" onclick="this.closest('.ov').remove()">Fechar</button></div>`;
 const ab=o.querySelector('#arqb');if(ab)ab.onclick=()=>arquivaHome(id,!x.arq,o);
 o.querySelector('#snb').onclick=function(){mudoC(id);this.innerHTML=sino()};document.body.appendChild(o)}
+/* ---------- Relatos: bug e feedback (pessoa -> administrador, com chat e botão "resolvido") ---------- */
+let relL=[],relRd={},relNl={},relNovos=0,relFil='aberto',relObs=null,relIv=0,relAnex=[],relEnv=false,relNid='',relId='',relAt=null,relMs=[],relSig='',relLeuT=0,relLeuOk=0;
+const relTipo=t=>t==='bug'?'🐞 Bug':'💡 Feedback';
+const relData=t=>t?new Date(t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+const relMap=s=>s.docs.map(d=>({id:d.id,...d.data()}));
+
+/* pendências = relatos novos (para o admin) ou com resposta não lida (para todos) */
+function relBadge(){relNovos=relL.filter(r=>(relNl[r.id]||0)>0||(admin&&r.uid!==uid&&r.status!=='resolvido'&&relRd[r.id]===undefined)).length;document.body.classList.toggle('relnovo',relNovos>0)}
+async function relCalc(){
+  try{const rd={};(await db.collection('data/users/'+uid).get()).docs.forEach(d=>{const x=d.data();if(x.rid)rd[x.rid]=x.lido||0});relRd=rd}catch(e){}
+  const rs=relL.filter(r=>relRd[r.id]!==undefined).sort((a,b)=>(b.t||0)-(a.t||0)).slice(0,40);
+  await Promise.all(rs.map(async r=>{try{relNl[r.id]=await db.naoLidas('relatos/'+r.id+'/msgs',relRd[r.id],uid)}catch(e){}}));
+  relBadge()}
+async function relCont(){if(!uid)return;try{relL=relMap(await db.collection('relatos').get());await relCalc()}catch(e){}}
+function relIni(){relFim();relL=[];relRd={};relNl={};relCont();
+  try{if(admin)relObs=db.observa('relatos',()=>relCont())}catch(e){}
+  relIv=setInterval(()=>{if(!document.hidden&&(admin||relL.length))relCont()},admin?60000:90000);
+  if(!window._rv){window._rv=1;document.addEventListener('visibilitychange',()=>{if(!document.hidden&&uid)relCont()})}}
+function relFim(){if(relObs){try{relObs()}catch(e){}relObs=null}if(relIv){clearInterval(relIv);relIv=0}document.body.classList.remove('relnovo');relNovos=0}
+
+/* ---------- lista ---------- */
+function relatos(){
+  tl='rel';monitor=false;desinscrever();
+  tela(`<header><button class=h onclick="inicio()">‹</button><span>${admin?'Relatos recebidos':'Bug ou feedback'}</span></header><div class=c><button onclick="relNovo()" style="width:100%">＋ Novo relato</button><div class=row id=rfl style="margin:12px 0 10px"></div><div id=rli><p class=mu>Carregando…</p></div></div>`);
+  if(relL.length)relListaDesenha();
+  subs.push(db.collection('relatos').onSnapshot(s=>{if(tl!=='rel')return;relL=relMap(s);relListaDesenha();relCalc().then(()=>{if(tl==='rel')relListaDesenha()})},()=>{}));
+  const iv=setInterval(()=>{if(tl==='rel'&&!document.hidden)relCalc().then(()=>{if(tl==='rel')relListaDesenha()})},20000);subs.push(()=>clearInterval(iv))}
+function relF(f){relFil=f;relListaDesenha()}
+function relListaDesenha(){
+  const e=$('#rli'),fl=$('#rfl');if(!e||!fl)return;
+  const ab=relL.filter(r=>r.status!=='resolvido'),rs=relL.filter(r=>r.status==='resolvido');
+  fl.innerHTML=`<button class="${relFil==='aberto'?'on':'s'}" style="flex:1" onclick="relF('aberto')">Abertos (${ab.length})</button><button class="${relFil==='resolvido'?'on':'s'}" style="flex:1" onclick="relF('resolvido')">Resolvidos (${rs.length})</button>`;
+  const l=(relFil==='aberto'?ab:rs).slice().sort((a,b)=>(b.t||0)-(a.t||0));
+  e.innerHTML=l.length?l.map(r=>{
+    const novo=admin&&r.uid!==uid&&r.status!=='resolvido'&&relRd[r.id]===undefined,n=relNl[r.id]||0;
+    return`<div class=card style="cursor:pointer" onclick="relAbrir('${esc(r.id)}')"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>${relTipo(r.tipo)}</b>${r.status==='resolvido'?'<span class="rtg rs">✅ Resolvido</span>':'<span class="rtg ab">Aberto</span>'}${novo?'<span class="rtg nv">Novo</span>':''}${n?`<span class="rtg nv">${n} ${n>1?'respostas':'resposta'}</span>`:''}</div><div class=mu style="margin:3px 0 4px">${admin?esc(r.nome||r.uid)+' · ':''}${relData(r.t)}${r.midias&&r.midias.length?' · 📎 '+r.midias.length:''}</div><div class=rcl>${esc(r.texto||'')}</div></div>`}).join(''):`<p class=mu style="text-align:center;margin-top:24px">${relL.length||!admin?(relFil==='aberto'?(admin?'Nenhum relato aberto. 🎉':'Você não tem relatos abertos.'):'Nenhum relato resolvido ainda.'):'Nenhum relato recebido ainda.'}</p>`}
+
+/* ---------- novo relato ---------- */
+function relNovo(){
+  tl='relnovo';monitor=false;desinscrever();relAnex.forEach(x=>URL.revokeObjectURL(x.p));relAnex=[];relEnv=false;relNid=Date.now().toString(36)+'-'+gid();
+  tela(`<header><button class=h onclick="relatos()">‹</button><span>Novo relato</span></header><div class=c><label>O que você quer enviar?</label><select id=rt><option value=bug>🐞 Bug (algo não está funcionando)</option><option value=feedback>💡 Feedback ou sugestão</option></select><label>Conte o que aconteceu</label><textarea id=rx class=lg maxlength=3000 placeholder="Descreva o que você estava fazendo, o que esperava e o que aconteceu."></textarea><label>Imagens e vídeos (opcional, até 6 arquivos de 25 MB)</label><div id=ra></div><button class=s onclick="$('#rfa').click()" style="width:100%;margin-top:8px">📎 Anexar imagem ou vídeo</button><input id=rfa type=file accept="image/*,video/*" multiple style="display:none" onchange="relAnexa(this)"><p class=err id=er></p><button id=rb onclick="relEnviar()" style="width:100%">Enviar relato</button></div>`)}
+function relAnexa(el){
+  const fs=[...el.files];el.value='';
+  for(const f of fs){
+    if(relAnex.length>=6){alert('O máximo é 6 arquivos por relato.');break}
+    if(!/^(image|video)\//.test(f.type)){alert('Envie apenas imagens, GIFs ou vídeos.');continue}
+    if(f.size>25*1048576){alert('"'+f.name+'" é muito grande. O limite é 25 MB.');continue}
+    relAnex.push({f,p:URL.createObjectURL(f),u:''})}
+  relAnexDesenha()}
+function relAnexDesenha(){const e=$('#ra');if(!e)return;
+  e.innerHTML=relAnex.map((x,i)=>`<div style="position:relative;display:inline-block;margin:6px 8px 0 0">${x.f.type.startsWith('video')?`<video src="${x.p}" muted playsinline preload=metadata style="width:84px;height:84px;object-fit:cover;border-radius:10px;display:block"></video><span style="position:absolute;left:8px;bottom:6px;font-size:18px;color:#fff;text-shadow:0 0 4px #000">▶</span>`:`<img src="${x.p}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:10px;display:block">`}<button class=x onclick="relAnexTira(${i})" style="position:absolute;top:-6px;right:-6px;width:24px;height:24px;padding:0;border-radius:50%;font-size:12px">✕</button></div>`).join('')}
+function relAnexTira(i){if(relEnv)return;const x=relAnex.splice(i,1)[0];if(x)URL.revokeObjectURL(x.p);relAnexDesenha()}
+async function relEnviar(){
+  if(relEnv)return;const tx=$('#rx').value.trim(),er=$('#er'),bt=$('#rb');
+  if(!tx)return er.textContent='Escreva o que aconteceu.';
+  relEnv=true;bt.disabled=true;er.textContent='';
+  const id=relNid||(relNid=Date.now().toString(36)+'-'+gid());
+  try{
+    for(let i=0;i<relAnex.length;i++){const x=relAnex[i];if(x.u)continue;bt.textContent='Enviando arquivo '+(i+1)+' de '+relAnex.length+'…';x.u=await tentar(()=>db.upload(x.f,'relatos/'+uid))}
+  }catch(e){console.error(e);relEnv=false;bt.disabled=false;bt.textContent='Enviar relato';er.textContent='Não foi possível enviar um dos arquivos. Confira a conexão e toque de novo.';return}
+  bt.textContent='Enviando…';
+  const t=agora(),dados={uid,nome:eu.nome,tipo:$('#rt').value,texto:tx,midias:relAnex.map(x=>({t:x.f.type.startsWith('video')?'v':'i',u:x.u})),status:'aberto',t,app:VERSAO,disp:((navigator.userAgent||'').slice(0,160)+' · '+innerWidth+'x'+innerHeight)};
+  let ok=false;
+  try{await tentar(()=>db.doc('relatos/'+id).set(dados));ok=true}
+  catch(e){try{const s=await db.doc('relatos/'+id).get();ok=s.exists&&s.data().uid===uid}catch(_){}}
+  if(!ok){relEnv=false;bt.disabled=false;bt.textContent='Enviar relato';er.textContent='Não foi possível enviar o relato. Confira a conexão e toque de novo.';return}
+  try{await db.doc('data/users/'+uid+'/r-'+id).set({rid:id,lido:t})}catch(e){}
+  relAnex.forEach(x=>URL.revokeObjectURL(x.p));relAnex=[];relNid='';relEnv=false;
+  relL=relL.filter(r=>r.id!==id).concat({id,...dados});relRd[id]=t;
+  relAbrir(id)}
+
+/* ---------- conversa de um relato ---------- */
+function relAbrir(id){
+  tl='relc';monitor=false;desinscrever();relId=id;relAt=relL.find(x=>x.id===id)||null;relMs=[];relSig='';relLeuT=0;relLeuOk=0;
+  tela(`<header><button class=h onclick="relatos()">‹</button><span id=rht>Relato</span></header><div id=rst></div><div id=rcm style="flex:1;overflow-y:auto;overflow-x:hidden;padding:10px;display:flex;flex-direction:column;gap:6px"></div><div class=cmp id=rcp></div>`);
+  if(relAt)relDesenha();
+  subs.push(db.doc('relatos/'+id).onSnapshot(s=>{if(tl!=='relc'||relId!==id)return;if(!s.exists){if(relAt){alert('Este relato não existe mais.');relatos()}return}relAt={id,...s.data()};relDesenha()},()=>{}));
+  subs.push(db.collection('relatos/'+id+'/msgs').orderBy('t').limit(300).onSnapshot(s=>{if(tl!=='relc'||relId!==id)return;relMs=relMap(s);relDesenha()},()=>{}))}
+function relDesenha(){
+  const r=relAt;if(!r||tl!=='relc')return;
+  const h=$('#rht');if(h)h.textContent=relTipo(r.tipo)+(admin&&r.uid!==uid?' · '+(r.nome||r.uid):'');
+  const res=r.status==='resolvido',modo=(res?'r':'a')+(admin?'1':'0'),st=$('#rst');
+  const sg=modo+'|'+(r.resolvidoT||'');
+  if(st&&st.dataset.s!==sg){st.dataset.s=sg;st.innerHTML=`<div style="padding:8px 12px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--bd);background:var(--cd)">${res?`<span class="rtg rs">✅ Resolvido${r.resolvidoT?' em '+relData(r.resolvidoT):''}</span>`:`<span class="rtg ab">Aberto</span>${admin?'':'<span class=mu style="font-size:12px">A equipe responde por aqui.</span>'}`}<span style="flex:1"></span>${admin?(res?'<button class=s onclick="relResolver(false)">Reabrir</button>':'<button onclick="relResolver(true)">✓ Marcar como resolvido</button>'):''}</div>`}
+  const cp=$('#rcp');
+  if(cp&&cp.dataset.m!==modo){cp.dataset.m=modo;cp.innerHTML=res?`<p class=mu style="margin:6px 4px;text-align:center">${admin?'Reabra o relato para voltar a conversar.':'Este relato foi resolvido. Se o problema voltar, envie um novo relato.'}</p>`:`<div class=row style="gap:6px"><button class=s onclick="$('#rarq').click()" title="Enviar imagem, GIF ou vídeo"><i class=nic-galeria></i></button><input id=rarq type=file accept="image/*,video/*" style="display:none" onchange="relMidia(this)"></div><div class=row><textarea id=rtx rows=1 placeholder="Mensagem" style="min-height:0;height:44px;max-height:120px;resize:none" oninput="auto(this)" onkeydown="relTecla(event)"></textarea><button onclick="relEnvMsg()">Enviar</button></div>`}
+  relMsgsDesenha()}
+function relMsgsDesenha(){
+  const e=$('#rcm'),r=relAt;if(!e||!r)return;
+  const sg=r.status+'|'+(r.texto||'').length+'|'+relMs.map(m=>m.id+':'+(m.texto||'').length).join(',');
+  if(sg===relSig){relLeu();return}relSig=sg;
+  const b=e.scrollHeight-e.scrollTop-e.clientHeight<80||!e.children.length;
+  let h=`<div class=card style="align-self:stretch;margin:0 0 4px"><div class=mu style="font-size:12px"><b>${relTipo(r.tipo)}</b> · ${esc(r.nome||r.uid)} · ${relData(r.t)}</div><div style="margin-top:6px;white-space:pre-wrap;word-break:break-word">${fmt(r.texto||'')}</div><div class=rmd>${(r.midias||[]).map(mid).join('')}</div>${admin?`<div class=mu style="font-size:11px;margin-top:8px;word-break:break-all">App v${esc(r.app||'?')} · ${esc(r.disp||'')}</div>`:''}</div>`;
+  h+=relMs.map(m=>{
+    if(m.tipo==='sis')return`<div style="align-self:center;font-size:12px;margin:2px 0;background:var(--bd);color:var(--tx);border-radius:999px;padding:3px 12px">${esc(m.texto)}</div>`;
+    const me=m.uid===uid;
+    return`<div class="m ${me?'me':''}"><div class=n style="color:${cor(m.uid)}">${esc(m.nome||m.uid)}${m.adm?' 🛡️':''} <span class=mu>${hora(m.t,m.id)}</span></div>${fmt(m.texto||'')}${mid(m.midia)}</div>`}).join('');
+  e.innerHTML=h;if(b)e.scrollTop=e.scrollHeight;
+  relLeu()}
+/* marca como lido (some o "Novo" / as respostas não lidas) */
+function relLeu(){
+  if(tl!=='relc'||document.hidden||!uid)return;
+  const o=relMs.filter(m=>m.uid!==uid),u=o.length?o[o.length-1].t:0;
+  if(relLeuOk&&u<=relLeuT)return;
+  relLeuOk=1;relLeuT=Math.max(relLeuT,u);
+  const t=agora();db.doc('data/users/'+uid+'/r-'+relId).set({rid:relId,lido:t}).catch(()=>{});
+  relRd[relId]=t;relNl[relId]=0;relBadge()}
+const relSend=async extra=>{
+  const m={t:agora(),uid,nome:eu.nome,adm:admin?1:0,...extra},r=db.collection('relatos/'+relId+'/msgs').doc();
+  await r.set(m);
+  if(tl==='relc'&&!relMs.some(x=>x.id===r.id)){relMs=relMs.concat({id:r.id,...m}).sort((a,b)=>(a.t||0)-(b.t||0));relMsgsDesenha()}};
+async function relEnvMsg(){
+  const i=$('#rtx');if(!i||!relAt)return;const t=i.value.trim();if(!t)return;
+  if(relAt.status==='resolvido'&&!admin)return;
+  i.value='';i.style.height='44px';
+  try{await relSend({texto:t})}catch(e){i.value=t;alert('Não foi possível enviar a mensagem.')}}
+function relTecla(e){if(e.key==='Enter'&&!e.shiftKey&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();relEnvMsg()}}
+function relMidia(el){
+  const f=el.files[0];el.value='';if(!f)return;
+  if(!/^(image|video)\//.test(f.type))return alert('Envie apenas imagens, GIFs ou vídeos.');
+  if(f.size>25*1048576)return alert('Arquivo muito grande. O limite é 25 MB.');
+  const i=$('#rtx');
+  prevMidia(f,i?i.value.trim():'','relatos/'+uid,async(url,v,leg)=>{if(i&&leg===i.value.trim()){i.value='';i.style.height='44px'}await relSend({texto:leg,midia:{t:v?'v':'i',u:url}})})}
+/* botão do administrador: fecha (ou reabre) o relato e avisa a pessoa no chat */
+async function relResolver(sim){
+  if(!admin||!relAt)return;
+  if(sim&&!confirm('Marcar este relato como resolvido? A pessoa verá o aviso no chat e não poderá mais responder.'))return;
+  try{
+    const up=sim?{status:'resolvido',resolvidoT:agora()}:{status:'aberto',resolvidoT:null};
+    await db.doc('relatos/'+relId).update(up);
+    relAt={...relAt,...up};relL=relL.map(r=>r.id===relId?{...r,...up}:r);relDesenha();
+    await relSend({tipo:'sis',texto:sim?'✅ Relato marcado como resolvido.':'🔄 Relato reaberto.'})
+  }catch(e){alert('Não foi possível alterar o relato.')}}
+
 /* ---------- botão "Voltar" do celular ---------- */
 function nivel(){let n=document.querySelectorAll('.ov').length;
-if(tl==='social'||tl==='nova')n+=1;else if(tl==='dm')n+=2;
+if(tl==='social'||tl==='nova'||tl==='rel')n+=1;else if(tl==='dm'||tl==='relnovo'||tl==='relc')n+=2;
 else if(tl==='camp')n+=1+(aba!=='chat'?1:0)+(['macros','modelo','tema','diario','galeria'].includes(aba)?1:0)+(ativo?1:0);return n}
 function atras(){const ov=document.querySelectorAll('.ov');if(ov.length){ov[ov.length-1].remove();return}
-if(tl==='dm')return social();if(tl==='social'||tl==='nova')return inicio();if(tl==='camp')return voltar()}
+if(tl==='relnovo'||tl==='relc')return relatos();if(tl==='rel')return inicio();if(tl==='dm')return social();if(tl==='social'||tl==='nova')return inicio();if(tl==='camp')return voltar()}
 let rcT=0;const agenda=()=>{clearTimeout(rcT);rcT=setTimeout(recon,0)};
 function recon(){const D=nivel();if(D>hd){while(hd<D)history.pushState({n:++hd},'')}else if(D<hd){const k=hd-D;hd=D;history.go(-k)}}
 history.replaceState({n:0},'');
@@ -1333,7 +1474,7 @@ function dirDe(x,alvo,m){
   if(alvo&&alvo.closest&&alvo.closest('input,textarea,select,canvas,[contenteditable="true"]'))return 0;
   if(tl==='social')return homeOk?-1:0;
   if(tl==='home')return 1;
-  if(tl==='camp')return 0; /* na campanha, a borda direita puxa o chat fora de contexto (bloco próprio) */
+  if(tl==='camp'||tl==='rel'||tl==='relnovo'||tl==='relc')return 0; /* na campanha, a borda direita puxa o chat fora de contexto (bloco próprio) */
   return(!m&&x>=innerWidth-28)?1:0;
 }
 function inicia(x,y,alvo,m){ini=null;const d=dirDe(x,alvo,m);if(d)ini={x,y,d}}
