@@ -410,7 +410,7 @@ html.xmas #haloMsg{background:#14261b;border-color:#e0262b;box-shadow:0 0 14px r
 </head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.4.3';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.4.4';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -571,15 +571,20 @@ function statsDe(p){const L=[];if(!p||!camp||!camp.modelo)return L;for(const s o
 function resAt(tx,p,u){return String(tx).replace(/@([\wÀ-ÿ-]+?)(\.mod)?(?![\wÀ-ÿ-])/g,(a,n,mo)=>{if(!p)throw new Error('Escolha um personagem em "Falar como" para usar @.');const L=statsDe(p).filter(x=>!!x.mod===!!mo),k=nz(n),s=L.find(x=>x.nm===k)||unico(L.filter(x=>x.nm.startsWith(k)));if(!s)throw new Error('@'+n+': atributo não encontrado na ficha de '+p.nome+'.');u.push(s.n);return s.v}).replace(/\+-/g,'-').replace(/--/g,'+')}
 function tentaAt(x){const u=[];try{const s=resAt(x,persFala(),u);return{s,u:[...new Set(u)]}}catch(e){return{erro:e.message}}}
 /* /dano "Nome" +3  → tira 3 PV (negativo = cura). Aceita nome de personagem, NPC/inimigo ou jogador. */
-function danoPlan(t){const m=t.match(/^\/(dano|cura)\s+(.+?)\s+([+-]?\d+)\s*$/i);if(!m)return{erro:'Use: /dano "Nome" +3  ou  /cura "Nome" +3'};
+function danoPlan(t){const m=t.match(/^\/(dano|cura)\s+(.+?)\s+([+-]?\d+)(?:\s+(puro|direto))?\s*$/i);if(!m)return{erro:'Use: /dano "Nome" +3  ou  /cura "Nome" +3'};
 const nome=m[2].replace(/^["“”']+|["“”']+$/g,'').trim(),n=m[1].toLowerCase()==='cura'?-(+m[3]):+m[3],k=nz(nome),f=g=>pers.filter(g);
 let c=f(p=>nz(p.nome)===k);if(!c.length)c=f(p=>!p.npc&&nz(p.donoNome)===k);if(!c.length)c=f(p=>nz(p.nome).startsWith(k));if(!c.length)c=f(p=>nz(p.nome).includes(k));
 if(!c.length)return{erro:'Ninguém encontrado com o nome "'+nome+'".'};
 if(c.length>1)return{erro:'Mais de um encontrado: '+c.map(p=>p.nome).join(', ')+'. Digite o nome completo.'};
 const p=c[0];if(!ehM()&&p.dono!==uid)return{erro:'Só o Mestre pode mexer na vida de outros personagens.'};
 if(p.pv==null)return{erro:p.nome+' ainda não tem PV preenchidos na ficha.'};
-const novo=Math.min(p.pvmax??1e9,Math.max(0,p.pv-n));
-return{p,novo,msg:n>=0?'💥 '+p.nome+' sofreu '+n+' de dano (PV '+p.pv+' → '+novo+')':'💚 '+p.nome+' recuperou '+(-n)+' PV (PV '+p.pv+' → '+novo+')'}}
+/* redução de dano: só se o Mestre escolheu um campo em Configurações; "puro" no fim do comando ignora a defesa */
+const dc=camp&&camp.defCampo;let def=0,nd=n;if(n>0&&dc&&!m[4]){def=Math.max(0,Math.round(valCampo(dc,p,0)));nd=Math.max(0,n-def)}
+const novo=Math.min(p.pvmax??1e9,Math.max(0,p.pv-nd));
+if(n<0)return{p,novo,msg:'💚 '+p.nome+' recuperou '+(-n)+' PV (PV '+p.pv+' → '+novo+')'};
+if(def>0&&nd===0)return{p,novo,msg:'🛡️ '+p.nome+' bloqueou o golpe ('+n+' de dano − '+def+' de '+dc+' = 0) (PV '+p.pv+')'};
+if(def>0)return{p,novo,msg:'💥 '+p.nome+' sofreu '+nd+' de dano ('+n+' − '+def+' de '+dc+') (PV '+p.pv+' → '+novo+')'};
+return{p,novo,msg:'💥 '+p.nome+' sofreu '+n+' de dano'+(m[4]&&dc&&n>0?' direto, ignorando '+dc:'')+' (PV '+p.pv+' → '+novo+')'}}
 /* lista de sugestões acima do campo: #macro, @atributo (dentro de /r) e nome após /dano */
 let acL=[],acI=0,acR=null;
 const subq=(s,k)=>{let i=0;for(const c of s)if(c===k[i])i++;return i===k.length};
@@ -1147,7 +1152,8 @@ o.innerHTML=`<div class=card style="max-height:85vh;overflow:auto;max-width:560p
 +g('⚡ Macros',[
 ['#nome','Envia o texto da macro. No meio da frase, troca pelo texto dela. Digite # para ver a lista.']])
 +g('❤️ Vida',[
-['/dano "Goblin" 5','Tira 5 PV do personagem ou NPC e avisa no chat.'],
+['/dano "Goblin" 5','Tira 5 PV do personagem ou NPC e avisa no chat. Se o Mestre ligou a redução de dano (em Configurações), a defesa do alvo é descontada.'],
+['/dano "Goblin" 20 puro','Dano direto: ignora a defesa do alvo.'],
 ['/cura "Elara" 3','Devolve 3 PV.']])
 +g('🗣️ Vários personagens',[
 ['>Goblin: Quem vai lá?','Uma linha por fala, cada uma sai no balão do personagem. Digite > e a letra inicial para escolher na lista.'],
@@ -1158,7 +1164,7 @@ o.innerHTML=`<div class=card style="max-height:85vh;overflow:auto;max-width:560p
 +`<button style="width:100%;margin-top:12px" onclick="this.closest('.ov').remove()">Fechar</button></div>`;
 document.body.appendChild(o)}
 function vCfg(){carregaPerfis();if(!amigIds)carregaAmigos();const gm=ehM(),dono=camp.mestre===uid,base=location.href.split('#')[0];const papel=m=>m.id===camp.mestre?'Mestre (GM)':m.papel==='cogm'?'Co-GM':'Jogador';
-$('#ab').innerHTML=`<div class=c>${capa(gm)}<h3>Configurações</h3><div class=card><div class=it onclick="aba='pers';tab()"><b><i class=nic-grupo></i> Personagens e NPCs</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='galeria';tab()"><b><i class=nic-galeria></i> Galeria de imagens</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='diario';tab()"><b><i class=nic-diario></i> Meu diário e notas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='tema';tab()"><b><i class=nic-temas></i> Temas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="expMod()"><b><i class=nic-exportar></i> Exportar modelo de ficha</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='macros';tab()"><b><i class=nic-macros></i> Macros</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="dicasCmd()"><b><i class=nic-dicas></i> Dicas de comandos</b><span class=mu>›</span></div>${gm?`<hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='modelo';mod=null;tab()"><b><i class=nic-martelo></i> Modelo de ficha</b><span class=mu>›</span></div>`:''}</div>
+$('#ab').innerHTML=`<div class=c>${capa(gm)}<h3>Configurações</h3><div class=card><div class=it onclick="aba='pers';tab()"><b><i class=nic-grupo></i> Personagens e NPCs</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='galeria';tab()"><b><i class=nic-galeria></i> Galeria de imagens</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='diario';tab()"><b><i class=nic-diario></i> Meu diário e notas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='tema';tab()"><b><i class=nic-temas></i> Temas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="expMod()"><b><i class=nic-exportar></i> Exportar modelo de ficha</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='macros';tab()"><b><i class=nic-macros></i> Macros</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="dicasCmd()"><b><i class=nic-dicas></i> Dicas de comandos</b><span class=mu>›</span></div>${gm?`<hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='modelo';mod=null;tab()"><b><i class=nic-martelo></i> Modelo de ficha</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="cfgDefesa()"><b>🛡️ Redução de dano</b><span class=mu>${camp.defCampo?esc(camp.defCampo):'Desligada'} ›</span></div>`:''}</div>
 <h3>Convidar amigos</h3><div class=card><label>Código de convite</label><input readonly value="${esc(cid)}"><label>Link de convite</label><input readonly value="${esc(base+'#convite='+cid)}">${gm&&!monitor?`<button style="width:100%;margin-top:10px" onclick="addAmigosCamp()"><i class=nic-amigos></i> Adicionar amigos</button>`:''}</div>
 <h3>Participantes (${membros.length})</h3>${membros.slice().sort((a,b)=>(b.id===camp.mestre)-(a.id===camp.mestre)||az(a,b)).map(m=>`<div class="card it" style="cursor:default;flex-wrap:wrap">${avP(m.id)}<b>${esc(m.nome)}</b><span class="tg ${m.id===camp.mestre?'g':''}">${papel(m)}</span>${m.id!==uid&&amigIds&&!amigIds.has(m.id)?`<button class=s onclick="addAmigo('${m.id}')">+ Amigo</button>`:''}${dono&&m.id!==camp.mestre?`<button class=s onclick="coroa('${m.id}')" title="Cargos de GM" style="padding:9px 12px">👑</button>`:''}${gm&&m.id!==camp.mestre&&m.id!==uid&&(dono||m.papel!=='cogm')?`<button class=x onclick="expulsar('${m.id}')">Remover</button>`:''}</div>`).join('')}
 ${!monitor?`<button class=s style="width:100%;margin-top:12px" onclick="arquivaCfg()">${(listaC.find(y=>y.cid===cid)||{}).arq?'📤 Desarquivar campanha':'<i class=nic-arquivar></i> Arquivar campanha'}</button>`:''}${!monitor?'<button class=s style="width:100%;margin-top:12px" onclick="sairCamp()">Sair da campanha</button>':''}${dono?'<p class=mu>O co-GM faz quase tudo que o Mestre faz, exceto excluir a campanha.</p><button class=x style="width:100%" onclick="excluirCamp()">Excluir campanha</button>':''}</div>`}
@@ -1339,6 +1345,12 @@ q('#mS').onclick=async()=>{const n=q('#mN').value.replace(/\s+/g,''),t=T.value.t
 const delMacro=id=>db.doc('campanhas/'+cid+'/macros/'+id).delete();
 /* ---------- fichas ---------- */
 const rotNpc=n=>{const t=(camp&&camp.rotuloNpc)||'NPCs de {nome}';return t.includes('{nome}')?t.replace(/\{nome\}/g,n):t};
+/* ---------- redução de dano: o Mestre escolhe qual campo da ficha vira "defesa" (ou deixa desligado) ---------- */
+function camposNum(){const L=[],v=new Set();const add=m=>{if(m&&Array.isArray(m.secoes))for(const s of m.secoes)for(const c of(s.campos||[]))if((c.k==='attr'||c.k==='num'||c.k==='calc')&&c.n&&!v.has(c.n)){v.add(c.n);L.push(c.n)}};add(camp.modelo);(camp.tipos||[]).forEach(t=>add(t.modelo));return L}
+function cfgDefesa(){if(!ehM())return;const L=camposNum(),at=camp.defCampo||'';
+if(!L.length)return alert('O modelo de ficha ainda não tem campos numéricos. Crie um campo (por exemplo, Defesa) em "Modelo de ficha" primeiro.');
+const sel=[{v:'',t:'Desligada (o /dano tira o valor inteiro)'},...L.map(n=>({v:n,t:n}))];if(at&&!L.includes(at))sel.push({v:at,t:at+' (campo não existe mais)'});
+modal('🛡️ Redução de dano',[{l:'Qual campo da ficha reduz o dano recebido? No /dano, o valor desse campo do alvo é descontado do dano (o mínimo é 0). Cura não é afetada. Para ignorar a defesa em um golpe, escreva "puro" no fim: /dano "Goblin" 20 puro',sel,v:at}],async([v])=>{v=(v||'').slice(0,60);try{await db.doc('campanhas/'+cid).update({defCampo:v});camp.defCampo=v;tab()}catch(e){alert('Não foi possível salvar a redução de dano.')}})}
 function editaRotNpc(){if(!ehM())return;modal('Nome do grupo de NPCs',[{l:'Como chamar os NPCs conectados a um jogador nesta campanha? Use {nome} para colocar o nome do jogador. Ex.: Pokémons de {nome}  ou  Família',v:(camp&&camp.rotuloNpc)||'NPCs de {nome}'}],async([t])=>{t=(t||'').slice(0,40);if(t==='NPCs de {nome}')t='';try{await db.doc('campanhas/'+cid).update({rotuloNpc:t});camp.rotuloNpc=t;tab()}catch(e){alert('Não foi possível salvar o nome do grupo.')}})}
 function vPers(){const p=pers.find(x=>x.id===ativo);if(p)return fichaDe(p);
 const vNpc=x=>x.npc&&(x.dono===uid||ehM()||x.visivel),ligOk=x=>!!x.lig&&membros.some(m=>m.id===x.lig);
