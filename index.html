@@ -407,10 +407,73 @@ html.xmas #haloMsg{background:#14261b;border-color:#e0262b;box-shadow:0 0 14px r
     setTimeout(function(){m.classList.remove('on')},5500);setTimeout(function(){m.remove()},6500)});
 })();
 </script>
+<style id="duCss">
+/* ===== duelo: barra de vida no topo ===== */
+#duel{display:none;flex:none;flex-direction:column;gap:7px;padding:8px 12px;background:linear-gradient(#000000cc,#000000a0);border-bottom:1px solid #ef444466;position:relative;z-index:3}
+#duel.on{display:flex}
+.dub{display:flex;align-items:center;gap:9px;color:#fff;max-height:70px}
+.dub img,.dub .dubi{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #ef4444;flex:none;background:#2a1216;display:flex;align-items:center;justify-content:center;font-size:17px}
+.dub.boss img,.dub.boss .dubi{width:46px;height:46px;border-color:#fbbf24;box-shadow:0 0 12px #fbbf24aa;font-size:22px}
+.dubm{flex:1;min-width:0}
+.dubn{font-size:12px;font-weight:800;letter-spacing:.3px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
+.dub.boss .dubn{font-size:14px;color:#fde68a;letter-spacing:1px}
+.dubt{position:relative;height:12px;border-radius:7px;background:#1b0b0e;overflow:hidden;border:1px solid #7f1d1d}
+.dub.boss .dubt{height:17px;border:2px solid #b45309;border-radius:9px}
+.dubg,.dubf{position:absolute;left:0;top:0;bottom:0;width:100%;display:block}
+.dubf{background:linear-gradient(#ff7a7a,#dc2626 55%,#991b1b);transition:width .35s ease}
+.dubg{background:#fecaca;opacity:.85;transition:width .9s ease .45s}
+.dubv{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000;font-style:normal}
+.dub.boss .dubv{font-size:12px}
+.dub.hit{animation:duhit .45s}
+.dub.hit .dubf{filter:brightness(2.2)}
+.dub.cura .dubf{filter:hue-rotate(95deg) brightness(1.4)}
+.dub.pop{animation:dupop .55s ease both}
+.dub.ko img,.dub.ko .dubi{filter:grayscale(1) brightness(.6)}
+.dub.sai{animation:dusai .9s ease forwards;overflow:hidden}
+@keyframes duhit{0%,100%{transform:translateX(0)}15%{transform:translateX(-6px)}35%{transform:translateX(6px)}55%{transform:translateX(-4px)}75%{transform:translateX(3px)}}
+@keyframes dupop{0%{transform:translateY(-16px) scale(.9);opacity:0}60%{transform:translateY(2px) scale(1.03);opacity:1}100%{transform:none;opacity:1}}
+@keyframes dusai{0%{opacity:1}30%{transform:translateX(8px);opacity:1}100%{opacity:0;transform:translateY(-10px) scale(.96);max-height:0;margin-top:-7px}}
+/* ===== duelo: animação de entrada (tela cheia) ===== */
+#dufx{position:fixed;inset:0;z-index:30;pointer-events:none;overflow:hidden;display:flex;align-items:center;justify-content:center}
+#dufx .bg{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,#000000aa 0,#000000e6 100%)}
+#dufx .fl{position:absolute;inset:0;background:#fff;opacity:0}
+#dufx .dufc{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;max-width:92vw}
+#dufx .dutag{font-weight:900;font-size:14px;letter-spacing:4px;color:#fff;background:#b91c1c;padding:4px 16px;border-radius:6px;text-shadow:0 1px 2px #000;box-shadow:0 0 14px #ef4444}
+#dufx .dunm{font-weight:900;font-size:26px;color:#fff;text-align:center;text-shadow:0 2px 10px #000;max-width:90vw}
+#dufx .dui{display:block;object-fit:cover}
+/* inimigo comum */
+#dufx.com .bg{animation:dubgc 2.5s ease both}
+#dufx.com .fl{animation:duflc 2.5s ease both}
+#dufx.com .dufc{animation:ducom 2.5s cubic-bezier(.2,.8,.3,1) both}
+#dufx.com .dui{width:150px;height:150px;border-radius:50%;border:4px solid #ef4444;box-shadow:0 0 30px #ef4444aa}
+@keyframes dubgc{0%{opacity:0}12%{opacity:1}78%{opacity:1}100%{opacity:0}}
+@keyframes duflc{0%{opacity:0}7%{opacity:.8}28%{opacity:0}100%{opacity:0}}
+@keyframes ducom{0%{transform:translateX(-120vw) skewX(-18deg);opacity:0}15%{transform:translateX(16px) skewX(0);opacity:1}21%{transform:translateX(0)}72%{transform:translateX(0) scale(1);opacity:1}100%{transform:translateY(-44vh) scale(.12);opacity:0}}
+/* boss */
+#dufx.boss{animation:dushk .55s .3s both}
+#dufx.boss .bg{background:radial-gradient(circle at 50% 55%,#7f1d1dcc 0,#000000f0 78%);animation:dubgb 4.8s ease both}
+#dufx.boss .fl{animation:duflb 4.8s ease both}
+#dufx.boss .rays{position:absolute;left:50%;top:50%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(from 0deg,#fbbf2430 0 5deg,transparent 5deg 16deg);-webkit-mask-image:radial-gradient(circle,#000 0,#0000 55%);mask-image:radial-gradient(circle,#000 0,#0000 55%);animation:durays 4.8s linear both}
+#dufx.boss .dufc{animation:duboss 4.8s cubic-bezier(.2,.8,.3,1) both}
+#dufx.boss .dui{max-width:min(82vw,440px);max-height:50vh;border-radius:18px;border:3px solid #fbbf24;object-fit:contain;background:#0007;box-shadow:0 0 40px #ef4444,0 0 90px #b91c1c99;animation:duglow 1.1s ease-in-out infinite alternate}
+#dufx.boss .dutag{background:linear-gradient(#dc2626,#7f1d1d);font-size:16px;animation:dutag 1s .15s both}
+#dufx.boss .dunm{font-size:clamp(28px,8vw,46px);color:#fde68a;text-shadow:0 0 20px #ef4444,0 3px 0 #7c2d12;animation:dunm .7s .45s both}
+#dufx .dups{position:absolute;left:0;right:0;bottom:0;height:0}
+#dufx .dup{position:absolute;bottom:-12px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:#fb923c;box-shadow:0 0 10px #f97316;opacity:0;animation:duup var(--t) ease-in var(--dl) infinite}
+@keyframes dubgb{0%{opacity:0}8%{opacity:1}88%{opacity:1}100%{opacity:0}}
+@keyframes duflb{0%{opacity:0}4%{opacity:1}12%{opacity:0}16%{opacity:.7}26%{opacity:0}100%{opacity:0}}
+@keyframes durays{0%{transform:rotate(0);opacity:0}12%{opacity:1}85%{opacity:1}100%{transform:rotate(70deg);opacity:0}}
+@keyframes duboss{0%{transform:scale(3.4);opacity:0;filter:blur(22px)}9%{transform:scale(.9);opacity:1;filter:blur(0)}13%{transform:scale(1.05)}17%{transform:scale(1)}32%{transform:scale(1.03)}48%{transform:scale(1)}64%{transform:scale(1.03)}80%{transform:scale(1);opacity:1;filter:blur(0)}100%{transform:translateY(-46vh) scale(.1);opacity:0;filter:blur(4px)}}
+@keyframes dushk{0%,100%{transform:translate(0,0)}10%{transform:translate(-10px,6px)}20%{transform:translate(9px,-8px)}30%{transform:translate(-8px,-4px)}40%{transform:translate(7px,5px)}50%{transform:translate(-5px,3px)}60%{transform:translate(4px,-3px)}80%{transform:translate(-2px,1px)}}
+@keyframes duglow{from{box-shadow:0 0 30px #ef4444,0 0 70px #b91c1c88}to{box-shadow:0 0 55px #f97316,0 0 120px #dc2626aa}}
+@keyframes dutag{0%{letter-spacing:34px;opacity:0}30%{opacity:1}100%{letter-spacing:6px;opacity:1}}
+@keyframes dunm{0%{transform:translateY(24px);opacity:0}100%{transform:none;opacity:1}}
+@keyframes duup{0%{transform:translate(0,0) scale(1);opacity:0}15%{opacity:1}100%{transform:translate(var(--dx),-105vh) scale(.2);opacity:0}}
+</style>
 </head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.5.1';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.5.3';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -525,9 +588,9 @@ else cur.l.push(l)}
 const out=s.map(x=>({k:x.k,tx:x.l.join('\n').trim()})).filter(x=>x.tx);
 if(!out.length)return{erro:'Escreva a fala depois do nome.'};return{s:out}}
 function planoMsg(tx,k){const fs=falar;falar=k;try{const q=quem();
-const mm=tx.match(/^#([\w\u00c0-\u00ff-]+)$/),mk=mm&&achaMacro(mm[1]);if(mk&&/^\/(r|dano|cura)(\s|$)/i.test(mk.texto.trim()))tx=mk.texto.trim();
+const mm=tx.match(/^#([\w\u00c0-\u00ff-]+)$/),mk=mm&&achaMacro(mm[1]);if(mk&&/^\/(r|dano|cura|boss|inimigo|sair)(\s|$)/i.test(mk.texto.trim()))tx=mk.texto.trim();
 const fc=cmdForca(tx);if(fc){if(fc.erro)return{erro:fc.erro};return{q,fc}}
-if(/^\/(dano|cura)(\s|$)/i.test(tx)){const a=danoPlan(tx);if(a.erro)return{erro:a.erro};return{q,dano:tx}}
+if(/^\/(dano|cura)(\s|$)/i.test(tx)){const a=danoPlan(tx);if(a.erro)return{erro:a.erro};return{q,dano:tx}}if(/^\/(boss|inimigo|sair)(\s|$)/i.test(tx)){const a=duPlan(tx);if(a.erro)return{erro:a.erro};return{q,duelo:tx}}
 const ra=/^\/r(\s|$)/.test(tx),at=ra?tentaAt(tx.slice(2)):null;if(at&&at.erro)return{erro:at.erro};
 const r=ra?rolar(at.s):/d/i.test(tx)?rolar(tx):null;
 if(ra&&!r)return{erro:'Expressão de dados inválida. Exemplos: /r 2d6+3, /r d20, /r 4dF'};
@@ -539,13 +602,15 @@ const pl=[];for(const x of f.s){const p=planoMsg(x.tx,x.k);if(p.erro)return aler
 i.value='';i.style.height='44px';previa();
 for(const p of pl){let vida=0;try{
 if(p.fc){if(p.fc.r)await enviarMsg(p.q,p.fc.r.txt,1)}
-else if(p.dano){vida=1;const a=danoPlan(p.dano);if(a.erro){alert(a.erro);continue}await db.doc('campanhas/'+cid+'/personagens/'+a.p.id).update({pv:a.novo});a.p.pv=a.novo;await enviarMsg(p.q,a.msg,0);cab()}
+else if(p.dano){vida=1;const a=danoPlan(p.dano);if(a.erro){alert(a.erro);continue}await db.doc('campanhas/'+cid+'/personagens/'+a.p.id).update({pv:a.novo});a.p.pv=a.novo;await enviarMsg(p.q,a.pub||a.msg,0);if(a.pub&&a.novo<=0)await enviarMsg(p.q,'☠️ '+a.p.nome+' foi derrotado!',0);cab();duSync()}
+else if(p.duelo){vida=2;const a=duPlan(p.duelo);if(a.erro){alert(a.erro);continue}await duExec(a,p.q)}
 else await enviarMsg(p.q,p.txt,p.dado?1:0)
-}catch(e){alert(vida?'Não foi possível alterar a vida.':'Não foi possível enviar a mensagem.');break}}}
+}catch(e){alert(vida===2?'Não foi possível mexer no duelo. Confira a conexão e tente de novo.':vida?'Não foi possível alterar a vida.':'Não foi possível enviar a mensagem.');break}}}
 function previa(){const i=$('#ent'),e=$('#pv');if(!i||!e)return;const t=i.value;let h='',d=0;const ok=x=>`<div class="ch ok">${x}</div>`,er=x=>`<div class="ch er">${x}</div>`;
 const rr=t.match(/^\/r(?:\s+(.*))?$/),ff=/^\/f(\s|$)/i.test(t);
 if(/^\s*>/m.test(t)){const fx=falasTexto(t);h=fx.erro?er('🗣️ '+esc(fx.erro)):ok('🗣️ '+fx.s.length+(fx.s.length>1?' mensagens: ':' mensagem: ')+fx.s.map(x=>'<b>'+esc(nomeFala(x.k))+'</b>').join(' → ')+' ✓')}
 else if(ff){if(admin){d=1;h=/^\/f\s+.+=\s*[+-]?\d+\s*$/i.test(t)?ok('🎲 Rolagem forçada ✓'):er('🎲 Use: /f d20=17')}}
+else if(/^\/(boss|inimigo|sair)(\s|$)/i.test(t)){const a=duPlan(t);h=a.erro?er('⚔️ '+esc(a.erro)):ok('⚔️ '+esc(a.txt)+' ✓ será feito ao enviar')}
 else if(/^\/(dano|cura)(\s|$)/i.test(t)){const a=danoPlan(t);h=a.erro?er('💥 '+esc(a.erro)):ok(esc(a.msg)+' ✓ será aplicado ao enviar')}
 else if(rr){d=1;const x=(rr[1]||'').trim(),a=x?tentaAt(x):{};h=!x?er('🎲 Dados: digite a rolagem, ex.: 2d6+3, d20+@, 4dF'):a.erro?er('🎲 '+esc(a.erro)):rolar(a.s)?ok('🎲 Rolagem de dados: <b>'+esc(x)+'</b>'+(a.s!==x?' → '+esc(a.s):'')+' ✓ será rolada ao enviar'):er('🎲 Expressão de dados inválida: '+esc(x))}
 else if(/d/i.test(t)&&rolar(t)){d=1;h=ok('🎲 Rolagem de dados: <b>'+esc(t.trim())+'</b> ✓ será rolada ao enviar')}
@@ -570,8 +635,119 @@ const modP=p=>{if(p&&p.tipo&&camp&&Array.isArray(camp.tipos)){const t=camp.tipos
 function statsDe(p){const L=[];if(!p||!camp||!camp.modelo)return L;for(const s of modP(p).secoes)for(const c of s.campos)if(c.k==='attr'||c.k==='num'||c.k==='calc'){const v=Math.round(valCampo(c.n,p,0)),tk='@'+c.n.replace(/\s+/g,'_');L.push({n:c.n,nm:nz(c.n),v,tk});if(c.k==='attr')L.push({n:c.n+' (mod)',nm:nz(c.n),mod:1,v:Math.floor((v-10)/2),tk:tk+'.mod'})}return L}
 function resAt(tx,p,u){return String(tx).replace(/@([\wÀ-ÿ-]+?)(\.mod)?(?![\wÀ-ÿ-])/g,(a,n,mo)=>{if(!p)throw new Error('Escolha um personagem em "Falar como" para usar @.');const L=statsDe(p).filter(x=>!!x.mod===!!mo),k=nz(n),s=L.find(x=>x.nm===k)||unico(L.filter(x=>x.nm.startsWith(k)));if(!s)throw new Error('@'+n+': atributo não encontrado na ficha de '+p.nome+'.');u.push(s.n);return s.v}).replace(/\+-/g,'-').replace(/--/g,'+')}
 function tentaAt(x){const u=[];try{const s=resAt(x,persFala(),u);return{s,u:[...new Set(u)]}}catch(e){return{erro:e.message}}}
+/* ---------- DUELO: /boss "Nome" 500 · /inimigo "Nome" 30 · /sair "Nome" · /sair todos ----------
+   O estado do duelo fica no documento da campanha (camp.duelo) e só guarda a PORCENTAGEM da vida.
+   O número exato continua só na ficha do NPC (que os jogadores não leem), e só o Mestre vê "23/50" na barra. */
+var duCid='',duVisto=null,duFila=[],duToca=null,duBusy=0;const duEsp=new Set();
+const duLista=()=>camp&&Array.isArray(camp.duelo)?camp.duelo:[];
+const duEm=id=>duLista().some(e=>e.id===id);
+const duPct=p=>p&&p.pv!=null&&p.pvmax>0?(p.pv<=0?0:Math.min(100,Math.max(.5,Math.round(p.pv/p.pvmax*1000)/10))):100;
+function duSug(cmd,k){const npc=/^\/(boss|inimigo)/i.test(cmd),sa=/^\/sair/i.test(cmd);return pers.filter(p=>(!k||nz(p.nome).includes(k))&&(!npc||p.npc)&&(!sa||duEm(p.id)))}
+function duPlan(t){
+const m=t.match(/^\/(boss|inimigo|sair)(?:\s+(.+?))?(?:\s+(\d+))?\s*$/i);
+if(!m)return{erro:'Use: /boss "Nome" 500  ·  /inimigo "Nome" 30  ·  /sair "Nome"  ·  /sair todos'};
+if(!ehM())return{erro:'Só o Mestre ou o co-Mestre pode usar os comandos de duelo.'};
+const cmd=m[1].toLowerCase(),nome=(m[2]||'').replace(/^["“”']+|["“”']+$/g,'').trim(),k=nz(nome);
+if(cmd==='sair'){
+if(!nome)return{erro:'Use: /sair "Nome"  ou  /sair todos'};
+const L=duLista();
+if(k==='todos'||k==='todas'||k==='tudo')return L.length?{sair:1,todos:1,txt:'o duelo termina e todos saem',msg:'🏁 O duelo terminou.'}:{erro:'Não tem ninguém no duelo agora.'};
+let c=L.filter(e=>nz(e.nome)===k);if(!c.length)c=L.filter(e=>nz(e.nome).startsWith(k));if(!c.length)c=L.filter(e=>nz(e.nome).includes(k));
+if(!c.length)return{erro:'Ninguém no duelo com o nome "'+nome+'".'};
+if(c.length>1)return{erro:'Mais de um no duelo: '+c.map(e=>e.nome).join(', ')+'. Digite o nome completo.'};
+return{sair:1,e:c[0],txt:c[0].nome+' sai do duelo',msg:'🏳️ '+c[0].nome+' saiu do duelo.'}}
+if(!nome)return{erro:'Use: /'+cmd+' "Nome" 30   (o número é a vida do NPC)'};
+const f=g=>pers.filter(p=>p.npc&&g(p));
+let c=f(p=>nz(p.nome)===k);if(!c.length)c=f(p=>nz(p.nome).startsWith(k));if(!c.length)c=f(p=>nz(p.nome).includes(k));
+if(!c.length)return{erro:'Nenhum NPC com o nome "'+nome+'". Crie o NPC na aba Personagens primeiro.'};
+if(c.length>1)return{erro:'Mais de um NPC encontrado: '+c.map(p=>p.nome).join(', ')+'. Digite o nome completo.'};
+const p=c[0],boss=cmd==='boss';let pv,pvmax;
+if(m[3]!=null){pv=pvmax=+m[3];if(pv<1)return{erro:'A vida precisa ser pelo menos 1.'}}
+else if(p.pv!=null&&p.pvmax>0&&p.pv>0){pv=p.pv;pvmax=p.pvmax}
+else return{erro:'Diga a vida do '+p.nome+': /'+cmd+' "'+p.nome+'" 30'};
+return{boss,p,pv,pvmax,txt:(boss?'👑 CHEFE ':'')+p.nome+' entra no duelo com '+pv+' PV',msg:boss?'👑 CHEFE: '+p.nome+' apareceu!':'⚔️ '+p.nome+' entrou no duelo!'}}
+async function duExec(a,q){
+const R=db.doc('campanhas/'+cid);let L;
+if(a.sair){L=a.todos?[]:duLista().filter(e=>e.id!==a.e.id)}
+else{const p=a.p;await db.doc('campanhas/'+cid+'/personagens/'+p.id).update({pv:a.pv,pvmax:a.pvmax});p.pv=a.pv;p.pvmax=a.pvmax;
+const e={id:p.id,nome:p.nome,img:p.img||p.imgG||'',big:p.imgG||p.img||'',boss:a.boss?1:0,pct:duPct(p),t:agora()};
+L=duLista().filter(x=>x.id!==p.id).concat([e])}
+await R.update({duelo:L});camp.duelo=L;
+await enviarMsg(q,a.msg,0);try{duelo()}catch(e){}}
+/* dano nos inimigos do duelo: o aviso no chat não mostra números (o Mestre vê o número na barra e na prévia) */
+function danoPlan(t){const a=danoPlan0(t);if(a.erro||!a.p||!duEm(a.p.id))return a;const d=a.p.pv-a.novo;
+return{...a,pub:d>0?'💥 '+a.p.nome+' sofreu dano!':d<0?'💚 '+a.p.nome+' se recuperou!':'🛡️ '+a.p.nome+' não sofreu dano'}}
+/* só o Mestre: mantém a barra igual à vida real da ficha; vida 0 = cai e sai do duelo */
+async function duSync(){
+if(duBusy||!camp||monitor||!ehM())return;const L=duLista();if(!L.length)return;
+const now=Date.now()+(typeof srvOff==='number'?srvOff:0);let mud=0,again=0;const N=[];
+for(const e of L){const p=pers.find(x=>x.id===e.id);
+if(!p){mud=1;continue}
+if(p.pv!=null&&p.pvmax>0&&p.pv<=0){
+if(!e.ko){mud=1;again=1;N.push({...e,pct:0,ko:1,kt:now})}
+else if(now-(e.kt||0)>1500){mud=1}
+else{again=1;N.push(e)}
+continue}
+const pc=duPct(p);
+if(e.ko){mud=1;const{ko,kt,...r}=e;N.push({...r,pct:pc});continue}
+if(Math.abs(pc-(+e.pct||0))>=.1){mud=1;N.push({...e,pct:pc})}else N.push(e)}
+if(again)setTimeout(()=>{try{duSync()}catch(e){}},1700);
+if(!mud)return;
+duBusy=1;try{camp.duelo=N;await db.doc('campanhas/'+cid).update({duelo:N})}catch(err){console.error(err)}duBusy=0}
+const duAnimOn=()=>{try{return localStorage.getItem('mrpg_duanim')!=='0'}catch(e){return true}};
+function alternaDuAnim(){const on=duAnimOn();try{localStorage.setItem('mrpg_duanim',on?'0':'1')}catch(e){return alert('Não foi possível salvar esta opção neste navegador.')}
+alert(on?'Animações de duelo desligadas. Você continua vendo a barra de vida dos inimigos.':'Animações de duelo ligadas.');if(camp&&aba==='cfg'&&$('#ab'))try{tab()}catch(e){}}
+const duMem={};
+function duVisLer(){try{const r=localStorage.getItem('mrpg_duv_'+cid);if(r!==null)return JSON.parse(r)||{}}catch(e){}return duMem[cid]||{}}
+function duVisSalva(o){duMem[cid]=o;try{localStorage.setItem('mrpg_duv_'+cid,JSON.stringify(o))}catch(e){}}
+function duVis(){const b=$('#duel');if(b)b.classList.toggle('on',duLista().length>0&&aba==='chat')}
+function duNo(e){const n=document.createElement('div');n.className='dub'+(e.boss?' boss':'');n.dataset.id=e.id;
+n.innerHTML=(e.img?'<img src="'+esc(e.img)+'" alt="" onerror="this.outerHTML=\'<span class=dubi>'+(e.boss?'👑':'⚔️')+'</span>\'">':'<span class=dubi>'+(e.boss?'👑':'⚔️')+'</span>')
++'<div class=dubm><div class=dubn>'+(e.boss?'👑 ':'')+esc(e.nome)+'</div><div class=dubt><i class=dubg></i><i class=dubf></i><em class=dubv></em></div></div>';return n}
+function duelo(){
+const box=$('#duel');if(!box||!camp)return;
+if(duCid!==cid){duCid=cid;duVisto=null;duFila=[];duEsp.clear()}
+const L=duLista(),prim=duVisto===null,gm=ehM();if(prim)duVisto={};
+const now=Date.now()+(typeof srvOff==='number'?srvOff:0);
+/* a animação toca UMA vez por inimigo/batalha em cada aparelho (lembrado mesmo com o app fechado); só se a batalha ainda estiver ativa */
+{const vis=duVisLer();let mud=0;
+for(const e of L){const k=e.id+':'+e.t;if(!vis[k]&&!e.ko){vis[k]=1;mud=1;duFila.push(e);duEsp.add(k)}}
+for(const k of Object.keys(vis)){if(!L.some(e=>e.id+':'+e.t===k)){delete vis[k];mud=1}}
+if(mud)duVisSalva(vis)}
+[...box.children].forEach(n=>{if(!n.classList.contains('sai')&&!L.some(e=>e.id===n.dataset.id)){n.classList.add('sai');setTimeout(()=>n.remove(),950)}});
+for(const e of L){
+const esp=duEsp.has(e.id+':'+e.t),v=duVisto[e.id];
+let n=[...box.children].find(x=>x.dataset.id===e.id&&!x.classList.contains('sai'));
+if(esp){if(n){n.style.display='none';n.dataset.h='1'}continue}
+if(!n){n=duNo(e);if(!prim)n.classList.add('pop');box.appendChild(n)}
+else if(n.dataset.h==='1'){n.style.display='';n.dataset.h='';n.classList.remove('pop');void n.offsetWidth;n.classList.add('pop')}
+const f=n.querySelector('.dubf'),g=n.querySelector('.dubg'),vv=n.querySelector('.dubv');
+if(v&&v.t===e.t){const d=e.pct-v.pct;if(d<-.05){n.classList.remove('hit');void n.offsetWidth;n.classList.add('hit')}else if(d>.05){n.classList.add('cura');setTimeout(()=>n.classList.remove('cura'),700)}}
+if(f)f.style.width=e.pct+'%';if(g)g.style.width=e.pct+'%';
+const p=pers.find(x=>x.id===e.id);
+if(vv)vv.textContent=gm&&p&&p.pv!=null&&p.pvmax!=null?p.pv+'/'+p.pvmax:'';
+n.classList.toggle('ko',!!e.ko)}
+const ord=L.filter(e=>!duEsp.has(e.id+':'+e.t)).sort((a,b)=>(b.boss||0)-(a.boss||0)).map(e=>[...box.children].find(x=>x.dataset.id===e.id&&!x.classList.contains('sai'))).filter(Boolean);
+const atual=[...box.children].filter(x=>!x.classList.contains('sai')&&x.style.display!=='none');
+if(ord.length>1&&ord.some((x,i)=>atual[i]!==x))ord.forEach(x=>box.appendChild(x));
+for(const e of L)duVisto[e.id]={t:e.t,pct:e.pct};
+Object.keys(duVisto).forEach(k=>{if(!L.some(e=>e.id===k))delete duVisto[k]});
+duVis();duProx()}
+/* animação de entrada: inimigo comum (rápida) e boss (grande, com raios, brasas e tremor) */
+function duProx(){
+if(duToca||!duFila.length)return;
+const e=duFila.shift();duToca=e;
+const fim=()=>{duToca=null;duEsp.delete(e.id+':'+e.t);try{duelo()}catch(x){}};
+if(leve||!duAnimOn()||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){setTimeout(fim,50);return}
+const o=document.createElement('div');o.id='dufx';o.className=e.boss?'boss':'com';
+const big=e.big||e.img,ph=e.boss?'👑':'⚔️',
+im=big?'<img class=dui src="'+esc(big)+'" alt="" onerror="this.outerHTML=\'<div class=dui style=&quot;font-size:96px&quot;>'+ph+'</div>\'">':'<div class=dui style="font-size:96px">'+ph+'</div>';
+let ps='';if(e.boss){for(let i=0;i<18;i++)ps+='<i class=dup style="--x:'+(Math.random()*100).toFixed(1)+'%;--s:'+(3+Math.random()*6).toFixed(1)+'px;--dx:'+((Math.random()-.5)*160).toFixed(0)+'px;--t:'+(2+Math.random()*1.6).toFixed(2)+'s;--dl:'+(Math.random()*1.6).toFixed(2)+'s"></i>'}
+o.innerHTML='<div class=bg></div>'+(e.boss?'<div class=rays></div><div class=dups>'+ps+'</div>':'')+'<div class=fl></div><div class=dufc><div class=dutag>'+(e.boss?'⚠ CHEFE ⚠':'⚔️ INIMIGO')+'</div>'+im+'<div class=dunm>'+esc(e.nome)+'</div></div>';
+document.body.appendChild(o);
+setTimeout(()=>{o.remove();fim()},e.boss?4850:2550)}
 /* /dano "Nome" +3  → tira 3 PV (negativo = cura). Aceita nome de personagem, NPC/inimigo ou jogador. */
-function danoPlan(t){const m=t.match(/^\/(dano|cura)\s+(.+?)\s+([+-]?\d+)(?:\s+(puro|direto))?\s*$/i);if(!m)return{erro:'Use: /dano "Nome" +3  ou  /cura "Nome" +3'};
+function danoPlan0(t){const m=t.match(/^\/(dano|cura)\s+(.+?)\s+([+-]?\d+)(?:\s+(puro|direto))?\s*$/i);if(!m)return{erro:'Use: /dano "Nome" +3  ou  /cura "Nome" +3'};
 const nome=m[2].replace(/^["“”']+|["“”']+$/g,'').trim(),n=m[1].toLowerCase()==='cura'?-(+m[3]):+m[3],k=nz(nome),f=g=>pers.filter(g);
 let c=f(p=>nz(p.nome)===k);if(!c.length)c=f(p=>!p.npc&&nz(p.donoNome)===k);if(!c.length)c=f(p=>nz(p.nome).startsWith(k));if(!c.length)c=f(p=>nz(p.nome).includes(k));
 if(!c.length)return{erro:'Ninguém encontrado com o nome "'+nome+'".'};
@@ -596,7 +772,7 @@ function acLista(t,b){t=t&&t.nodeType?t:$('#ent');if(!t)return;acT=t;acB=b||$('#
 if(t.id==='ent'&&(m=ln.match(/^(\s*>\s*)([^:]*)$/))){const U=ultMap();acR=[pos-ln.length,pos];acL=falasLista().filter(x=>falaCasa(x.nome,m[2])).sort((x,y)=>(nz(y.nome).startsWith(nz(m[2]))-nz(x.nome).startsWith(nz(m[2])))||((U[y.k.slice(2)]||0)-(U[x.k.slice(2)]||0))||x.nome.localeCompare(y.nome,'pt-BR')).slice(0,30).map(x=>({t:'>'+x.nome,s:x.sub,ins:'>'+x.nome+': '}));if(!acL.length)acL=[{t:'Nenhum personagem com essa letra.'}]}
 else if(m=a.match(/(?:^|\s)#([\wÀ-ÿ-]*)$/)){const k=nz(m[1]);acR=[pos-m[1].length-1,pos];acL=macros.filter(x=>(x.publica||x.dono===uid)&&(!k||nz(x.nome).includes(k)||subq(nz(x.nome),k)||nz(x.texto).includes(k))).sort((x,y)=>sem(x.nome).localeCompare(sem(y.nome),'pt')).slice(0,30).map(x=>({t:'#'+x.nome,s:x.texto,ins:'#'+x.nome+' '}))}
 else if((/^\/r(\s|$)/.test(t.value)||(a.match(/\/\//g)||[]).length%2)&&(m=a.match(/(?:^|[\s+\-*(\/])@([\wÀ-ÿ.-]*)$/))){const p=persFala();acR=[pos-m[1].length-1,pos];if(!p)acL=[{t:'Escolha um personagem em "Falar como" para usar @.'}];else{const k=nz(m[1].replace(/\..*$/,''));acL=statsDe(p).filter(x=>!k||nz(x.n).includes(k)).map(x=>({t:x.n,s:(x.mod&&x.v>0?'+':'')+x.v,ins:x.tk}))}}
-else if(m=a.match(/^(\/(?:dano|cura)\s+)"?([^"]*)$/i)){const k=nz(m[2]);acR=[m[1].length,pos];acL=pers.filter(p=>!k||nz(p.nome).includes(k)).map(p=>({t:p.nome,s:(hpTxt(p)||'sem PV')+(p.npc?' · NPC':''),ins:'"'+p.nome+'" '}))}
+else if(m=a.match(/^(\/(?:dano|cura|boss|inimigo|sair)\s+)"?([^"]*)$/i)){const k=nz(m[2]);acR=[m[1].length,pos];acL=duSug(m[1],k).map(p=>({t:p.nome,s:(hpTxt(p)||'sem PV')+(p.npc?' · NPC':''),ins:'"'+p.nome+'" '}))}
 acDesenha()}
 function teclaEnter(e){if(acL.some(x=>x.ins)){const n=acL.length;if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();acI=(acI+(e.key==='ArrowDown'?1:n-1))%n;acDesenha();return}if(e.key==='Tab'||(e.key==='Enter'&&!e.shiftKey&&!matchMedia('(pointer:coarse)').matches)){e.preventDefault();return acPick(acI)}if(e.key==='Escape'){acFecha();return}}
 if(e.key==='Enter'&&!e.shiftKey&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();enviar()}}
@@ -686,7 +862,7 @@ function filtro(f){fAt=f;const a=$('#ft-todos'),b=$('#ft-nao'),c=$('#ft-arq');if
 /* menu ⋮ do topo */
 function menuTopo(){if($('.ov'))return;const o=document.createElement('div');o.className='ov';o.style.cssText='align-items:flex-start;justify-content:flex-end;padding:54px 12px 0;background:rgba(0,0,0,.25)';o.onclick=e=>{if(e.target===o)o.remove()};const t=mu().todos;
 const it=(i,x,f)=>`<div onclick="this.closest('.ov').remove();${f}"><span>${i}</span><span>${x}</span></div>`;
-o.innerHTML=`<div class="card pm">${it('➕','Nova campanha','novaCamp()')}${it('🔑','Entrar com código','entrarCod()')}${it(t?'🔔':'🔕',t?'Ativar todas as notificações':'Silenciar todas as notificações','mudoT()')}${it('📲',(window.pushOn&&window.pushOn())?'Desativar notificações push':'Ativar notificações push','pushMenu()')}${it('<i class=nic-dicas></i>','Dicas de comandos','dicasCmd()')}${it(leve?'🐢':'⚡','Modo leve: '+(leve?'ligado (toque para desligar)':'desligado (toque para ligar)'),'alternaLeve()')}${it('🐞',admin?'Relatos recebidos'+(relNovos?' ('+relNovos+')':''):'Bug ou feedback'+(relNovos?' ('+relNovos+')':''),'relatos()')}${it('🚪','Sair','sair()')}</div>`;document.body.appendChild(o)}
+o.innerHTML=`<div class="card pm">${it('➕','Nova campanha','novaCamp()')}${it('🔑','Entrar com código','entrarCod()')}${it(t?'🔔':'🔕',t?'Ativar todas as notificações':'Silenciar todas as notificações','mudoT()')}${it('📲',(window.pushOn&&window.pushOn())?'Desativar notificações push':'Ativar notificações push','pushMenu()')}${it('<i class=nic-dicas></i>','Dicas de comandos','dicasCmd()')}${it(leve?'🐢':'⚡','Modo leve: '+(leve?'ligado (toque para desligar)':'desligado (toque para ligar)'),'alternaLeve()')}${it('✨','Animações de duelo: '+(duAnimOn()?'ligadas (toque para desligar)':'desligadas (toque para ligar)'),'alternaDuAnim()')}${it('🐞',admin?'Relatos recebidos'+(relNovos?' ('+relNovos+')':''):'Bug ou feedback'+(relNovos?' ('+relNovos+')':''),'relatos()')}${it('🚪','Sair','sair()')}</div>`;document.body.appendChild(o)}
 /* barra de baixo: Campanhas | Amigos */
 function setAba(a){document.querySelectorAll('#bn button').forEach(b=>b.classList.toggle('on',b.dataset.a===a))}
 function sincBn(){let b=document.getElementById('bn');
@@ -717,16 +893,16 @@ function entrarCod(){modal('Entrar em uma campanha',[{l:'Código de convite'}],(
 async function entrar(id){try{const r=await db.entrar(id);if(!r)return alert('Campanha não encontrada. Confira o código de convite.');const mb=db.doc('campanhas/'+id+'/membros/'+uid);let reg=false;try{reg=(await mb.get()).exists}catch(e){}if(!reg){try{await mb.set({nome:eu.nome})}catch(e){return alert('O servidor não registrou sua entrada nesta campanha (função entrar_campanha no Supabase). Sem isso você não aparece como participante nem consegue criar personagem.\n\nDetalhe: '+((e&&e.message)||e))}}const ja=(await db.doc('data/users/'+uid+'/c-'+id).get()).exists;await db.collection('data/users/'+uid).doc('c-'+id).set({cid:id,nome:r.nome,lido:Date.now()});if(!ja)db.collection('campanhas/'+id+'/msgs').add({t:agora(),uid,tipo:'sys',nome:eu.nome,texto:'entrou na campanha'}).catch(()=>{});abrir(id)}catch(e){alert('Não foi possível entrar na campanha.'+(e&&e.message?'\n\nDetalhe: '+e.message:''))}}
 function desinscrever(){const _o=$('#mpov');if(_o)_o.remove();abrTk++;dmFr=null;subs.forEach(f=>f());subs=[];camp=null;ativo=null}
 function abrir(id,mon){tl='camp';desinscrever();monitor=false;cid=id;const tk=abrTk;sigM='';naoLidas[id]=0;resp=null;carregou=false;entrou=false;semScroll=0;lido=monitor?1e15:null;aba='chat';falar=lerF(id);susU=null;lmMsg=LM0;avl=[];carregaAvl(id);narr=null;carregaNarr(id);msgs=[];macros=[];pers=[];membros=[];mapas=[];toks=[];mpAt=null;mpZ=0;mpPts=[];mpSel=null;let ini=false,curou=0;const b='campanhas/'+id;
-subs.push(db.doc(b).onSnapshot(s=>{if(!s.exists){alert('Campanha não encontrada.');return inicio()}camp=s.data();if(!ini){ini=true;casca()}else{pin();tit();if(aba==='cfg'&&!document.activeElement.closest('#ab'))tab();else if(aba==='chat'){cab();lista()}else if(aba==='pers'&&!document.activeElement.closest('#ab'))tab()}},()=>{}));
+subs.push(db.doc(b).onSnapshot(s=>{if(!s.exists){alert('Campanha não encontrada.');return inicio()}camp=s.data();if(!ini){ini=true;casca()}else{try{duelo()}catch(e){console.error(e)}pin();tit();if(aba==='cfg'&&!document.activeElement.closest('#ab'))tab();else if(aba==='chat'){cab();lista()}else if(aba==='pers'&&!document.activeElement.closest('#ab'))tab()}},()=>{}));
 if(!monitor){leit=[];digit={};canalDig=db.canal('dig-'+id,p=>{digit[p.u]={n:p.n,t:Date.now()};mostraDig()});subs.push(()=>canalDig.fim())}
 subs.push(db.collection(b+'/leituras').onSnapshot(s=>{leit=s.docs.map(d=>({id:d.id,...d.data()}));if(aba==='chat'&&!window._lT)window._lT=setTimeout(()=>{window._lT=0;if(aba==='chat'&&tl==='camp')lista()},1200)},()=>{}));
 (async()=>{try{if(!monitor){const x=await db.doc('data/users/'+uid+'/c-'+id).get();if(x.exists&&x.data().lido!=null)lido=x.data().lido}}catch(e){}if(tk!==abrTk)return;ouveLix(id);ouveMsgs()})();
 subs.push(db.collection(b+'/macros').onSnapshot(s=>{macros=s.docs.map(d=>({id:d.id,...d.data()}));if(aba==='macros')tab()},()=>{}));
-subs.push(db.collection(b+'/personagens').onSnapshot(s=>{pers=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.nome);if(aba==='chat'){cab();lista()}else if(aba==='pers'&&!document.activeElement.closest('#ab'))tab()},()=>{}));
+subs.push(db.collection(b+'/personagens').onSnapshot(s=>{pers=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.nome);try{duSync();duelo()}catch(e){console.error(e)}if(aba==='chat'){cab();lista()}else if(aba==='pers'&&!document.activeElement.closest('#ab'))tab()},()=>{}));
 subs.push(db.collection(b+'/mapas').onSnapshot(s=>{mapas=s.docs.map(d=>({id:d.id,...d.data()}));mpRender()},()=>{}));subs.push(db.collection(b+'/tokens').onSnapshot(s=>{toks=s.docs.map(d=>({id:d.id,...d.data()}));mpRender()},()=>{}));
 const cbM=s=>{const n=s.docs.map(d=>({id:d.id,...d.data()})),sg=JSON.stringify(n.map(m=>[m.id,m.papel||'',m.nome]));if(sg===sigM)return;sigM=sg;membros=n;if(!monitor&&camp&&camp.mestre===uid&&!membros.some(m=>m.id===uid)&&!curou){curou=1;db.doc(b+'/membros/'+uid).set({nome:eu.nome}).then(()=>db.collection(b+'/membros').get()).then(s=>{if(s.docs.some(d=>d.id===uid))cbM(s);else alert('O servidor aceitou o registro, mas não mostra você na lista de participantes (provável problema de permissão de leitura no Supabase).')}).catch(e=>alert('Não foi possível registrar você como participante desta campanha.\n\nDetalhe: '+((e&&e.message)||e)))}if(!monitor&&camp&&camp.mestre!==uid&&membros.length&&!membros.some(m=>m.id===uid)){alert('Você foi removido desta campanha.');return inicio()}if(camp&&$('#pin')){pin();if(aba==='cfg'&&!document.activeElement.closest('#ab'))tab();else if(aba==='chat')cab()}};subs.push(db.collection(b+'/membros').onSnapshot(cbM,()=>{}));const ivM=setInterval(()=>{if(!document.hidden)db.collection(b+'/membros').get().then(cbM).catch(()=>{})},6000);subs.push(()=>clearInterval(ivM))}
 const ehM=()=>!!camp&&(monitor||camp.mestre===uid||membros.some(m=>m.id===uid&&m.papel==='cogm'));
-function casca(){tela(`<header class="ch"><button class="h" onclick="voltar()" title="Voltar">${ic('voltar')}</button><div class="tav"><img id="ti" alt="" style="display:none"><div id="td" class="tdi">${ic('campanhaPadrao')}</div></div><span id="tt">${esc(camp.nome)}</span><button class="h" onclick="menuCamp()" title="Mais" aria-label="Mais opções">⋮</button></header><div id=pin></div><div id=ab style="flex:1;display:flex;flex-direction:column;min-height:0"></div>`);tit();pin();tab()}
+function casca(){tela(`<header class="ch"><button class="h" onclick="voltar()" title="Voltar">${ic('voltar')}</button><div class="tav"><img id="ti" alt="" style="display:none"><div id="td" class="tdi">${ic('campanhaPadrao')}</div></div><span id="tt">${esc(camp.nome)}</span><button class="h" onclick="menuCamp()" title="Mais" aria-label="Mais opções">⋮</button></header><div id=pin></div><div id=duel></div><div id=ab style="flex:1;display:flex;flex-direction:column;min-height:0"></div>`);tit();pin();tab();try{duelo()}catch(e){console.error(e)}}
 function menuCamp(){if($('.ov'))return;const o=document.createElement('div');o.className='ov';o.style.cssText='align-items:flex-start;justify-content:flex-end;padding:54px 12px 0;background:rgba(0,0,0,.25)';o.onclick=e=>{if(e.target===o)o.remove()};
 const it=(ic,t,fn)=>{const d=document.createElement('div');d.innerHTML='<span>'+ic+'</span><span>'+t+'</span>';d.onclick=()=>{o.remove();fn()};return d};
 const c=document.createElement('div');c.className='card pm';
@@ -805,7 +981,7 @@ document.body.appendChild(o);const mk=()=>o.querySelectorAll('#fc2 button').forE
 o.querySelectorAll('#fc2 button').forEach(b=>b.onclick=()=>{c=b.dataset.k;mk()});o.querySelector('#fn').onclick=()=>o.remove();
 o.querySelector('#fs').onclick=()=>{db.doc('campanhas/'+cid).update({fixa:o.querySelector('#fx').value.trim(),fixaCor:c});o.remove()}}
 function info(){const base=location.href.split('#')[0];modal('Convidar amigos',[{l:'Código de convite',v:cid},{l:'Link de convite',v:base+'#convite='+cid}],()=>{});const o=document.querySelector('.ov');o.querySelectorAll('input').forEach(i=>i.readOnly=1);o.querySelector('#moc').textContent='Fechar';o.querySelector('#mok').remove();const p=document.createElement('p');p.className='mu';p.textContent='Envie o código ou o link. Quem recebe usa "Entrar com código" na tela inicial. Membros: '+membros.map(m=>m.nome).join(', ');o.querySelector('.card').insertBefore(p,o.querySelector('.row'))}
-function tab(){const f=({chat:vChat,pers:vPers,cfg:vCfg,macros:vMacros,modelo:vModelo,tema:vTema,diario:vDiario,galeria:vGaleria})[aba];try{f()}catch(e){console.error(e);if(ativo){ativo=null;try{f()}catch(e2){console.error(e2)}}}}
+function tab(){try{duVis()}catch(e){}const f=({chat:vChat,pers:vPers,cfg:vCfg,macros:vMacros,modelo:vModelo,tema:vTema,diario:vDiario,galeria:vGaleria})[aba];try{f()}catch(e){console.error(e);if(ativo){ativo=null;try{f()}catch(e2){console.error(e2)}}}}
 const tit=()=>{const t=$('#tt');if(t)t.textContent=camp.nome;const i=$('#ti');if(i){i.src=camp.img||'';i.style.display=camp.img?'':'none'}const d=$('#td');if(d)d.style.display=camp.img?'none':''};
 function ampliar(u){const o=document.createElement('div');o.className='ov';o.onclick=()=>o.remove();o.innerHTML=`<button class=s style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;padding:6px 14px">✕</button><img src="${esc(u)}" style="max-width:100%;max-height:85vh;border-radius:14px" onclick="event.stopPropagation()">`;document.body.appendChild(o)}
 const capa=g=>`<div class=card><div class=row><div class=big style="width:64px;height:64px;overflow:hidden;${g?'cursor:pointer':''}" ${g?`onclick="$('#ci').click()"`:''}>${camp.img?`<img src="${esc(camp.img)}" style="width:100%;height:100%;object-fit:cover">`:'<span style="font-size:28px;line-height:64px;display:block;text-align:center">🎲</span>'}</div><div ${g?`onclick="editarCamp('nome')" style="cursor:pointer"`:''}><b style="font-size:17px">${esc(camp.nome)}</b>${g?' <span class=mu>✎</span>':''}</div></div>${g?'<input id=ci type=file accept="image/*" style="display:none" onchange="imgCamp(this)">':''}<div class=mu style="margin-top:10px;white-space:pre-wrap;${g?'cursor:pointer':''}" ${g?`onclick="editarCamp('descricao')"`:''}>${camp.descricao?fmt(camp.descricao):g?'Configurar descrição da campanha…':'Sem descrição.'}</div>${g?gmImg():''}</div>`;
@@ -1155,6 +1331,12 @@ o.innerHTML=`<div class=card style="max-height:85vh;overflow:auto;max-width:560p
 ['/dano "Goblin" 5','Tira 5 PV do personagem ou NPC e avisa no chat. Se o Mestre ligou a redução de dano (em Configurações), a defesa do alvo é descontada.'],
 ['/dano "Goblin" 20 puro','Dano direto: ignora a defesa do alvo.'],
 ['/cura "Elara" 3','Devolve 3 PV.']])
++g('⚔️ Duelo (só o Mestre)',[
+['/boss "Dragão" 500','Chefe! Aparece a foto grande do NPC com efeitos, depois só a barra de vida vermelha no topo. O 500 é a vida (só o Mestre vê o número).'],
+['/inimigo "Goblin" 30','Inimigo comum: entrada mais rápida e barra de vida no topo.'],
+['/dano "Goblin" 5','Tira vida e a barra desce para todo mundo. No chat os jogadores não veem o número.'],
+['/sair "Goblin"','Tira o inimigo do duelo. Também sai sozinho quando a vida chega a zero.'],
+['/sair todos','Encerra o duelo inteiro.']])
 +g('🗣️ Vários personagens',[
 ['>Goblin: Quem vai lá?','Uma linha por fala, cada uma sai no balão do personagem. Digite > e a letra inicial para escolher na lista.'],
 ['>Goblin: Atacar!\n>Elara: Cuidado!','Várias linhas seguidas mandam várias falas, uma atrás da outra.']])
@@ -1164,7 +1346,7 @@ o.innerHTML=`<div class=card style="max-height:85vh;overflow:auto;max-width:560p
 +`<button style="width:100%;margin-top:12px" onclick="this.closest('.ov').remove()">Fechar</button></div>`;
 document.body.appendChild(o)}
 function vCfg(){carregaPerfis();if(!amigIds)carregaAmigos();const gm=ehM(),dono=camp.mestre===uid,base=location.href.split('#')[0];const papel=m=>m.id===camp.mestre?'Mestre (GM)':m.papel==='cogm'?'Co-GM':'Jogador';
-$('#ab').innerHTML=`<div class=c>${capa(gm)}<h3>Configurações</h3><div class=card><div class=it onclick="aba='pers';tab()"><b><i class=nic-grupo></i> Personagens e NPCs</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='galeria';tab()"><b><i class=nic-galeria></i> Galeria de imagens</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='diario';tab()"><b><i class=nic-diario></i> Meu diário e notas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='tema';tab()"><b><i class=nic-temas></i> Temas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="expMod()"><b><i class=nic-exportar></i> Exportar modelo de ficha</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='macros';tab()"><b><i class=nic-macros></i> Macros</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="dicasCmd()"><b><i class=nic-dicas></i> Dicas de comandos</b><span class=mu>›</span></div>${gm?`<hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='modelo';mod=null;tab()"><b><i class=nic-martelo></i> Modelo de ficha</b><span class=mu>›</span></div>`:''}</div>
+$('#ab').innerHTML=`<div class=c>${capa(gm)}<h3>Configurações</h3><div class=card><div class=it onclick="aba='pers';tab()"><b><i class=nic-grupo></i> Personagens e NPCs</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='galeria';tab()"><b><i class=nic-galeria></i> Galeria de imagens</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='diario';tab()"><b><i class=nic-diario></i> Meu diário e notas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='tema';tab()"><b><i class=nic-temas></i> Temas</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="expMod()"><b><i class=nic-exportar></i> Exportar modelo de ficha</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='macros';tab()"><b><i class=nic-macros></i> Macros</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="alternaDuAnim()"><b>✨ Animações de duelo: ${duAnimOn()?'ligadas':'desligadas'}</b><span class=mu>›</span></div><hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="dicasCmd()"><b><i class=nic-dicas></i> Dicas de comandos</b><span class=mu>›</span></div>${gm?`<hr style="border:0;border-top:1px solid var(--bd)"><div class=it onclick="aba='modelo';mod=null;tab()"><b><i class=nic-martelo></i> Modelo de ficha</b><span class=mu>›</span></div>`:''}</div>
 <h3>Convidar amigos</h3><div class=card><label>Código de convite</label><input readonly value="${esc(cid)}"><label>Link de convite</label><input readonly value="${esc(base+'#convite='+cid)}">${gm&&!monitor?`<button style="width:100%;margin-top:10px" onclick="addAmigosCamp()"><i class=nic-amigos></i> Adicionar amigos</button>`:''}</div>
 <h3>Participantes (${membros.length})</h3>${membros.slice().sort((a,b)=>(b.id===camp.mestre)-(a.id===camp.mestre)||az(a,b)).map(m=>`<div class="card it" style="cursor:default;flex-wrap:wrap">${avP(m.id)}<b>${esc(m.nome)}</b><span class="tg ${m.id===camp.mestre?'g':''}">${papel(m)}</span>${m.id!==uid&&amigIds&&!amigIds.has(m.id)?`<button class=s onclick="addAmigo('${m.id}')">+ Amigo</button>`:''}${dono&&m.id!==camp.mestre?`<button class=s onclick="coroa('${m.id}')" title="Cargos de GM" style="padding:9px 12px">👑</button>`:''}${gm&&m.id!==camp.mestre&&m.id!==uid&&(dono||m.papel!=='cogm')?`<button class=x onclick="expulsar('${m.id}')">Remover</button>`:''}</div>`).join('')}
 ${!monitor?`<button class=s style="width:100%;margin-top:12px" onclick="arquivaCfg()">${(listaC.find(y=>y.cid===cid)||{}).arq?'📤 Desarquivar campanha':'<i class=nic-arquivar></i> Arquivar campanha'}</button>`:''}${!monitor?'<button class=s style="width:100%;margin-top:12px" onclick="sairCamp()">Sair da campanha</button>':''}${dono?'<p class=mu>O co-GM faz quase tudo que o Mestre faz, exceto excluir a campanha.</p><button class=x style="width:100%" onclick="excluirCamp()">Excluir campanha</button>':''}</div>`}
