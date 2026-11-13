@@ -442,13 +442,13 @@ html.xmas #haloMsg{background:#14261b;border-color:#e0262b;box-shadow:0 0 14px r
 #dufx .dunm{font-weight:900;font-size:26px;color:#fff;text-align:center;text-shadow:0 2px 10px #000;max-width:90vw}
 #dufx .dui{display:block;object-fit:cover}
 /* inimigo comum */
-#dufx.com .bg{animation:dubgc 2.5s ease both}
-#dufx.com .fl{animation:duflc 2.5s ease both}
-#dufx.com .dufc{animation:ducom 2.5s cubic-bezier(.2,.8,.3,1) both}
-#dufx.com .dui{width:150px;height:150px;border-radius:50%;border:4px solid #ef4444;box-shadow:0 0 30px #ef4444aa}
+#dufx.com .bg{animation:dubgc 3.1s ease both}
+#dufx.com .fl{animation:duflc 3.1s ease both}
+#dufx.com .dufc{animation:ducom 3.1s cubic-bezier(.2,.8,.3,1) both}
+#dufx.com .dui{max-width:min(80vw,380px);max-height:50vh;border-radius:18px;border:4px solid #ef4444;object-fit:contain;background:#0007;box-shadow:0 0 36px #ef4444bb,0 0 80px #b91c1c66}
 @keyframes dubgc{0%{opacity:0}12%{opacity:1}78%{opacity:1}100%{opacity:0}}
 @keyframes duflc{0%{opacity:0}7%{opacity:.8}28%{opacity:0}100%{opacity:0}}
-@keyframes ducom{0%{transform:translateX(-120vw) skewX(-18deg);opacity:0}15%{transform:translateX(16px) skewX(0);opacity:1}21%{transform:translateX(0)}72%{transform:translateX(0) scale(1);opacity:1}100%{transform:translateY(-44vh) scale(.12);opacity:0}}
+@keyframes ducom{0%{transform:scale(.3);opacity:0}11%{transform:scale(1.08);opacity:1}16%{transform:scale(1)}70%{transform:scale(1);opacity:1}100%{transform:translateY(-44vh) scale(.12);opacity:0}}
 /* boss */
 #dufx.boss{animation:dushk .55s .3s both}
 #dufx.boss .bg{background:radial-gradient(circle at 50% 55%,#7f1d1dcc 0,#000000f0 78%);animation:dubgb 4.8s ease both}
@@ -473,7 +473,7 @@ html.xmas #haloMsg{background:#14261b;border-color:#e0262b;box-shadow:0 0 14px r
 </head><body><div id="app"><div class="c"><h2>NeroRPG</h2><p class="mu">Carregando…</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const VERSAO='0.5.3';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
+const VERSAO='0.5.7';const CRED=`<div class="cred" title="NeroRPG v${VERSAO}">criadora Tan · v${VERSAO}</div>`;
 
 const SUPA_URL="https://tdfemtmsiftgawegthch.supabase.co",SUPA_KEY="sb_publishable_5qJOGieP23TtPunOh41z6g_l1gpxZpx";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -643,11 +643,11 @@ const duLista=()=>camp&&Array.isArray(camp.duelo)?camp.duelo:[];
 const duEm=id=>duLista().some(e=>e.id===id);
 const duPct=p=>p&&p.pv!=null&&p.pvmax>0?(p.pv<=0?0:Math.min(100,Math.max(.5,Math.round(p.pv/p.pvmax*1000)/10))):100;
 function duSug(cmd,k){const npc=/^\/(boss|inimigo)/i.test(cmd),sa=/^\/sair/i.test(cmd);return pers.filter(p=>(!k||nz(p.nome).includes(k))&&(!npc||p.npc)&&(!sa||duEm(p.id)))}
-function duPlan(t){
+function duPlan1(t){
 const m=t.match(/^\/(boss|inimigo|sair)(?:\s+(.+?))?(?:\s+(\d+))?\s*$/i);
 if(!m)return{erro:'Use: /boss "Nome" 500  ·  /inimigo "Nome" 30  ·  /sair "Nome"  ·  /sair todos'};
 if(!ehM())return{erro:'Só o Mestre ou o co-Mestre pode usar os comandos de duelo.'};
-const cmd=m[1].toLowerCase(),nome=(m[2]||'').replace(/^["“”']+|["“”']+$/g,'').trim(),k=nz(nome);
+const cmd=m[1].toLowerCase(),nome=(m[2]||'').replace(/["“”]/g,'').replace(/^'+|'+$/g,'').trim(),k=nz(nome);
 if(cmd==='sair'){
 if(!nome)return{erro:'Use: /sair "Nome"  ou  /sair todos'};
 const L=duLista();
@@ -666,12 +666,28 @@ if(m[3]!=null){pv=pvmax=+m[3];if(pv<1)return{erro:'A vida precisa ser pelo menos
 else if(p.pv!=null&&p.pvmax>0&&p.pv>0){pv=p.pv;pvmax=p.pvmax}
 else return{erro:'Diga a vida do '+p.nome+': /'+cmd+' "'+p.nome+'" 30'};
 return{boss,p,pv,pvmax,txt:(boss?'👑 CHEFE ':'')+p.nome+' entra no duelo com '+pv+' PV',msg:boss?'👑 CHEFE: '+p.nome+' apareceu!':'⚔️ '+p.nome+' entrou no duelo!'}}
+/* vários de uma vez: /inimigo "Goblin" 30, "Orc" 40   ou   /inimigo "Goblin" 30, /boss "Rei" 300   (máximo 4 no duelo) */
+const DU_MAX=4;
+function duPlan(t){
+const ps=t.trim().split(/\s*[,·;]\s*(?=\/(?:boss|inimigo|sair)\b|["“])/i);
+let cmd='';const L=[];
+for(let x of ps){x=x.trim();if(!x)continue;
+const mm=x.match(/^\/(boss|inimigo|sair)\b/i);
+if(mm)cmd=mm[1].toLowerCase();else if(cmd)x='/'+cmd+' '+x;else return{erro:'Use: /inimigo "Nome" 30, "Nome2" 30'};
+const a=duPlan1(x);if(a.erro)return a;L.push(a)}
+if(!L.length)return duPlan1(t);
+const ids=new Set(duLista().map(e=>e.id)),vistos=new Set();
+for(const a of L){if(a.sair){if(a.todos)ids.clear();else ids.delete(a.e.id)}else{if(vistos.has(a.p.id))return{erro:'O NPC "'+a.p.nome+'" foi repetido no mesmo comando.'};vistos.add(a.p.id);ids.add(a.p.id)}}
+if(ids.size>DU_MAX)return{erro:'O duelo aceita no máximo '+DU_MAX+' inimigos ao mesmo tempo (ficaria com '+ids.size+'). Use /sair para tirar algum.'};
+if(L.length===1)return L[0];
+return{multi:L,txt:L.map(a=>a.txt).join(' · '),msg:L.map(a=>a.msg).join('\n')}}
 async function duExec(a,q){
-const R=db.doc('campanhas/'+cid);let L;
-if(a.sair){L=a.todos?[]:duLista().filter(e=>e.id!==a.e.id)}
-else{const p=a.p;await db.doc('campanhas/'+cid+'/personagens/'+p.id).update({pv:a.pv,pvmax:a.pvmax});p.pv=a.pv;p.pvmax=a.pvmax;
-const e={id:p.id,nome:p.nome,img:p.img||p.imgG||'',big:p.imgG||p.img||'',boss:a.boss?1:0,pct:duPct(p),t:agora()};
-L=duLista().filter(x=>x.id!==p.id).concat([e])}
+const R=db.doc('campanhas/'+cid);let L=duLista();
+for(const x of (a.multi||[a])){
+if(x.sair){L=x.todos?[]:L.filter(e=>e.id!==x.e.id)}
+else{const p=x.p;await db.doc('campanhas/'+cid+'/personagens/'+p.id).update({pv:x.pv,pvmax:x.pvmax});p.pv=x.pv;p.pvmax=x.pvmax;
+const e={id:p.id,nome:p.nome,img:p.img||p.imgG||'',big:p.imgG||p.img||'',boss:x.boss?1:0,pct:duPct(p),t:agora()};
+L=L.filter(y=>y.id!==p.id).concat([e])}}
 await R.update({duelo:L});camp.duelo=L;
 await enviarMsg(q,a.msg,0);try{duelo()}catch(e){}}
 /* dano nos inimigos do duelo: o aviso no chat não mostra números (o Mestre vê o número na barra e na prévia) */
@@ -701,7 +717,7 @@ const duMem={};
 function duVisLer(){try{const r=localStorage.getItem('mrpg_duv_'+cid);if(r!==null)return JSON.parse(r)||{}}catch(e){}return duMem[cid]||{}}
 function duVisSalva(o){duMem[cid]=o;try{localStorage.setItem('mrpg_duv_'+cid,JSON.stringify(o))}catch(e){}}
 function duVis(){const b=$('#duel');if(b)b.classList.toggle('on',duLista().length>0&&aba==='chat')}
-function duNo(e){const n=document.createElement('div');n.className='dub'+(e.boss?' boss':'');n.dataset.id=e.id;
+function duNo(e){const n=document.createElement('div');n.className='dub'+(e.boss?' boss':'');n.dataset.id=e.id;n._big=e.big||e.img||'';n.onclick=()=>{if(n._big)ampliar(n._big)};
 n.innerHTML=(e.img?'<img src="'+esc(e.img)+'" alt="" onerror="this.outerHTML=\'<span class=dubi>'+(e.boss?'👑':'⚔️')+'</span>\'">':'<span class=dubi>'+(e.boss?'👑':'⚔️')+'</span>')
 +'<div class=dubm><div class=dubn>'+(e.boss?'👑 ':'')+esc(e.nome)+'</div><div class=dubt><i class=dubg></i><i class=dubf></i><em class=dubv></em></div></div>';return n}
 function duelo(){
@@ -721,7 +737,7 @@ let n=[...box.children].find(x=>x.dataset.id===e.id&&!x.classList.contains('sai'
 if(esp){if(n){n.style.display='none';n.dataset.h='1'}continue}
 if(!n){n=duNo(e);if(!prim)n.classList.add('pop');box.appendChild(n)}
 else if(n.dataset.h==='1'){n.style.display='';n.dataset.h='';n.classList.remove('pop');void n.offsetWidth;n.classList.add('pop')}
-const f=n.querySelector('.dubf'),g=n.querySelector('.dubg'),vv=n.querySelector('.dubv');
+n._big=e.big||e.img||'';n.style.cursor=n._big?'zoom-in':'';const f=n.querySelector('.dubf'),g=n.querySelector('.dubg'),vv=n.querySelector('.dubv');
 if(v&&v.t===e.t){const d=e.pct-v.pct;if(d<-.05){n.classList.remove('hit');void n.offsetWidth;n.classList.add('hit')}else if(d>.05){n.classList.add('cura');setTimeout(()=>n.classList.remove('cura'),700)}}
 if(f)f.style.width=e.pct+'%';if(g)g.style.width=e.pct+'%';
 const p=pers.find(x=>x.id===e.id);
@@ -745,7 +761,7 @@ im=big?'<img class=dui src="'+esc(big)+'" alt="" onerror="this.outerHTML=\'<div 
 let ps='';if(e.boss){for(let i=0;i<18;i++)ps+='<i class=dup style="--x:'+(Math.random()*100).toFixed(1)+'%;--s:'+(3+Math.random()*6).toFixed(1)+'px;--dx:'+((Math.random()-.5)*160).toFixed(0)+'px;--t:'+(2+Math.random()*1.6).toFixed(2)+'s;--dl:'+(Math.random()*1.6).toFixed(2)+'s"></i>'}
 o.innerHTML='<div class=bg></div>'+(e.boss?'<div class=rays></div><div class=dups>'+ps+'</div>':'')+'<div class=fl></div><div class=dufc><div class=dutag>'+(e.boss?'⚠ CHEFE ⚠':'⚔️ INIMIGO')+'</div>'+im+'<div class=dunm>'+esc(e.nome)+'</div></div>';
 document.body.appendChild(o);
-setTimeout(()=>{o.remove();fim()},e.boss?4850:2550)}
+setTimeout(()=>{o.remove();fim()},e.boss?4850:3150)}
 /* /dano "Nome" +3  → tira 3 PV (negativo = cura). Aceita nome de personagem, NPC/inimigo ou jogador. */
 function danoPlan0(t){const m=t.match(/^\/(dano|cura)\s+(.+?)\s+([+-]?\d+)(?:\s+(puro|direto))?\s*$/i);if(!m)return{erro:'Use: /dano "Nome" +3  ou  /cura "Nome" +3'};
 const nome=m[2].replace(/^["“”']+|["“”']+$/g,'').trim(),n=m[1].toLowerCase()==='cura'?-(+m[3]):+m[3],k=nz(nome),f=g=>pers.filter(g);
@@ -1335,6 +1351,7 @@ o.innerHTML=`<div class=card style="max-height:85vh;overflow:auto;max-width:560p
 ['/boss "Dragão" 500','Chefe! Aparece a foto grande do NPC com efeitos, depois só a barra de vida vermelha no topo. O 500 é a vida (só o Mestre vê o número).'],
 ['/inimigo "Goblin" 30','Inimigo comum: entrada mais rápida e barra de vida no topo.'],
 ['/dano "Goblin" 5','Tira vida e a barra desce para todo mundo. No chat os jogadores não veem o número.'],
+['/inimigo "Goblin" 30, "Orc" 40','Até 4 inimigos de uma vez: a foto de cada um aparece, uma de cada vez, e depois ficam só as barras. Dá para misturar com chefe: /inimigo "Goblin" 30, /boss "Rei" 300.'],
 ['/sair "Goblin"','Tira o inimigo do duelo. Também sai sozinho quando a vida chega a zero.'],
 ['/sair todos','Encerra o duelo inteiro.']])
 +g('🗣️ Vários personagens',[
